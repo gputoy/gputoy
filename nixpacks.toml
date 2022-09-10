@@ -1,5 +1,19 @@
 [phases.setup]
-nixPkgs = ['nodejs', 'cargo']
+nixPkgs = ['nodejs', 'rustup', 'wasm-pack', 'wasm-bindgen-cli', 'openssl']
+
+
+[phases.install]
+cmds = ['rustup default stable']
+aptPkgs = ['pkg-config', 'libssl-dev', 'build-essential']
 
 [phases.build]
-cmds = ['cargo build']
+dependsOn = ['install']
+cmds = [
+  'wasm-pack build ./gpu-wasm/ --out-dir ../pkg --target web --mode no-install',
+  'cd front && npm install',
+  'cd front && npm run build',
+  'echo {\"type\": \"module\"} >> package.json',
+]
+
+[start]
+cmd = 'node dist/index.js'
