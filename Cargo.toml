@@ -1,0 +1,7 @@
+[workspace]
+members = ["gpu-core", "gpu-naga", "gpu-types", "gpu-wasm"]
+
+[profile.release]
+lto = true
+# optimize for size
+opt-level = 's'

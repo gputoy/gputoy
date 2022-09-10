@@ -1,0 +1,11 @@
+[package]
+name = "gpu-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# local dependencies
+gpu-types = { path = "../gpu-types" }
+gpu-naga = { path = "../gpu-naga" }
+
+lazy_static = "1.4.0"

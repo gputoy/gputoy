@@ -1,0 +1,12 @@
+[package]
+name = "gpu-naga"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# local dependencies
+gpu-types = { path = "../gpu-types/" }
+
+[dependencies.naga]
+version = "0.9.0"
+features = ["glsl-in", "wgsl-in", "wgsl-out", "serde", "serialize"]
