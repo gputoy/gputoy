@@ -1,0 +1,61 @@
+# ----------------- Basic tasks -------------------
+[tasks.fmt]
+command = "cargo"
+args = ["fmt", "--all"]
+
+[tasks.clippy]
+command = "cargo"
+args = ["clippy"]
+
+[tasks.clean]
+clear = true
+workspace = false
+description = "Cleans wasm build package"
+script = """
+  rm -rf ./front/pkg
+"""
+
+[tasks.deep-clean]
+workspace = false
+description = "Cleans all build artifacts"
+script = "rm -rf ./dist ./target ./front/pkg"
+
+# ----------------- Wasm build -------------------
+[tasks.wasm-dev]
+condition = { profiles = ["development"] }
+description = "Generate wasm package"
+script = """\
+  RUSTFLAGS=--cfg=web_sys_unstable_apis \
+  wasm-pack build ./gpu-wasm --out-dir ../front/pkg  --target web --mode no-install --dev\
+"""
+
+[tasks.wasm-prod]
+condition = { profiles = ["production"] }
+description = "Generate wasm package (release)"
+script = """\
+  RUSTFLAGS=--cfg=web_sys_unstable_apis \
+  wasm-pack build ./gpu-wasm --out-dir ../front/pkg  --target web --mode no-install\
+"""
+
+[tasks.build-wasm]
+description = "Building .wasm from gpu-wasm and outputting compiled module to front/pgk"
+workspace = false
+clear = true
+dependencies = ["clean", "wasm-dev", "wasm-prod"]
+
+
+# ----------------- Runners -------------------
+[tasks.dev]
+description = "Building and running sveltekit server"
+workspace = false
+script = ["cd front", "npm run build", "node ../dist/index.js"]
+dependencies = ["build-wasm"]
+
+# ----------------- Env -------------------
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+
+[env.dev]
+
+
+[env.prod]

@@ -7,13 +7,12 @@ cmds = ['rustup default stable']
 aptPkgs = ['pkg-config', 'libssl-dev', 'build-essential']
 
 [phases.build]
+cmds = ["""\
+  RUSTFLAGS=--cfg=web_sys_unstable_apis \
+  wasm-pack build ./gpu-wasm/ --out-dir ../front/pkg \
+  --target web --mode no-install --release\
+  """, 'cd front && npm install', 'cd front && npm run build']
 dependsOn = ['install']
-cmds = [
-  'wasm-pack build ./gpu-wasm/ --out-dir ../pkg --target web --mode no-install',
-  'cd front && npm install',
-  'cd front && npm run build',
-  'echo {\"type\": \"module\"} >> package.json',
-]
 
 [start]
 cmd = 'node dist/index.js'

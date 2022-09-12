@@ -14,13 +14,18 @@ gpu-core = { path = "../gpu-core" }
 
 # crates.io dependencies
 wasm-bindgen = "0.2.82"
+wasm-bindgen-futures = "0.4.32"
 js-sys = "0.3.59"
+log = "0.4.17"
+console_log = "0.2.0"
 console_error_panic_hook = "0.1.7"
 serde = { version = "1.0.144", features = ["derive"] }
 ron = "0.8.0"
 lazy_static = "1.4.0"
 serde_json = "1.0.85"
+thiserror = "1.0.4"
+
 
 [dependencies.web-sys]
-version = "0.3.59"
+version = "=0.3.58"
 features = ['console', 'Location', 'HtmlCanvasElement']

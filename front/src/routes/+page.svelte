@@ -1,5 +1,25 @@
 <script lang="ts">
 	import Counter from '$lib/Counter.svelte';
+	import { onMount } from 'svelte';
+	import init from '../../pkg/gpu_wasm.js';
+
+	onMount(() => {
+		async function __init() {
+			const wasm = await init();
+
+			let context;
+			try {
+				context = wasm.build();
+			} catch (e) {
+				console.error('context build ended with error: ', e);
+				return;
+			}
+			console.log('context created successfully, ', context);
+
+			wasm.print_context(context);
+		}
+		__init();
+	});
 </script>
 
 <svelte:head>
