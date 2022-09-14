@@ -14,13 +14,17 @@
 ```console
 cargo install cargo-make
 ```
-Compile webassembly and start svelte-kit server with:
+Build wasm module and start svelte-kit server with:
 ```console
-cargo make dev
+cargo dev
 ```
-If you need to rebuild wasm modules while svelte server is running, in a new terminal run:
+Build wasm module
 ```console
-cargo make build-wasm
+cargo build-wasm
+```
+Run backend
+```console
+cargo api
 ```
 
 ## Build image
@@ -29,7 +33,7 @@ cargo make build-wasm
  ```
 
 ```
- > nixpacks build .
+  nixpacks build .
 ````
 
 Once build finished, it should output:

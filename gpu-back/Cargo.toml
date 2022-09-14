@@ -1,0 +1,36 @@
+[package]
+name = "gpu-back"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.12.0", features = ["macros"] }
+sqlx = { version = "0.6.1", default-features = false, features = [
+  "runtime-tokio-rustls",
+  "macros",
+  "postgres",
+  "uuid",
+  "chrono",
+  "migrate",
+] }
+config = "0.13.2"
+dotenv = "0.15"
+actix-web = "4.2.1"
+# actix-rt = "2.7.0"
+actix-identity = "0.5.2"
+actix-web-httpauth = "0.8.0"
+serde = { version = "1.0.144", features = ["derive"] }
+futures = { version = "0.3.24", features = ["compat"] }
+log = "0.4.17"
+pretty_env_logger = "0.4.0"
+tracing = "0.1"
+tracing-futures = "0.2"
+tracing-log = { version = "0.1", features = ["env_logger"] }
+tracing-subscriber = "0.3.15"
+uuid = { version = "1.1.2", features = ["serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+validator = "0.16.0"
+validator_derive = "0.16.0"
+jsonwebtoken = "8.1.1"
+thiserror = "1.0.35"
+anyhow = "1.0.65"

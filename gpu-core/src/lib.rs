@@ -1,3 +1,8 @@
+// TODO: remove global cfg
+// Rust-analyzer doesn't bother analyzing any code within
+// a target_arch block
+#![cfg(target_arch = "wasm32")]
+
 use gpu_types as types;
 use thiserror::Error;
 use wasm_bindgen::prelude::*;
@@ -48,10 +53,10 @@ impl Context {
         let backend = wgpu::Backends::BROWSER_WEBGPU;
         let instance = wgpu::Instance::new(backend);
 
-        #[cfg(target_arch = "wasm32")]
         {
             use winit::platform::web::WindowExtWebSys;
             let query_string = web_sys::window().unwrap().location().search().unwrap();
+            log::info!("query_String: {query_string}");
             // On wasm, append the canvas to the document body
             web_sys::window()
                 .and_then(|win| win.document())

@@ -43,6 +43,22 @@ workspace = false
 clear = true
 dependencies = ["clean", "wasm-dev", "wasm-prod"]
 
+# ------------------- Api ---------------------
+[tasks.api-dev]
+condition = { profiles = ["development"] }
+description = "Serve backend"
+workspace = false
+script = """
+  RUST_LOG=debug cargo run --package gpu-back
+"""
+
+[tasks.api-prod]
+condition = { profiles = ["production"] }
+description = "Serve backend"
+workspace = false
+script = """
+  RUST_LOG=info cargo run --package gpu-back --release
+"""
 
 # ----------------- Runners -------------------
 [tasks.dev]
@@ -50,6 +66,24 @@ description = "Building and running sveltekit server"
 workspace = false
 script = ["cd front", "npm run build", "node ../dist/index.js"]
 dependencies = ["build-wasm"]
+
+[tasks.serve]
+description = "Serve frontend"
+workspace = false
+script = ["node ./dist/index.js"]
+
+
+[tasks.api]
+description = "Building api from gpu-back"
+workspace = false
+dependencies = ["migrate", "api-dev", "api-prod"]
+
+# ----------------- Database -----------------
+[tasks.migrate]
+description = "Migrate database with sqlx"
+workspace = false
+command = "sqlx"
+args = ["migrate", "run"]
 
 # ----------------- Env -------------------
 [env]
