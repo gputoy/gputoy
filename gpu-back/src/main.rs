@@ -25,6 +25,10 @@ async fn main() -> Result<(), Error> {
     pretty_env_logger::init();
     //tracing_log::LogTracer::init().expect("LogTracer::init");
 
+    let port = std::env::var("PORT_BACK")
+        .map(|p| p.parse::<u16>().expect("Port value invalid"))
+        .expect("Port environment variable");
+
     let pool = store::db_pool().await?;
     let pool = Arc::new(pool);
     let user_repo = Arc::new(UserRepository::new(&pool));
@@ -39,7 +43,7 @@ async fn main() -> Result<(), Error> {
             .service(crate::realm::user::sign_up)
             .service(crate::realm::user::get_test)
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
     .map_err(From::from)
