@@ -2,6 +2,7 @@ mod model;
 mod realm;
 mod store;
 
+use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::web::Data;
 use thiserror::Error;
@@ -29,6 +30,8 @@ async fn main() -> Result<(), Error> {
         .map(|p| p.parse::<u16>().expect("Port value invalid"))
         .expect("Port environment variable");
 
+    let cors_allowed = std::env::var("CORS_ALLOW").unwrap_or("http://localhost:3000".into());
+
     let pool = store::db_pool().await?;
     let pool = Arc::new(pool);
     let user_repo = Arc::new(UserRepository::new(&pool));
@@ -37,6 +40,7 @@ async fn main() -> Result<(), Error> {
 
     actix_web::HttpServer::new(move || {
         actix_web::App::new()
+            .wrap(Cors::default().allowed_origin(&cors_allowed))
             .wrap(Logger::default())
             .app_data(Data::new(pool.clone()))
             .app_data(Data::new(user_repo.clone()))

@@ -8,8 +8,10 @@ const config: UserConfig = {
 			allow: [
 				'./pkg/'
 			]
-		}
-	}
+		},
+		host: true,
+		port: 3000,
+	},
 };
 
 export default config;

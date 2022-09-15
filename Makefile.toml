@@ -64,7 +64,7 @@ script = """
 [tasks.dev]
 description = "Building and running sveltekit server"
 workspace = false
-script = ["cd front", "npm run build", "node ../dist/index.js"]
+script = ["cd front", "npm run dev -- --port 3000"]
 dependencies = ["build-wasm"]
 
 [tasks.serve]
