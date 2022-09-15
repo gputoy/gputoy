@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ['rustup', 'openssl']
+
+
+[phases.install]
+cmds = ['rustup default stable']
+aptPkgs = ['libssl-dev', 'build-essential']
+
+[phases.build]
+cmds = ['cargo build --package gpu-back --release']
+dependsOn = ['install']
+
+[start]
+cmd = './target/release/gpu-back'
