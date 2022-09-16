@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Login from '$lib/forms/Login.svelte';
+	import Signup from '$lib/forms/Signup.svelte';
 	import vars from '$lib/vars';
 	// import { onMount } from 'svelte';
 	// import init from '../../pkg/gpu_wasm.js';
@@ -32,26 +34,16 @@
 	<title>gputoy</title>
 	<meta name="description" content="Gputoy" />
 </svelte:head>
-
-<button on:click={handleClick}> click mee</button>
-
-<form class="form" action="http://localhost:8080/signup">
-	<input type="email" name="email" placeholder="Email" autocomplete="email" />
-	<input type="text" name="username" placeholder="Username" autocomplete="username" />
-	<input type="password" name="password" placeholder="Password" autocomplete="new-password" />
-	<input type="submit" />
-</form>
+<div id="main">
+	<Signup />
+	<Login />
+</div>
 
 <style>
-	.form {
-		padding: 1rem;
-		border: 1px red solid;
+	#main {
 		display: flex;
-		flex-direction: column;
-		max-width: 12rem;
-		gap: 1rem;
-	}
-	input {
-		border: 3px blue solid;
+		flex-direction: row;
+		justify-content: center;
+		gap: 2rem;
 	}
 </style>

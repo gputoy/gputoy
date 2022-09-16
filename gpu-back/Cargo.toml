@@ -17,9 +17,8 @@ config = "0.13.2"
 dotenv = "0.15"
 actix-web = "4.2.1"
 actix-cors = "0.6.2"
-# actix-rt = "2.7.0"
+actix-session = { version = "0.7.2", features = ["redis-rs-session"] }
 actix-identity = "0.5.2"
-actix-web-httpauth = "0.8.0"
 serde = { version = "1.0.144", features = ["derive"] }
 futures = { version = "0.3.24", features = ["compat"] }
 log = "0.4.17"

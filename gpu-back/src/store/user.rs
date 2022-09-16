@@ -27,6 +27,20 @@ impl UserRepository {
         .await
         .map_err(From::from)
     }
+
+    pub async fn find_by_username(&self, username: &String) -> Result<User, Error> {
+        sqlx::query_as!(User, "SELECT * FROM users WHERE username = $1", username)
+            .fetch_one(&*self.pool)
+            .await
+            .map_err(From::from)
+    }
+
+    pub async fn find_by_email(&self, email: &String) -> Result<User, Error> {
+        sqlx::query_as!(User, "SELECT * FROM users WHERE email = $1", email)
+            .fetch_one(&*self.pool)
+            .await
+            .map_err(From::from)
+    }
 }
 
 // impl FromRequest for UserRepository {

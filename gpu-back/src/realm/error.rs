@@ -3,14 +3,19 @@ use std::fmt::Display;
 use actix_web::{http::StatusCode, HttpResponse, ResponseError};
 use serde::Serialize;
 use thiserror::Error;
+use validator::{ValidationError, ValidationErrors};
 
 #[allow(dead_code)]
 #[derive(Debug, Error)]
 pub enum ApiErrorType {
     #[error("Requested resource not found.")]
     NotFound,
-    #[error("Requested resource not found.")]
+    #[error("Internal server error.")]
     InternalServerError,
+    #[error("Invalid arguments")]
+    InvalidArguments,
+    #[error("Unauthorized")]
+    Unauthorized,
 }
 
 #[derive(Debug)]
@@ -27,6 +32,16 @@ impl Display for ApiError {
                 .as_ref()
                 .unwrap_or(&self.error_type.to_string()),
         )
+    }
+}
+
+impl From<ValidationErrors> for ApiError {
+    fn from(_: ValidationErrors) -> Self {
+        (
+            "Validation failed for the following inputs: ",
+            ApiErrorType::InvalidArguments,
+        )
+            .into()
     }
 }
 
@@ -77,6 +92,8 @@ impl ResponseError for ApiError {
         match self.error_type {
             ApiErrorType::NotFound => StatusCode::NOT_FOUND,
             ApiErrorType::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiErrorType::InvalidArguments => StatusCode::BAD_REQUEST,
+            ApiErrorType::Unauthorized => StatusCode::UNAUTHORIZED,
         }
     }
 }
