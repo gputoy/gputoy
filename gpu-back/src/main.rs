@@ -60,13 +60,15 @@ async fn main() -> Result<(), Error> {
             .wrap(
                 Cors::default()
                     .allowed_origin(&cors_allowed)
-                    .supports_credentials(),
+                    .supports_credentials()
+                    .expose_any_header(),
             )
             .app_data(Data::new(pool.clone()))
             .app_data(Data::new(user_repo.clone()))
             .service(crate::realm::user::sign_up)
             .service(crate::realm::user::login)
-            .service(crate::realm::user::get_test)
+            .service(crate::realm::user::user_info)
+            .service(crate::realm::user::logout)
     })
     .bind(("0.0.0.0", port))?
     .run()

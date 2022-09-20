@@ -60,10 +60,13 @@ impl Context {
             // On wasm, append the canvas to the document body
             web_sys::window()
                 .and_then(|win| win.document())
-                .and_then(|doc| doc.body())
-                .and_then(|body| {
-                    body.append_child(&web_sys::Element::from(window.canvas()))
-                        .ok()
+                .and_then(|doc| doc.get_element_by_id("canvas-root"))
+                .and_then(|root| {
+                    let element = web_sys::Element::from(window.canvas());
+                    element.set_id("canvas");
+                    element.set_attribute("width", "");
+                    element.set_attribute("height", "");
+                    root.append_child(&element).ok()
                 })
                 .expect("couldn't append canvas to document body");
         }
@@ -85,7 +88,7 @@ impl Context {
                     log::info!("Creating OffscreenCanvasSetup");
 
                     let offscreen_canvas =
-                        OffscreenCanvas::new(1024, 768).expect("couldn't create OffscreenCanvas");
+                        OffscreenCanvas::new(500, 500).expect("couldn't create OffscreenCanvas");
 
                     let bitmap_renderer = window
                         .canvas()
@@ -107,18 +110,19 @@ impl Context {
         let surface = unsafe { instance.create_surface(&window) };
         #[cfg(target_arch = "wasm32")]
         let surface = if let Some(offscreen) = offscreen_canvas_setup {
+            log::info!("Creating from offscreen");
             instance.create_surface_from_offscreen_canvas(&offscreen.offscreen_canvas)
         } else {
+            log::info!("Creating from on-screen");
             unsafe { instance.create_surface(&window) }
         };
         log::info!("Initializing the surface...");
 
         let size = window.inner_size();
 
-        let adapter =
-            wgpu::util::initialize_adapter_from_env_or_default(&instance, backend, Some(&surface))
-                .await
-                .ok_or(Error::NoAdapter)?;
+        let adapter = wgpu::util::initialize_adapter_from_env_or_default(&instance, backend, None)
+            .await
+            .ok_or(Error::NoAdapter)?;
 
         let features = adapter.features();
         log::info!("Adapter features: {features:?}");

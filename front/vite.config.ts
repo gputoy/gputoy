@@ -2,6 +2,9 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import type { UserConfig } from 'vite';
 
 const config: UserConfig = {
+	optimizeDeps: {
+		exclude: ['svelte-navigator']
+	},
 	plugins: [sveltekit()],
 	server: {
 		fs: {

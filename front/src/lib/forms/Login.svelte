@@ -1,5 +1,7 @@
 <script lang="ts">
-	import vars from '$lib/vars';
+	import { login } from '../../stores/auth';
+
+	let isOpen: boolean;
 	let username_or_email: string = '';
 	let password: string = '';
 	let invalidIdentifier = false;
@@ -18,25 +20,7 @@
 		if (isIdentifierInvalid(username_or_email)) invalidIdentifier = true;
 		if (isPasswordInvalid(password)) invalidPassword = true;
 		if (invalidIdentifier || invalidPassword) return;
-		const response = await fetch(vars.API_PATH + 'login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			},
-			body: new URLSearchParams({
-				username_or_email,
-				password
-			}),
-			credentials: 'include'
-		});
-		const json = await response.text();
-		// unauthorized
-		if (response.status == 401) {
-			unauthorized = true;
-			return;
-		}
-		console.log('Response: ', json);
-		//window.location = '/profile';
+		const response = await login(username_or_email, password);
 	}
 
 	function isIdentifierInvalid(username: string): boolean {
@@ -50,9 +34,10 @@
 <form on:submit|preventDefault={onSubmit} class="form" action="#" method="post">
 	<span><strong>Log in</strong> to gputoy</span>
 	<input
+		id="login-focus"
 		type="text"
 		name="username"
-		placeholder="Username/email"
+		placeholder="Username"
 		autocomplete="username"
 		bind:value={username_or_email}
 	/>
@@ -71,7 +56,6 @@
 	{/if}
 	<div>
 		<button type="submit"> Log in </button>
-		<button>Forgot password</button>
 	</div>
 
 	{#if unauthorized}
@@ -80,27 +64,30 @@
 </form>
 
 <style>
-	* {
-		border: none;
-		border-radius: 4px;
+	span {
+		font-size: var(--lg);
 	}
+
 	.form {
+		/* border-radius: 31px;
+		background: #d8dfe4;
+		box-shadow: 8px 8px 43px #b8bec2, -8px -8px 43px #f8ffff; */
 		background-color: var(--primary-color);
-		padding: 12px;
+		border: var(--border-primary-size) solid var(--border-primary);
+		padding: 2rem;
 		display: flex;
 		flex-direction: column;
 		max-width: 12rem;
-		gap: 1rem;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.219);
+		gap: 2rem;
+		box-shadow: var(--card-shadow);
 		align-items: center;
 	}
-	input {
-		padding: 12px;
-		box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.219);
-	}
 	button {
-		padding: 8px;
+		padding: 1rem;
 		font-weight: bold;
+		font-size: var(--md);
+		background-color: var(--accent-color);
+		color: var(--text-accent-color);
 	}
 	.invalid {
 		color: red;

@@ -1,4 +1,5 @@
 use chrono::NaiveDateTime;
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use uuid::Uuid;
 
@@ -15,14 +16,18 @@ use uuid::Uuid;
 //     created_at TIMESTAMP NOT NULL default current_timestamp,
 //     updated_at TIMESTAMP NOT NULL default current_timestamp
 //   );
-#[derive(Debug, FromRow)]
+#[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct User {
     pub id: Uuid,
     pub username: String,
     pub email: String,
+    #[serde(skip_serializing)]
     pub password: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub full_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bio: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<String>,
     pub email_verified: bool,
     pub active: bool,

@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use uuid::Uuid;
 
 use crate::{model::User, realm::user::NewUser};
 //use actix_web::{web::Data, FromRequest};
@@ -37,6 +38,14 @@ impl UserRepository {
 
     pub async fn find_by_email(&self, email: &String) -> Result<User, Error> {
         sqlx::query_as!(User, "SELECT * FROM users WHERE email = $1", email)
+            .fetch_one(&*self.pool)
+            .await
+            .map_err(From::from)
+    }
+
+    pub async fn find_by_id(&self, id: &String) -> Result<User, Error> {
+        let uuid = Uuid::parse_str(id)?;
+        sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1", uuid)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)

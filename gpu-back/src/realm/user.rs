@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use actix_identity::Identity;
-use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
+use actix_web::{delete, get, post, web, HttpMessage, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use validator_derive::Validate;
@@ -36,6 +36,12 @@ pub struct NewUserResponse {
     pub id: uuid::Uuid,
 }
 
+#[derive(Debug, Serialize)]
+pub struct UserInfoResponse {
+    #[serde(flatten)]
+    inner: User,
+}
+
 #[post("/signup")]
 pub async fn sign_up(
     form: web::Form<NewUser>,
@@ -54,9 +60,11 @@ pub async fn login(
     form: web::Form<Credentials>,
     user_repository: web::Data<Arc<UserRepository>>,
 ) -> ApiResult {
-    if ident.is_some() {
-        log::info!("User {form:?} already signed in");
-        return Ok(HttpResponse::Ok().body("Already signed in"));
+    log::info!("{request:?}\n{form:?}\n");
+
+    if let Some(ident) = ident {
+        log::info!("User {:?} already signed in", ident.id());
+        ident.logout();
     }
 
     let credentials = form.into_inner();
@@ -78,7 +86,21 @@ pub async fn login(
     Ok(HttpResponse::Ok().body("Logged in"))
 }
 
-#[get("/test")]
-pub async fn get_test() -> ApiResult {
-    Ok(HttpResponse::Ok().body("Hello, world!"))
+#[get("/me")]
+pub async fn user_info(
+    ident: Identity,
+    user_repositroy: web::Data<Arc<UserRepository>>,
+) -> ApiResult {
+    //let ident = ident.ok_or(ApiErrorType::Unauthorized)?;
+    let id = ident
+        .id()
+        .map_err(|_| ("Invalid indentity", ApiErrorType::InternalServerError))?;
+    let user = user_repositroy.find_by_id(&id).await?;
+    Ok(HttpResponse::Ok().json(user))
+}
+
+#[post("/logout")]
+pub async fn logout(ident: Identity) -> ApiResult {
+    ident.logout();
+    Ok(HttpResponse::Ok().finish())
 }

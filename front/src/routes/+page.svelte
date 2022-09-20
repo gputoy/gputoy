@@ -1,49 +1,68 @@
 <script lang="ts">
-	import Login from '$lib/forms/Login.svelte';
-	import Signup from '$lib/forms/Signup.svelte';
-	import vars from '$lib/vars';
-	// import { onMount } from 'svelte';
-	// import init from '../../pkg/gpu_wasm.js';
-
-	// onMount(() => {
-	// 	async function __init() {
-	// 		const wasm = await init();
-
-	// 		let context;
-	// 		try {
-	// 			context = wasm.build();
-	// 		} catch (e) {
-	// 			console.error('context build ended with error: ', e);
-	// 			return;
-	// 		}
-	// 		console.log('context created successfully, ', context);
-
-	// 		wasm.print_context(context);
-	// 	}
-	// 	__init();
-	// });
-
-	async function handleClick() {
-		let res = await fetch(vars.API_PATH + 'test', { method: 'GET' });
-		let data = await res.text();
-		console.log(data);
-	}
+	import { OnMount } from 'fractils';
+	import { fade } from 'svelte/transition';
 </script>
 
 <svelte:head>
 	<title>gputoy</title>
 	<meta name="description" content="Gputoy" />
 </svelte:head>
-<div id="main">
-	<Signup />
-	<Login />
-</div>
+
+<section>
+	<div class="hero-container">
+		<OnMount>
+			<div class="header-container">
+				<h1 in:fade={{ delay: 500, duration: 500 }}>All those gigaflops, sitting idle</h1>
+				<h1 in:fade={{ delay: 1750, duration: 500 }}>Put them to work</h1>
+			</div>
+			<p>
+				Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repudiandae nobis officiis
+				sapiente inventore voluptate a doloribus blanditiis distinctio ab laborum pariatur possimus,
+				odio commodi exercitationem sunt reiciendis. Suscipit, tempora unde!
+			</p>
+			<!-- <h1>All those gigaflops, sitting idle</h1> -->
+		</OnMount>
+	</div>
+</section>
+<section>
+	<!-- <h1 transition:fade|local={{ delay: 500, duration: 1000 }}>Here is more text to look at</h1> -->
+</section>
+<section>
+	<!-- <h1 transition:fade|local={{ delay: 500, duration: 1000 }}>Here is more text to look at</h1> -->
+</section>
 
 <style>
-	#main {
+	section {
+		flex: 0 0 auto;
+		height: 100%;
+		width: 50%;
 		display: flex;
-		flex-direction: row;
+	}
+
+	.hero-container {
+		display: flex;
 		justify-content: center;
-		gap: 2rem;
+		align-items: center;
+		flex-direction: column;
+	}
+
+	.header-container {
+		display: flex;
+		justify-content: center;
+		align-items: left;
+		flex-direction: column;
+	}
+
+	h1 {
+		line-height: 0%;
+	}
+
+	p {
+		position: relative;
+		left: 10%;
+		width: 60%;
+		text-align: end;
+		font-size: var(--xl);
+		color: var(--text-accent-color);
 	}
 </style>
