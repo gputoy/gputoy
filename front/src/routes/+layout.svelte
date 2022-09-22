@@ -2,13 +2,13 @@
 	import { page } from '$app/stores';
 	import IconButton from '$lib/buttons/IconButton.svelte';
 	import NavItem from '$lib/buttons/NavItem.svelte';
+	import UiThemeButton from '$lib/buttons/UiThemeButton.svelte';
 	import UserModal from '$lib/modal/UserModal.svelte';
 	import { onMount } from 'svelte';
-	import FaRegMoon from 'svelte-icons/fa/FaRegMoon.svelte';
-	import FaRegSun from 'svelte-icons/fa/FaRegSun.svelte';
 	import FaUserCircle from 'svelte-icons/fa/FaUserCircle.svelte';
+	import GoRepoForked from 'svelte-icons/go/GoRepoForked.svelte';
 	import '../app.css';
-	import { getSession } from '../stores/auth';
+	import { getSession, user } from '../stores/auth';
 	import '../theme.css';
 	$: {
 		console.log('Route id: ', $page.routeId);
@@ -19,10 +19,6 @@
 	onMount(getSession);
 
 	$: showUserModal = false;
-	function onToggleNightMode() {
-		window.document.body.classList.toggle('dark-mode');
-		isNightMode = !isNightMode;
-	}
 
 	function onToggleUserModal() {
 		showUserModal = !showUserModal;
@@ -43,16 +39,20 @@
 		</ul>
 
 		<div>
-			<IconButton on:click={onToggleNightMode} class="icon-button">
-				{#if isNightMode}
-					<FaRegSun />
-				{:else}
-					<FaRegMoon />
-				{/if}
+			<IconButton on:click={onToggleUserModal} text="Fork">
+				<GoRepoForked width={12} height={12} />
 			</IconButton>
-			<IconButton on:click={onToggleUserModal} class="icon-button">
-				<FaUserCircle />
-			</IconButton>
+			<UiThemeButton />
+
+			{#if $user}
+				<IconButton on:click={onToggleUserModal} text={$user.fullname ?? $user.username}>
+					<FaUserCircle />
+				</IconButton>
+			{:else}
+				<IconButton on:click={onToggleUserModal} text="Sign in">
+					<FaUserCircle />
+				</IconButton>
+			{/if}
 		</div>
 	</nav>
 </header>
@@ -76,11 +76,13 @@
 		height: 100%;
 		display: flex;
 		justify-content: center;
-		margin-right: 1rem;
+		gap: 0.25rem;
+		margin-right: 0.25rem;
 		align-items: center;
 	}
 
 	header {
+		z-index: 2;
 		flex: 0 0 auto;
 		border-bottom: var(--border-primary) var(--border-primary-size) solid;
 		height: var(--navbar-height);
@@ -96,7 +98,6 @@
 	#link-container {
 		display: flex;
 		flex-direction: row;
-		height: 100%;
 		gap: 1rem;
 		margin: 0rem;
 		margin-left: 1rem;

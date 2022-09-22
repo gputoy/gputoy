@@ -6,42 +6,29 @@
 </script>
 
 <div class={current ? 'current' : ''}>
-	<div class="pad" />
 	<a href={route ?? '/'} class={aClass}>
 		{title}
 	</a>
 </div>
 
 <style>
-	.pad {
-		height: 5px;
-		width: 100%;
-		border: none;
-	}
 	div {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
 		/* font-family: var(--font-body); */
 		font-size: var(--sm);
-		border-bottom: 1px solid var(--text-color);
-		width: fit-content;
 		height: 100%;
 		cursor: pointer;
 		transition: background-color 0.1s ease;
 	}
 
 	a:hover {
-		background-color: var(--glass-med);
+		color: var(--text-accent-color);
 	}
 
 	a {
-		align-self: center;
 		color: inherit;
 		text-decoration: none;
 		width: 100%;
-		padding: 0.3rem;
+		padding: 3px;
 		border-radius: 4px;
 	}
 
@@ -50,8 +37,8 @@
 	}
 
 	.current > a {
-		font-weight: 600;
 		background-color: var(--secondary-color);
+		border: 1px solid var(--border-secondary);
 	}
 
 	.current:hover {

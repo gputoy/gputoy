@@ -42,6 +42,7 @@
 
 <style>
 	.modal-frame {
+		z-index: 10;
 		position: absolute;
 		top: 50%;
 		left: 50%;

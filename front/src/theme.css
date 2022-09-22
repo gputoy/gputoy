@@ -1,4 +1,4 @@
-body.dark-mode {
+body.dark-theme {
   --font-heading: 'Raleway', monospace;
   --font-body: 'Inter', sans-serif;
   --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
@@ -31,6 +31,10 @@ body.dark-mode {
   --border-secondary: rgba(255, 255, 255, 0.164);
   --border-primary-size: 1px;
 
+  --icon-sm: 16px;
+  --icon-md: 24px;
+  --icon-lg: 32px;
+
   --xs: 0.75rem;
   --sm: 0.875rem;
   --md: 1rem;
@@ -49,15 +53,17 @@ body.dark-mode {
 }
 
 body {
+
   --font-heading: 'Raleway', monospace;
   --font-body: 'Inter', sans-serif;
   --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
+
   --pure-bg: #ffffff;
-  --nav-color: var(--primary-color);
-  --primary-color: #eeeeee;
-  --secondary-color: #e4e4e4;
+  --primary-color: #f5f5f5;
+  --secondary-color: #e7e7e7;
   --tertiary-color: #edf0f8;
+
   --accent-color: #5b87e6;
   --heading-color: rgba(0, 0, 0, 0.7);
 
@@ -67,19 +73,24 @@ body {
 
   --navbar-height: 40px;
 
-  --text-color: rgb(94, 94, 94);
-  --text-accent-color: #5e5e5f;
+  --nav-color: var(--secondary-color);
+  --text-color: rgb(77, 77, 77);
+  --text-accent-color: #888888;
   --text-important: rgb(75, 75, 75);
 
   --glass-low: rgba(0, 0, 0, 0.1);
-  --glass-med: rgba(0, 0, 0, 0.2);
+  --glass-med: rgba(0, 0, 0, 0.144);
   --glass-high: rgba(0, 0, 0, 0.4);
 
   --input-color: rgba(17, 17, 17, 0.034);
 
-  --border-primary: rgba(0, 0, 0, 0.4);
-  --border-secondary: rgba(0, 0, 0, 0.2);
+  --border-primary: rgb(99, 99, 99);
+  --border-secondary: rgb(100, 100, 100);
   --border-primary-size: 1px;
+
+  --icon-sm: 16px;
+  --icon-md: 24px;
+  --icon-lg: 32px;
 
   --xs: 0.75rem;
   --sm: 0.875rem;
