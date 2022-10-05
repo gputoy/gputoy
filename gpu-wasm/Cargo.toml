@@ -8,7 +8,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 # local dependencies
-gpu-types = { path = "../gpu-types" }
 gpu-naga = { path = "../gpu-naga" }
 gpu-core = { path = "../gpu-core" }
 

@@ -4,9 +4,9 @@ use error::Error;
 use sqlx::{postgres::PgPoolOptions, PgPool};
 
 pub mod error;
+pub mod model;
+pub mod project;
 pub mod user;
-// pub mod owner;
-// pub mod pet;
 
 const DB_POOL_MAX_OPEN: u32 = 32;
 const DB_POOL_TIMEOUT_SECONDS: u64 = 15;

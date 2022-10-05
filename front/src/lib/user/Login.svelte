@@ -64,8 +64,13 @@
 </form>
 
 <style>
+	strong {
+		color: var(--text-important);
+	}
 	span {
 		font-size: var(--lg);
+		color: var(--text-accent-color);
+		font-family: var(--font-heading);
 	}
 
 	.form {
@@ -74,7 +79,7 @@
 		box-shadow: 8px 8px 43px #b8bec2, -8px -8px 43px #f8ffff; */
 		background-color: var(--primary-color);
 		border: var(--border-primary-size) solid var(--border-primary);
-		padding: 2rem;
+		padding: 1rem;
 		display: flex;
 		flex-direction: column;
 		max-width: 12rem;

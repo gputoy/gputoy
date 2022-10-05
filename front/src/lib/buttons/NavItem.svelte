@@ -21,24 +21,24 @@
 	}
 
 	a:hover {
-		color: var(--text-accent-color);
+		color: inherit;
 	}
 
 	a {
-		color: inherit;
+		color: var(--text-accent-color);
 		text-decoration: none;
+		font-weight: bolder;
 		width: 100%;
-		padding: 3px;
+		padding: 3px 5px;
 		border-radius: 4px;
 	}
-
-	.current {
-		border-color: var(--accent-color);
-	}
-
 	.current > a {
-		background-color: var(--secondary-color);
-		border: 1px solid var(--border-secondary);
+		/* background-color: var(--secondary-color); */
+		background-color: var(--glass-low);
+		outline: 1px solid var(--border-secondary);
+		color: var(--accent-color);
+
+		font-weight: black;
 	}
 
 	.current:hover {

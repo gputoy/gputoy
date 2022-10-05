@@ -1,12 +1,19 @@
 <script lang="ts">
-	// import { init } from '$lib/context';
-	import Editor from '$lib/editor/Editor.svelte';
+	import { init, stop } from '$lib/context';
+	import ControlBar from '$lib/editor/ControlBar.svelte';
+	import Editor from '$lib/editor/monaco/Editor.svelte';
 	import ProjectPane from '$lib/editor/panes/ProjectPane.svelte';
+	import Viewport from '$lib/editor/Viewport.svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { Pane, Splitpanes } from 'svelte-splitpanes';
-	// onMount(init);
+
+	let clientHeight: number;
+
+	onMount(init);
+	onDestroy(stop);
 </script>
 
-<div class="root">
+<div class="root" bind:clientHeight>
 	<Splitpanes style="height: 100%;" theme="no-splitter">
 		<!-- ---------- project pane ------------- -->
 		<Pane size={10} snapSize={10} maxSize={10}>
@@ -18,11 +25,13 @@
 				<Pane>
 					<Splitpanes horizontal theme="modern-theme">
 						<!-- ---------- viewport  ------------- -->
-						<Pane class="canvas-container">
-							<div id="canvas-root" />
+						<Pane size={60}>
+							<Viewport />
 						</Pane>
-						<!-- ---------- other stuff   ------------- -->
-						<Pane>Other stuff</Pane>
+						<!-- ---------- control bar   ------------- -->
+						<Pane size={40} minSize={(48 / clientHeight) * 100} snapSize={5}>
+							<ControlBar />
+						</Pane>
 					</Splitpanes>
 				</Pane>
 				<!-- ---------- editor   ------------- -->
@@ -35,67 +44,10 @@
 </div>
 
 <style global lang="scss">
-	.canvas-container {
-		padding: 2px;
-	}
-
-	#canvas-root {
-		height: 100%;
-		width: calc(100% - 4px);
-		background-color: black;
-	}
 	.root {
 		height: 100%;
 		width: 100%;
 	}
-
-	// .splitpanes.modern-theme {
-	// 	.splitpanes__pane {
-	// 		background-color: var(--pure-bg);
-	// 	}
-	// 	.splitpanes__splitter {
-	// 		background-color: var(--border-primary);
-	// 		position: relative;
-
-	// 		&:hover {
-	// 			background-color: var(--border-primary);
-	// 		}
-
-	// 		&:before {
-	// 			content: '';
-	// 			position: absolute;
-	// 			left: 0;
-	// 			top: 0;
-	// 			transition: opacity 0.4s;
-	// 			background-color: var(--border-primay);
-	// 			opacity: 0;
-	// 			z-index: 1;
-	// 		}
-	// 		&:hover:before {
-	// 			opacity: 1;
-	// 		}
-	// 		&.splitpanes__splitter__active {
-	// 			z-index: 2; /* Fix an issue of overlap fighting with a near hovered splitter */
-	// 		}
-	// 		// &:first-child {
-	// 		// 	cursor: auto;
-	// 		// }
-	// 	}
-	// }
-	// .modern-theme {
-	// 	&.splitpanes--vertical > .splitpanes__splitter:before {
-	// 		left: -3px;
-	// 		right: -3px;
-	// 		height: 100%;
-	// 		cursor: col-resize;
-	// 	}
-	// 	&.splitpanes--horizontal > .splitpanes__splitter:before {
-	// 		top: -3px;
-	// 		bottom: -3px;
-	// 		width: 100%;
-	// 		cursor: row-resize;
-	// 	}
-	// }
 
 	.splitpanes.modern-theme {
 		.splitpanes__pane {

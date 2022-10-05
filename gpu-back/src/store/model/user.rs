@@ -17,7 +17,7 @@ use uuid::Uuid;
 //     updated_at TIMESTAMP NOT NULL default current_timestamp
 //   );
 #[derive(Debug, FromRow, Serialize, Deserialize)]
-pub struct User {
+pub struct UserRow {
     pub id: Uuid,
     pub username: String,
     pub email: String,

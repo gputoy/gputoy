@@ -1,24 +1,27 @@
+import { browser } from '$app/environment';
 import { Context, default as init_module } from '../../pkg/gpu_wasm';
 
-var context: Context;
-await init();
+var context: Context | undefined = undefined;
 
 export async function init() {
-  const wasm = await init_module();
-  const context = wasm.build();
-  console.log("js:context:init ", context);
-
+  if (!browser || !("gpu" in navigator)) return;
+  await init_module();
+  context = await new Context();
+  console.log("js:context:init", context);
+  context.debug();
 }
 
 export async function reset() {
+  if (!browser || !("gpu" in navigator)) return;
   console.log("js:context:reset");
-  // drop all gpu resources
-  context.free();
+  context?.free();
   await init()
 }
 
 export async function stop() {
+  if (!browser || !("gpu" in navigator)) return;
   console.log("js:context:stop");
-  // drop all gpu resources
-  context.free();
+  context?.free();
 }
+
+export default context;

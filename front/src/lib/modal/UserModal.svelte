@@ -1,5 +1,6 @@
 <script lang="ts">
-	import Login from '$lib/forms/Login.svelte';
+	import Login from '$lib/user/Login.svelte';
+	import UserDashboard from '$lib/user/UserDashboard.svelte';
 	import { fade } from 'svelte/transition';
 	import { user } from '../../stores/auth';
 	export let show: boolean = false;
@@ -14,7 +15,8 @@
 		duration: 50
 	};
 
-	function onHandleBlur(event) {
+	function onHandleBlur(event: any) {
+		console.log('blur ran for ', event);
 		if (!event) return;
 		if (!event.currentTarget.contains(event.relatedTarget) && onHide) {
 			onHide();
@@ -22,23 +24,20 @@
 	}
 </script>
 
-{#if show}
-	<div
-		class="modal-frame"
-		on:blur|preventDefault|capture={onHandleBlur}
-		in:fade={_fade}
-		out:fade={_fade}
-		bind:this={ref}
-	>
-		{#if $user}
-			<div>
-				{JSON.stringify($user, null, 4)}
-			</div>
-		{:else}
-			<Login />
-		{/if}
-	</div>
-{/if}
+<dialog
+	class="modal-frame"
+	in:fade={_fade}
+	out:fade={_fade}
+	bind:this={ref}
+	open={show}
+	on:blur|capture={onHandleBlur}
+>
+	{#if $user}
+		<UserDashboard />
+	{:else}
+		<Login />
+	{/if}
+</dialog>
 
 <style>
 	.modal-frame {
@@ -49,5 +48,7 @@
 		translate: -50% -50%;
 		height: fit-content;
 		width: fit-content;
+		border: none;
+		background-color: transparent;
 	}
 </style>

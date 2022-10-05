@@ -1355,10 +1355,12 @@ dependencies = [
  "actix-session",
  "actix-web",
  "anyhow",
+ "base64",
  "chrono",
  "config",
  "dotenv",
  "futures 0.3.24",
+ "gpu-core",
  "jsonwebtoken",
  "log",
  "pretty_env_logger",
@@ -1384,10 +1386,12 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "gpu-naga",
- "gpu-types",
  "js-sys",
  "log",
+ "serde",
+ "serde_json",
  "thiserror",
+ "uuid",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -1420,16 +1424,11 @@ dependencies = [
 name = "gpu-naga"
 version = "0.1.0"
 dependencies = [
- "gpu-types",
  "naga",
 ]
 
 [[package]]
 name = "gpu-tauri"
-version = "0.1.0"
-
-[[package]]
-name = "gpu-types"
 version = "0.1.0"
 
 [[package]]
@@ -1440,7 +1439,6 @@ dependencies = [
  "console_log",
  "gpu-core",
  "gpu-naga",
- "gpu-types",
  "js-sys",
  "lazy_static",
  "log",
@@ -2917,6 +2915,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
+ "serde_json",
  "sha2",
  "sqlx-core",
  "sqlx-rt",

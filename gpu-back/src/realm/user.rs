@@ -1,18 +1,20 @@
 use std::sync::Arc;
 
 use actix_identity::Identity;
-use actix_web::{delete, get, post, web, HttpMessage, HttpRequest, HttpResponse};
+use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use validator_derive::Validate;
 
 use crate::{
-    model::User,
     realm::{
         error::{ApiError, ApiErrorType},
         ApiResult,
     },
+    store::model::UserRow,
     store::user::UserRepository,
+    util::to_base64,
 };
 
 #[derive(Debug, Validate, Deserialize)]
@@ -38,8 +40,41 @@ pub struct NewUserResponse {
 
 #[derive(Debug, Serialize)]
 pub struct UserInfoResponse {
-    #[serde(flatten)]
-    inner: User,
+    pub id: String,
+    pub username: String,
+    pub email: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub full_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bio: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub image: Option<String>,
+    pub email_verified: bool,
+    pub active: bool,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+}
+
+impl From<UserRow> for UserInfoResponse {
+    fn from(user: UserRow) -> Self {
+        Self {
+            id: to_base64(&user.id),
+            username: user.username,
+            email: user.email,
+            full_name: user.full_name,
+            bio: user.bio,
+            image: user.image,
+            email_verified: user.email_verified,
+            active: user.active,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct LoginResult {
+    user_id: String,
 }
 
 #[post("/signup")]
@@ -75,7 +110,7 @@ pub async fn login(
     );
 
     let user = match res {
-        (Ok(user), _) => Ok::<User, ApiError>(user),
+        (Ok(user), _) => Ok::<UserRow, ApiError>(user),
         (_, Ok(user)) => Ok(user),
         _ => Err((ApiErrorType::Unauthorized).into()),
     }?;
@@ -83,7 +118,9 @@ pub async fn login(
     Identity::login(&request.extensions(), user.id.to_string())
         .map_err(|err| ApiError::from((err.to_string(), ApiErrorType::InternalServerError)))?;
 
-    Ok(HttpResponse::Ok().body("Logged in"))
+    Ok(HttpResponse::Ok().json(LoginResult {
+        user_id: to_base64(&user.id),
+    }))
 }
 
 #[get("/me")]
@@ -91,12 +128,11 @@ pub async fn user_info(
     ident: Identity,
     user_repositroy: web::Data<Arc<UserRepository>>,
 ) -> ApiResult {
-    //let ident = ident.ok_or(ApiErrorType::Unauthorized)?;
     let id = ident
         .id()
         .map_err(|_| ("Invalid indentity", ApiErrorType::InternalServerError))?;
     let user = user_repositroy.find_by_id(&id).await?;
-    Ok(HttpResponse::Ok().json(user))
+    Ok(HttpResponse::Ok().json(UserInfoResponse::from(user)))
 }
 
 #[post("/logout")]

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::{model::User, realm::user::NewUser};
+use crate::{realm::user::NewUser, store::model::UserRow};
 //use actix_web::{web::Data, FromRequest};
 use sqlx::PgPool;
 
@@ -16,9 +16,9 @@ impl UserRepository {
         Self { pool: pool.clone() }
     }
 
-    pub async fn create(&self, new_user: NewUser) -> Result<User, Error> {
+    pub async fn create(&self, new_user: NewUser) -> Result<UserRow, Error> {
         sqlx::query_as!(
-            User,
+            UserRow,
             "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *",
             new_user.username,
             new_user.email,
@@ -29,23 +29,23 @@ impl UserRepository {
         .map_err(From::from)
     }
 
-    pub async fn find_by_username(&self, username: &String) -> Result<User, Error> {
-        sqlx::query_as!(User, "SELECT * FROM users WHERE username = $1", username)
+    pub async fn find_by_username(&self, username: &String) -> Result<UserRow, Error> {
+        sqlx::query_as!(UserRow, "SELECT * FROM users WHERE username = $1", username)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)
     }
 
-    pub async fn find_by_email(&self, email: &String) -> Result<User, Error> {
-        sqlx::query_as!(User, "SELECT * FROM users WHERE email = $1", email)
+    pub async fn find_by_email(&self, email: &String) -> Result<UserRow, Error> {
+        sqlx::query_as!(UserRow, "SELECT * FROM users WHERE email = $1", email)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)
     }
 
-    pub async fn find_by_id(&self, id: &String) -> Result<User, Error> {
+    pub async fn find_by_id(&self, id: &String) -> Result<UserRow, Error> {
         let uuid = Uuid::parse_str(id)?;
-        sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1", uuid)
+        sqlx::query_as!(UserRow, "SELECT * FROM users WHERE id = $1", uuid)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)

@@ -8,9 +8,9 @@ target = "wasm-32-unknown-unknown"
 
 [dependencies]
 # local dependencies
-gpu-types = { path = "../gpu-types" }
 gpu-naga = { path = "../gpu-naga" }
-
+serde = { version = "1.0.144", features = ["derive"] }
+serde_json = "1.0.85"
 winit = { version = "0.27.2" }
 bytemuck = { version = "1.12.1", features = ["derive"] }
 cgmath = " 0.18.0"
@@ -23,6 +23,7 @@ wgpu = { version = "0.13.1" }
 wee_alloc = { version = "0.4.5", optional = true }
 log = "0.4.17"
 thiserror = "1.0.4"
+uuid = { version = "1.1.2", features = ["serde"] }
 
 web-sys = { version = "0.3.58", features = [
   "Document",

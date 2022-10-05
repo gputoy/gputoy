@@ -6,9 +6,9 @@ body.dark-theme {
   --pure-bg: #000000;
   --nav-color: var(--primary-color);
   --primary-color: #0e0e0e;
-  --secondary-color: #141414;
-  --tertiary-color: #edf0f8;
-  --accent-color: #5b87e6;
+  --secondary-color: #0f0f0f;
+  --tertiary-color: #070707;
+  --accent-color: #5c8aee;
   --heading-color: rgba(0, 0, 0, 0.7);
 
   --background-without-opacity: rgba(255, 255, 255, 0.7);
@@ -16,10 +16,10 @@ body.dark-theme {
   --column-margin-top: 4rem;
 
   --text-color: #a5a5a5;
-  --text-accent-color: #969696;
+  --text-accent-color: #868686;
   --text-important: #c7c7c7;
 
-  --navbar-height: 40px;
+  --navbar-height: 32px;
 
   --glass-low: rgba(255, 255, 255, 0.014);
   --glass-med: rgba(255, 255, 255, 0.055);
@@ -27,13 +27,17 @@ body.dark-theme {
 
   --input-color: rgba(255, 255, 255, 0.027);
 
-  --border-primary: rgba(255, 255, 255, 0.3);
-  --border-secondary: rgba(255, 255, 255, 0.164);
+  --button: rgba(255, 255, 255, 0.12);
+  --button-hovered: rgba(255, 255, 255, 0.1);
+  --button-active: rgba(0, 0, 0, 0.1);
+
+  --border-primary: rgba(255, 255, 255, 0.2);
+  --border-secondary: rgba(255, 255, 255, 0.15);
   --border-primary-size: 1px;
 
   --icon-sm: 16px;
-  --icon-md: 24px;
-  --icon-lg: 32px;
+  --icon-md: 16px;
+  --icon-lg: 24px;
 
   --xs: 0.75rem;
   --sm: 0.875rem;
@@ -52,6 +56,7 @@ body.dark-theme {
   --card-shadow: none;
 }
 
+
 body {
 
   --font-heading: 'Raleway', monospace;
@@ -59,38 +64,42 @@ body {
   --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
 
-  --pure-bg: #ffffff;
-  --primary-color: #f5f5f5;
-  --secondary-color: #e7e7e7;
-  --tertiary-color: #edf0f8;
+  --pure-bg: #e0e0e0;
+  --primary-color: #D3D3D3;
+  --secondary-color: #CACACA;
+  --tertiary-color: #cecdcd;
 
-  --accent-color: #5b87e6;
+  --accent-color: #5c8aee;
   --heading-color: rgba(0, 0, 0, 0.7);
 
   --background-without-opacity: rgba(255, 255, 255, 0.7);
   --column-width: 42rem;
   --column-margin-top: 4rem;
 
-  --navbar-height: 40px;
+  --navbar-height: 32px;
 
   --nav-color: var(--secondary-color);
-  --text-color: rgb(77, 77, 77);
-  --text-accent-color: #888888;
-  --text-important: rgb(75, 75, 75);
+  --text-color: rgb(117, 117, 117);
+  --text-accent-color: #585858;
+  --text-important: rgb(31, 31, 31);
 
   --glass-low: rgba(0, 0, 0, 0.1);
   --glass-med: rgba(0, 0, 0, 0.144);
-  --glass-high: rgba(0, 0, 0, 0.4);
+  --glass-high: rgba(0, 0, 0, 0.199);
 
   --input-color: rgba(17, 17, 17, 0.034);
 
-  --border-primary: rgb(99, 99, 99);
-  --border-secondary: rgb(100, 100, 100);
+  --button: rgba(255, 255, 255, 0.2);
+  --button-hovered: rgba(255, 255, 255, 0.1);
+  --button-active: rgba(0, 0, 0, 0.1);
+
+  --border-primary: rgb(141, 141, 141);
+  --border-secondary: rgb(179, 179, 179);
   --border-primary-size: 1px;
 
   --icon-sm: 16px;
-  --icon-md: 24px;
-  --icon-lg: 32px;
+  --icon-md: 16px;
+  --icon-lg: 24px;
 
   --xs: 0.75rem;
   --sm: 0.875rem;

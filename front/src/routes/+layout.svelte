@@ -14,8 +14,6 @@
 		console.log('Route id: ', $page.routeId);
 	}
 
-	$: isNightMode = false;
-
 	onMount(getSession);
 
 	$: showUserModal = false;
@@ -98,9 +96,9 @@
 	#link-container {
 		display: flex;
 		flex-direction: row;
-		gap: 1rem;
+		gap: 0.5rem;
 		margin: 0rem;
-		margin-left: 1rem;
+		margin-left: 0.25rem;
 	}
 	:global(*) {
 		transition: background-color 0.25s ease;
