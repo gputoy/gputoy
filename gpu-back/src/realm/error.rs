@@ -3,7 +3,7 @@ use std::fmt::Display;
 use actix_web::{http::StatusCode, HttpResponse, ResponseError};
 use serde::Serialize;
 use thiserror::Error;
-use validator::{ValidationError, ValidationErrors};
+use validator::ValidationErrors;
 
 #[allow(dead_code)]
 #[derive(Debug, Error)]

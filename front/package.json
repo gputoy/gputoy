@@ -13,20 +13,25 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.25.0",
+		"@rollup/plugin-alias": "^3.1.9",
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/adapter-node": "^1.0.0-next.89",
 		"@sveltejs/kit": "next",
 		"@types/cookie": "^0.5.1",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
+		"dotenv": "^16.0.2",
 		"eslint": "^8.16.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^4.0.0",
+		"fractils": "^3.0.2",
+		"monaco-editor": "^0.34.0",
 		"prettier": "^2.6.2",
 		"prettier-plugin-svelte": "^2.7.0",
+		"sass": "^1.54.9",
 		"svelte": "^3.46.0",
 		"svelte-check": "^2.7.1",
-		"svelte-preprocess": "^4.10.6",
+		"svelte-splitpanes": "^0.7.3",
 		"tslib": "^2.3.1",
 		"typescript": "^4.7.4",
 		"vite": "^3.1.0",
@@ -35,6 +40,9 @@
 	"type": "module",
 	"dependencies": {
 		"@fontsource/fira-mono": "^4.5.0",
-		"dotenv": "^16.0.2"
+		"@fontsource/inter": "4.5.12",
+		"@fontsource/jetbrains-mono": "4.5.10",
+		"@fontsource/raleway": "^4.5.10",
+		"svelte-icons": "^2.1.0"
 	}
 }

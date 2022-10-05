@@ -1,14 +1,8 @@
 #![cfg(target_arch = "wasm32")]
 
+use gpu_core::Context as InnerContext;
 use thiserror::Error;
-use wasm_bindgen::prelude::*;
-
-use gpu_core::Context;
-
-// #[wasm_bindgen]
-// pub fn bind_surface(canvas: &web_sys::Element) -> Result<(), JsValue> {
-//     Ok(())
-// }
+use wasm_bindgen::{prelude::*, JsValue};
 
 #[wasm_bindgen(start)]
 pub fn __init() -> Result<(), JsValue> {
@@ -33,12 +27,35 @@ impl From<Error> for JsValue {
 }
 
 #[wasm_bindgen]
-pub async fn build() -> Result<Context, JsValue> {
-    let context = Context::new().await.map_err(Error::ContextInit)?;
-    Ok(context)
+#[derive(Debug)]
+pub struct Context(InnerContext);
+
+#[wasm_bindgen]
+impl Context {
+    #[wasm_bindgen(constructor)]
+    pub async fn new() -> Result<Context, Error> {
+        let inner = InnerContext::new().await.map_err(Error::ContextInit)?;
+        Ok(Context(inner))
+    }
+
+    #[wasm_bindgen(js_name = debug)]
+    pub fn debug_to_console(&self) {
+        log::info!("{:#?}", &self);
+    }
+
+    #[wasm_bindgen]
+    pub fn resize(&self, width: i32, height: i32) {
+        log::info!("Resizing to: {} {}", width, height);
+    }
 }
 
 #[wasm_bindgen]
-pub fn print_context(context: &Context) {
-    log::trace!("Here is the context: {context:?}");
+pub enum FrameResult {
+    Placeholder,
+}
+
+impl From<FrameResult> for JsValue {
+    fn from(_: FrameResult) -> Self {
+        JsValue::from_str("Placeholder")
+    }
 }

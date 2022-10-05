@@ -1,6 +1,6 @@
-mod model;
 mod realm;
 mod store;
+mod util;
 
 use actix_cors::Cors;
 use actix_identity::IdentityMiddleware;
@@ -13,6 +13,7 @@ use thiserror::Error;
 
 use std::sync::Arc;
 
+use crate::store::project::ProjectRepository;
 use crate::store::user::UserRepository;
 //use tracing_log::LogTracer;
 
@@ -46,6 +47,7 @@ async fn main() -> Result<(), Error> {
     let pool = store::db_pool().await?;
     let pool = Arc::new(pool);
     let user_repo = Arc::new(UserRepository::new(&pool));
+    let project_repo = Arc::new(ProjectRepository::new(&pool));
 
     log::info!("Connected to database");
 
@@ -60,13 +62,20 @@ async fn main() -> Result<(), Error> {
             .wrap(
                 Cors::default()
                     .allowed_origin(&cors_allowed)
-                    .supports_credentials(),
+                    .supports_credentials()
+                    .expose_any_header(),
             )
             .app_data(Data::new(pool.clone()))
             .app_data(Data::new(user_repo.clone()))
+            .app_data(Data::new(project_repo.clone()))
             .service(crate::realm::user::sign_up)
             .service(crate::realm::user::login)
-            .service(crate::realm::user::get_test)
+            .service(crate::realm::user::user_info)
+            .service(crate::realm::user::logout)
+            .service(crate::realm::project::post_project)
+            .service(crate::realm::project::get_project)
+            .service(crate::realm::project::delete_project)
+            .service(crate::realm::project::get_user_projects)
     })
     .bind(("0.0.0.0", port))?
     .run()
