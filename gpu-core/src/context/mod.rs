@@ -1,6 +1,5 @@
 #![cfg(target_arch = "wasm32")]
 
-use gpu_types as types;
 use thiserror::Error;
 use wasm_bindgen::prelude::*;
 
