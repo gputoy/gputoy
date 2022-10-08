@@ -8,7 +8,7 @@ use sqlx::PgPool;
 
 use super::Error;
 
-const UPDATE_QUERY: &'static str = r#"
+const UPDATE_QUERY: &str = r#"
     UPDATE projects SET 
         (title, description, files, layout, config, published) =
         ($1, $2, $3, $4, $5, $6)
@@ -16,22 +16,22 @@ const UPDATE_QUERY: &'static str = r#"
     RETURNING *
 "#;
 
-const INSERT_QUERY: &'static str = r#"
+const INSERT_QUERY: &str = r#"
     Insert INTO projects 
         (author_id, title, description, files, layout, config, published)
     VALUES ($1, $2, $3, $4, $5, $6, $7) 
     RETURNING *
 "#;
 
-const FIND_BY_ID_QUERY: &'static str = r#"
+const FIND_BY_ID_QUERY: &str = r#"
     SELECT * FROM projects WHERE id = $1
 "#;
 
-const FIND_BY_USER_QUERY: &'static str = r#"
+const FIND_BY_USER_QUERY: &str = r#"
     SELECT * FROM projects WHERE author_id = $1
 "#;
 
-const DELETE_QUERY: &'static str = r#"
+const DELETE_QUERY: &str = r#"
     DELETE FROM projects WHERE id = $1
 "#;
 
@@ -61,7 +61,7 @@ impl ProjectRepository {
 
     pub async fn insert(&self, author_id: &Uuid, project: ProjectUpsert) -> Result<Project, Error> {
         let files = Json(project.files);
-        let config = project.config.map(|c| Json(c));
+        let config = project.config.map(Json);
         sqlx::query_as(INSERT_QUERY)
             .bind(author_id)
             .bind(project.title)
@@ -81,7 +81,7 @@ impl ProjectRepository {
         project: ProjectUpsert,
     ) -> Result<Project, Error> {
         let files = Json(project.files);
-        let config = project.config.map(|c| Json(c));
+        let config = project.config.map(Json);
         sqlx::query_as(UPDATE_QUERY)
             .bind(project.title)
             .bind(project.description)

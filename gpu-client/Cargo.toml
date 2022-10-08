@@ -1,5 +1,5 @@
 [package]
-name = "gpu-core"
+name = "gpu-client"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,6 +9,7 @@ target = "wasm-32-unknown-unknown"
 [dependencies]
 # local dependencies
 gpu-naga = { path = "../gpu-naga" }
+gpu-common = { path = "../gpu-common" }
 serde = { version = "1.0.144", features = ["derive"] }
 serde_json = "1.0.85"
 winit = { version = "0.27.2" }

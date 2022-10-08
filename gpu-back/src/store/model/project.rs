@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use gpu_core::project::{config::Config, Files};
+use gpu_common::{Files, ProjectConfig};
 use serde::{Deserialize, Serialize};
 use sqlx::{
     types::{Json, JsonValue},
@@ -29,21 +29,10 @@ pub struct Project {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub layout: Option<JsonValue>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub config: Option<Json<Config>>,
+    pub config: Option<Json<ProjectConfig>>,
     pub published: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub author_id: Option<Uuid>,
     pub forked_from_id: Option<Uuid>,
-}
-
-impl TryInto<gpu_core::project::Project> for Project {
-    type Error = std::convert::Infallible;
-    fn try_into(self) -> Result<gpu_core::project::Project, Self::Error> {
-        Ok(gpu_core::project::Project {
-            config: self.config.map(|s| s.0),
-            files: self.files.0,
-            layout: Some(()),
-        })
-    }
 }

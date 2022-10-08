@@ -3,7 +3,7 @@ use std::{str::FromStr, sync::Arc};
 use actix_identity::Identity;
 use actix_web::{delete, get, post, web, HttpResponse};
 use chrono::NaiveDateTime;
-use gpu_core::project::{config::Config, Files};
+use gpu_common::{Files, ProjectConfig};
 use serde::{Deserialize, Serialize};
 use sqlx::types::JsonValue;
 use uuid::Uuid;
@@ -21,7 +21,7 @@ pub struct ProjectUpsert {
     pub description: Option<String>,
     pub files: Files,
     pub layout: Option<JsonValue>,
-    pub config: Option<Config>,
+    pub config: Option<ProjectConfig>,
     pub published: bool,
 }
 
@@ -34,7 +34,7 @@ pub struct ProjectResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub layout: Option<JsonValue>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub config: Option<Config>,
+    pub config: Option<ProjectConfig>,
     pub published: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -83,7 +83,7 @@ pub async fn post_project(
             .await
             .ok();
 
-        if let Some(author_id) = current_project.map(|s| s.author_id).flatten() {
+        if let Some(author_id) = current_project.and_then(|s| s.author_id) {
             if id != author_id {
                 return Err(("Project belongs to other user", ApiErrorType::Unauthorized).into());
             }
@@ -110,7 +110,7 @@ pub async fn get_project(
         .map_err(|_| ("Project not found", ApiErrorType::NotFound))?;
 
     if !project.published
-        && project.author_id.map(|id| id.to_string()) != identity.map(|i| i.id().ok()).flatten()
+        && project.author_id.map(|id| id.to_string()) != identity.and_then(|i| i.id().ok())
     {
         Err(("Project is private", ApiErrorType::Unauthorized).into())
     } else {

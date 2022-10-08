@@ -6,5 +6,5 @@ edition = "2021"
 [dependencies]
 
 [dependencies.naga]
-version = "0.9.0"
+version = "0.10.0"
 features = ["glsl-in", "wgsl-in", "wgsl-out", "serde", "serialize"]

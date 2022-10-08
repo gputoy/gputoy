@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use gpu_core::context::Context as InnerContext;
+use gpu_client::context::Context as InnerContext;
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsValue};
 
@@ -15,7 +15,7 @@ pub fn __init() -> Result<(), JsValue> {
 #[derive(Error, Debug)]
 enum Error {
     #[error("Context init failed: {0}")]
-    ContextInit(gpu_core::context::Error),
+    ContextInit(gpu_client::context::Error),
     #[error("Could not initialize logger")]
     LoggerInit,
 }
@@ -28,13 +28,13 @@ impl From<Error> for JsValue {
 
 #[wasm_bindgen]
 #[derive(Debug)]
-pub struct Context(gpu_core::context::Context);
+pub struct Context(gpu_client::context::Context);
 
 #[wasm_bindgen]
 impl Context {
     #[wasm_bindgen(constructor)]
     pub async fn new() -> Result<Context, Error> {
-        let inner = gpu_core::context::Context::new()
+        let inner = gpu_client::context::Context::new()
             .await
             .map_err(Error::ContextInit)?;
         Ok(Context(inner))
