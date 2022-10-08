@@ -35,7 +35,7 @@ pub struct Credentials {
 
 #[derive(Debug, Serialize)]
 pub struct NewUserResponse {
-    pub id: uuid::Uuid,
+    pub id: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -85,24 +85,25 @@ pub async fn sign_up(
     let new_user = form.into_inner();
     new_user.validate()?;
     let response = user_repository.create(new_user).await?;
-    Ok(HttpResponse::Ok().json(NewUserResponse { id: response.id }))
+    let id = to_base64(&response.id);
+    Ok(HttpResponse::Ok().json(NewUserResponse { id }))
 }
 
 #[post("/login")]
 pub async fn login(
     request: HttpRequest,
     ident: Option<Identity>,
-    form: web::Form<Credentials>,
+    credentials: web::Form<Credentials>,
     user_repository: web::Data<Arc<UserRepository>>,
 ) -> ApiResult {
-    log::info!("{request:?}\n{form:?}\n");
+    log::info!("{request:?}\n{credentials:?}\n");
 
     if let Some(ident) = ident {
         log::info!("User {:?} already signed in", ident.id());
         ident.logout();
     }
 
-    let credentials = form.into_inner();
+    let credentials = credentials.into_inner();
 
     let res = tokio::join!(
         user_repository.find_by_username(&credentials.username_or_email),

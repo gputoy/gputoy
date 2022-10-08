@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::{realm::project::ProjectUpsert, store::model::Project};
+use crate::{realm::project::ProjectUpsert, store::model::ProjectRow};
 
 use sqlx::types::Json;
 use sqlx::PgPool;
@@ -49,7 +49,7 @@ impl ProjectRepository {
         author_id: &Uuid,
         decoded_project_id: Option<Uuid>,
         project: ProjectUpsert,
-    ) -> Result<Project, Error> {
+    ) -> Result<ProjectRow, Error> {
         log::info!("Upsert args: {:?}", project);
 
         if let Some(project_id) = decoded_project_id {
@@ -59,7 +59,11 @@ impl ProjectRepository {
         }
     }
 
-    pub async fn insert(&self, author_id: &Uuid, project: ProjectUpsert) -> Result<Project, Error> {
+    pub async fn insert(
+        &self,
+        author_id: &Uuid,
+        project: ProjectUpsert,
+    ) -> Result<ProjectRow, Error> {
         let files = Json(project.files);
         let config = project.config.map(Json);
         sqlx::query_as(INSERT_QUERY)
@@ -79,7 +83,7 @@ impl ProjectRepository {
         &self,
         project_id: &Uuid,
         project: ProjectUpsert,
-    ) -> Result<Project, Error> {
+    ) -> Result<ProjectRow, Error> {
         let files = Json(project.files);
         let config = project.config.map(Json);
         sqlx::query_as(UPDATE_QUERY)
@@ -95,7 +99,7 @@ impl ProjectRepository {
             .map_err(From::from)
     }
 
-    pub async fn find_by_id(&self, project_id: &Uuid) -> Result<Project, Error> {
+    pub async fn find_by_id(&self, project_id: &Uuid) -> Result<ProjectRow, Error> {
         sqlx::query_as(FIND_BY_ID_QUERY)
             .bind(project_id)
             .fetch_one(&*self.pool)
@@ -103,7 +107,7 @@ impl ProjectRepository {
             .map_err(From::from)
     }
 
-    pub async fn find_by_user(&self, user_id: &Uuid) -> Result<Vec<Project>, Error> {
+    pub async fn find_by_user(&self, user_id: &Uuid) -> Result<Vec<ProjectRow>, Error> {
         sqlx::query_as(FIND_BY_USER_QUERY)
             .bind(user_id)
             .fetch_all(&*self.pool)

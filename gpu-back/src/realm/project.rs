@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 use crate::{
     realm::{error::ApiErrorType, ApiResult},
-    store::{model::Project, project::ProjectRepository},
+    store::{model::ProjectRow, project::ProjectRepository},
     util::{from_base64, to_base64},
 };
 
@@ -26,6 +26,7 @@ pub struct ProjectUpsert {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ProjectResponse {
     pub id: String,
     pub title: String,
@@ -38,12 +39,12 @@ pub struct ProjectResponse {
     pub published: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-    pub author_id: Option<Uuid>,
-    pub forked_from_id: Option<Uuid>,
+    pub author_id: Option<String>,
+    pub forked_from_id: Option<String>,
 }
 
-impl From<Project> for ProjectResponse {
-    fn from(project: Project) -> Self {
+impl From<ProjectRow> for ProjectResponse {
+    fn from(project: ProjectRow) -> Self {
         Self {
             id: to_base64(&project.id),
             title: project.title,
@@ -54,8 +55,8 @@ impl From<Project> for ProjectResponse {
             published: project.published,
             created_at: project.created_at,
             updated_at: project.updated_at,
-            author_id: project.author_id,
-            forked_from_id: project.forked_from_id,
+            author_id: project.author_id.as_ref().map(to_base64),
+            forked_from_id: project.forked_from_id.as_ref().map(to_base64),
         }
     }
 }

@@ -21,7 +21,7 @@ use uuid::Uuid;
 //   CONSTRAINT forked_from_id FOREIGN KEY(id) REFERENCES projects(id)
 // );
 #[derive(Debug, FromRow, Serialize, Deserialize)]
-pub struct Project {
+pub struct ProjectRow {
     pub id: Uuid,
     pub title: String,
     pub description: Option<String>,
