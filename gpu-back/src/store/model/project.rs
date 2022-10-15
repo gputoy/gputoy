@@ -1,10 +1,7 @@
 use chrono::NaiveDateTime;
-use gpu_common::{Files, ProjectConfig};
+use gpu_common::{Config, Files, Layout};
 use serde::{Deserialize, Serialize};
-use sqlx::{
-    types::{Json, JsonValue},
-    FromRow,
-};
+use sqlx::{types::Json, FromRow};
 use uuid::Uuid;
 
 // CREATE TABLE projects (
@@ -27,9 +24,9 @@ pub struct ProjectRow {
     pub description: Option<String>,
     pub files: Json<Files>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub layout: Option<JsonValue>,
+    pub layout: Option<Json<Layout>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub config: Option<Json<ProjectConfig>>,
+    pub config: Option<Json<Config>>,
     pub published: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,

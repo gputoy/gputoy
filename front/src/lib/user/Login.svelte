@@ -1,33 +1,33 @@
 <script lang="ts">
-	import { login } from '../../stores/auth';
+	import { login } from '../../stores/auth'
 
-	let isOpen: boolean;
-	let username_or_email: string = '';
-	let password: string = '';
-	let invalidIdentifier = false;
-	let invalidPassword = false;
-	$: unauthorized = false;
+	let isOpen: boolean
+	let username_or_email: string = ''
+	let password: string = ''
+	let invalidIdentifier = false
+	let invalidPassword = false
+	$: unauthorized = false
 
 	$: {
-		unauthorized = false;
+		unauthorized = false
 	}
 
 	$: if (username_or_email || password) {
-		invalidIdentifier = false;
-		invalidPassword = false;
+		invalidIdentifier = false
+		invalidPassword = false
 	}
 	async function onSubmit() {
-		if (isIdentifierInvalid(username_or_email)) invalidIdentifier = true;
-		if (isPasswordInvalid(password)) invalidPassword = true;
-		if (invalidIdentifier || invalidPassword) return;
-		const response = await login(username_or_email, password);
+		if (isIdentifierInvalid(username_or_email)) invalidIdentifier = true
+		if (isPasswordInvalid(password)) invalidPassword = true
+		if (invalidIdentifier || invalidPassword) return
+		const response = await login(username_or_email, password)
 	}
 
 	function isIdentifierInvalid(username: string): boolean {
-		return username.length < 3 || username.length > 40;
+		return username.length < 3 || username.length > 40
 	}
 	function isPasswordInvalid(password: string): boolean {
-		return password.length < 8 || password.length > 40;
+		return password.length < 8 || password.length > 40
 	}
 </script>
 

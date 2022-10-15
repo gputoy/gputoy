@@ -2,10 +2,7 @@ use std::{str::FromStr, sync::Arc};
 
 use actix_identity::Identity;
 use actix_web::{delete, get, post, web, HttpResponse};
-use chrono::NaiveDateTime;
-use gpu_common::{Files, ProjectConfig};
-use serde::{Deserialize, Serialize};
-use sqlx::types::JsonValue;
+use gpu_common::realm::{ProjectResponse, ProjectUpsert};
 use uuid::Uuid;
 
 use crate::{
@@ -14,35 +11,6 @@ use crate::{
     util::{from_base64, to_base64},
 };
 
-#[derive(Debug, Deserialize)]
-pub struct ProjectUpsert {
-    pub id: Option<String>,
-    pub title: String,
-    pub description: Option<String>,
-    pub files: Files,
-    pub layout: Option<JsonValue>,
-    pub config: Option<ProjectConfig>,
-    pub published: bool,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ProjectResponse {
-    pub id: String,
-    pub title: String,
-    pub description: Option<String>,
-    pub files: Files,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub layout: Option<JsonValue>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub config: Option<ProjectConfig>,
-    pub published: bool,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
-    pub author_id: Option<String>,
-    pub forked_from_id: Option<String>,
-}
-
 impl From<ProjectRow> for ProjectResponse {
     fn from(project: ProjectRow) -> Self {
         Self {
@@ -50,7 +18,7 @@ impl From<ProjectRow> for ProjectResponse {
             title: project.title,
             description: project.description,
             files: project.files.0,
-            layout: project.layout,
+            layout: project.layout.map(|c| c.0),
             config: project.config.map(|c| c.0),
             published: project.published,
             created_at: project.created_at,

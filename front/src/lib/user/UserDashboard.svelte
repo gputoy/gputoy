@@ -1,6 +1,6 @@
 <script lang="ts">
-	import IconButton from '$lib/buttons/IconButton.svelte';
-	import { logout } from '$stores/auth';
+	import IconButton from '$lib/buttons/IconButton.svelte'
+	import { logout } from '$stores/auth'
 </script>
 
 <div id="root">

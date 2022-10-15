@@ -2,10 +2,8 @@ use std::sync::Arc;
 
 use actix_identity::Identity;
 use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
-use chrono::NaiveDateTime;
-use serde::{Deserialize, Serialize};
+use gpu_common::realm::*;
 use validator::Validate;
-use validator_derive::Validate;
 
 use crate::{
     realm::{
@@ -16,44 +14,6 @@ use crate::{
     store::user::UserRepository,
     util::to_base64,
 };
-
-#[derive(Debug, Validate, Deserialize)]
-pub struct NewUser {
-    #[validate(length(min = 3, max = 31))]
-    pub username: String,
-    #[validate(email)]
-    pub email: String,
-    #[validate(length(min = 8, max = 40))]
-    pub password: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Credentials {
-    pub username_or_email: String,
-    pub password: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct NewUserResponse {
-    pub id: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct UserInfoResponse {
-    pub id: String,
-    pub username: String,
-    pub email: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub full_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub bio: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub image: Option<String>,
-    pub email_verified: bool,
-    pub active: bool,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
-}
 
 impl From<UserRow> for UserInfoResponse {
     fn from(user: UserRow) -> Self {
@@ -70,11 +30,6 @@ impl From<UserRow> for UserInfoResponse {
             updated_at: user.updated_at,
         }
     }
-}
-
-#[derive(Debug, Serialize)]
-pub struct LoginResult {
-    user_id: String,
 }
 
 #[post("/signup")]
@@ -119,7 +74,7 @@ pub async fn login(
     Identity::login(&request.extensions(), user.id.to_string())
         .map_err(|err| ApiError::from((err.to_string(), ApiErrorType::InternalServerError)))?;
 
-    Ok(HttpResponse::Ok().json(LoginResult {
+    Ok(HttpResponse::Ok().json(LoginResponse {
         user_id: to_base64(&user.id),
     }))
 }

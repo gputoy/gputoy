@@ -1,4 +1,4 @@
-import { readable, type Subscriber } from "svelte/store";
+import { readable, type Subscriber } from "svelte/store"
 
 export const gpu_avail = readable<boolean>(false, (set: Subscriber<boolean>) => {
   // console.log("is set: ", ('gpu' in navigator))

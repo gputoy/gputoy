@@ -1,12 +1,12 @@
 <script lang="ts">
-	import vars from '$lib/vars';
-	let username: string = '';
-	let password: string = '';
-	let email: string = '';
+	import vars from '$lib/vars'
+	let username: string = ''
+	let password: string = ''
+	let email: string = ''
 
-	$: invalidUsername = isUsernameInvalid(username);
-	$: invalidEmail = isEmailInvalid(email);
-	$: invalidPassword = isPasswordInvalid(password);
+	$: invalidUsername = isUsernameInvalid(username)
+	$: invalidEmail = isEmailInvalid(email)
+	$: invalidPassword = isPasswordInvalid(password)
 	async function onSubmit() {
 		const response = await fetch(vars.API_PATH + 'signup', {
 			method: 'POST',
@@ -18,19 +18,19 @@
 				email,
 				password
 			})
-		});
-		const json = await response.json();
-		console.log('Response: ', json);
+		})
+		const json = await response.json()
+		console.log('Response: ', json)
 	}
 
 	function isUsernameInvalid(username: string): boolean {
-		return username.length < 3 || username.length > 30;
+		return username.length < 3 || username.length > 30
 	}
 	function isEmailInvalid(email: string): boolean {
-		return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+		return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 	}
 	function isPasswordInvalid(password: string): boolean {
-		return password.length < 8 || password.length > 40;
+		return password.length < 8 || password.length > 40
 	}
 </script>
 

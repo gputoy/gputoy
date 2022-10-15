@@ -35,7 +35,7 @@ tracing-subscriber = "0.3.15"
 uuid = { version = "1.1.2", features = ["serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 validator = "0.16.0"
-validator_derive = "0.16.0"
+# validator_derive = "0.16.0"
 jsonwebtoken = "8.1.1"
 thiserror = "1.0.35"
 anyhow = "1.0.65"

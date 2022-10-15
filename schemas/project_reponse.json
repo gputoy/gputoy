@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProjectResponse",
+  "type": "object",
+  "required": [
+    "createdAt",
+    "files",
+    "id",
+    "published",
+    "title",
+    "updatedAt"
+  ],
+  "properties": {
+    "authorId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "config": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/Config"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "partial-date-time"
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "files": {
+      "$ref": "#/definitions/Files"
+    },
+    "forkedFromId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "type": "string"
+    },
+    "layout": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/Layout"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "published": {
+      "type": "boolean"
+    },
+    "title": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "partial-date-time"
+    }
+  },
+  "definitions": {
+    "Config": {
+      "type": "object",
+      "properties": {
+        "limitFps": {
+          "default": 0,
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "perfLevel": {
+          "default": null,
+          "anyOf": [
+            {
+              "$ref": "#/definitions/PerformanceLevel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "File": {
+      "description": "Encapsulates all data needed to emulate a file in gputoy virtual directory structure.",
+      "type": "object",
+      "required": [
+        "data",
+        "dir",
+        "extension",
+        "fileName"
+      ],
+      "properties": {
+        "data": {
+          "description": "Contents of file in plain text",
+          "type": "string"
+        },
+        "dir": {
+          "description": "File path starting at / (project root)",
+          "type": "string"
+        },
+        "extension": {
+          "description": "File extension",
+          "allOf": [
+            {
+              "$ref": "#/definitions/SupportedExtension"
+            }
+          ]
+        },
+        "fetch": {
+          "description": "Fetch url. If exists, then contents will be fetched from remote URL on project load",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fileName": {
+          "description": "Name of file",
+          "type": "string"
+        }
+      }
+    },
+    "Files": {
+      "description": "Gputoy virtual directory. Each file in the map has its path from root as key, including file name and extension\n\nexample: ```ts map: { \"shaders/main.wgsl\": { \"data\": \"...\", \"dir\": \"shaders/\", \"fileName\": \"main\", \"extension\": \"wgsl\", } } ```",
+      "type": "object",
+      "required": [
+        "map"
+      ],
+      "properties": {
+        "map": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/File"
+          }
+        }
+      }
+    },
+    "Layout": {
+      "type": "object",
+      "required": [
+        "isStatusOpen"
+      ],
+      "properties": {
+        "isStatusOpen": {
+          "type": "boolean"
+        }
+      }
+    },
+    "PerformanceLevel": {
+      "type": "string",
+      "enum": [
+        "Default",
+        "PowerSaver"
+      ]
+    },
+    "SupportedExtension": {
+      "type": "string",
+      "enum": [
+        "wgsl",
+        "glsl",
+        "txt",
+        "md",
+        "json",
+        "csv",
+        "png",
+        "jpeg",
+        "mp3"
+      ]
+    }
+  }
+}

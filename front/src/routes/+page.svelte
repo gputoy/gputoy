@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { OnMount } from 'fractils';
-	import { fade } from 'svelte/transition';
+	import { OnMount } from 'fractils'
+	import { fade } from 'svelte/transition'
 </script>
 
 <svelte:head>

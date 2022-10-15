@@ -1,7 +1,8 @@
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::{realm::user::NewUser, store::model::UserRow};
+use crate::store::model::UserRow;
+use gpu_common::realm::NewUser;
 //use actix_web::{web::Data, FromRequest};
 use sqlx::PgPool;
 

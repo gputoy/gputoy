@@ -1,6 +1,6 @@
 <script lang="ts">
-	export let text: string | undefined = undefined;
-	export let size: string = 'sm';
+	export let text: string | undefined = undefined
+	export let size: string = 'sm'
 </script>
 
 <button class={'icon-button ' + size} {...$$restProps} on:click>

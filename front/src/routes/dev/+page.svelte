@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { init, stop } from '$lib/context';
-	import ControlBar from '$lib/editor/ControlBar.svelte';
-	import Editor from '$lib/editor/monaco/Editor.svelte';
-	import ProjectPane from '$lib/editor/panes/ProjectPane.svelte';
-	import Viewport from '$lib/editor/Viewport.svelte';
-	import { onDestroy, onMount } from 'svelte';
-	import { Pane, Splitpanes } from 'svelte-splitpanes';
+	import { init, stop } from '$lib/context'
+	import ControlBar from '$lib/editor/ControlBar.svelte'
+	import Editor from '$lib/editor/monaco/Editor.svelte'
+	import ProjectPane from '$lib/editor/panes/ProjectPane.svelte'
+	import Viewport from '$lib/editor/Viewport.svelte'
+	import { onDestroy, onMount } from 'svelte'
+	import { Pane, Splitpanes } from 'svelte-splitpanes'
 
-	let clientHeight: number;
+	let clientHeight: number
 
-	onMount(init);
-	onDestroy(stop);
+	onMount(init)
+	onDestroy(stop)
 </script>
 
 <div class="root" bind:clientHeight>

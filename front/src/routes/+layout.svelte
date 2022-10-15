@@ -1,29 +1,29 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import IconButton from '$lib/buttons/IconButton.svelte';
-	import NavItem from '$lib/buttons/NavItem.svelte';
-	import UiThemeButton from '$lib/buttons/UiThemeButton.svelte';
-	import UserModal from '$lib/modal/UserModal.svelte';
-	import { onMount } from 'svelte';
-	import FaUserCircle from 'svelte-icons/fa/FaUserCircle.svelte';
-	import GoRepoForked from 'svelte-icons/go/GoRepoForked.svelte';
-	import '../app.css';
-	import { getSession, user } from '../stores/auth';
-	import '../theme.css';
+	import { page } from '$app/stores'
+	import IconButton from '$lib/buttons/IconButton.svelte'
+	import NavItem from '$lib/buttons/NavItem.svelte'
+	import UiThemeButton from '$lib/buttons/UiThemeButton.svelte'
+	import UserModal from '$lib/modal/UserModal.svelte'
+	import { onMount } from 'svelte'
+	import FaUserCircle from 'svelte-icons/fa/FaUserCircle.svelte'
+	import GoRepoForked from 'svelte-icons/go/GoRepoForked.svelte'
+	import '../app.css'
+	import { getSession, user } from '../stores/auth'
+	import '../theme.css'
 	$: {
-		console.log('Route id: ', $page.routeId);
+		console.log('Route id: ', $page.routeId)
 	}
 
-	onMount(getSession);
+	onMount(getSession)
 
-	$: showUserModal = false;
+	$: showUserModal = false
 
 	function onToggleUserModal() {
-		showUserModal = !showUserModal;
+		showUserModal = !showUserModal
 	}
 
 	function onHideUserModal() {
-		showUserModal = false;
+		showUserModal = false
 	}
 </script>
 

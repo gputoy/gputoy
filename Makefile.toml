@@ -85,6 +85,13 @@ workspace = false
 command = "sqlx"
 args = ["migrate", "run"]
 
+
+# ----------------- Types -----------------
+[tasks.types]
+description = "Make json schema and typescript types from rust types"
+workspace = false
+script = ["cargo run -p gpu-schemas", "cd front", "node generate_api_types.js"]
+
 # ----------------- Env -------------------
 [env]
 CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true

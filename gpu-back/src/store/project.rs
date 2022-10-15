@@ -1,7 +1,9 @@
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::{realm::project::ProjectUpsert, store::model::ProjectRow};
+use gpu_common::realm::ProjectUpsert;
+
+use crate::store::model::ProjectRow;
 
 use sqlx::types::Json;
 use sqlx::PgPool;
@@ -66,12 +68,13 @@ impl ProjectRepository {
     ) -> Result<ProjectRow, Error> {
         let files = Json(project.files);
         let config = project.config.map(Json);
+        let layout = project.layout.map(Json);
         sqlx::query_as(INSERT_QUERY)
             .bind(author_id)
             .bind(project.title)
             .bind(project.description)
             .bind(files)
-            .bind(project.layout)
+            .bind(layout)
             .bind(config)
             .bind(project.published)
             .fetch_one(&*self.pool)
@@ -86,11 +89,12 @@ impl ProjectRepository {
     ) -> Result<ProjectRow, Error> {
         let files = Json(project.files);
         let config = project.config.map(Json);
+        let layout = project.layout.map(Json);
         sqlx::query_as(UPDATE_QUERY)
             .bind(project.title)
             .bind(project.description)
             .bind(files)
-            .bind(project.layout)
+            .bind(layout)
             .bind(config)
             .bind(project.published)
             .bind(project_id)

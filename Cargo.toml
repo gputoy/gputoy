@@ -6,6 +6,7 @@ members = [
   "gpu-naga",
   "gpu-wasm",
   "gpu-tauri",
+  "gpu-schemas",
 ]
 resolver = "2"
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-	export let title: string;
-	export let route: string = '/';
-	export let current: boolean = false;
-	export let aClass: string = '';
+	export let title: string
+	export let route: string = '/'
+	export let current: boolean = false
+	export let aClass: string = ''
 </script>
 
 <div class={current ? 'current' : ''}>

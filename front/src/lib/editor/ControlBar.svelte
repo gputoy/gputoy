@@ -1,6 +1,6 @@
 <script lang="ts">
-	import IconButton from '$lib/buttons/IconButton.svelte';
-	import FaPlay from 'svelte-icons/fa/FaPlay.svelte';
+	import IconButton from '$lib/buttons/IconButton.svelte'
+	import FaPlay from 'svelte-icons/fa/FaPlay.svelte'
 </script>
 
 <div id="controlbar-container">

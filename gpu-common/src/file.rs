@@ -1,39 +1,47 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use serde_json::{Map, Value};
+use std::collections::HashMap;
 
-#[derive(Debug, Serialize, Deserialize)]
+/// Gputoy virtual directory. Each file in the map
+/// has its path from root as key, including file name
+/// and extension
+///
+/// example:
+/// ```ts
+/// map: {
+///     "shaders/main.wgsl": {
+///         "data": "...",
+///         "dir": "shaders/",
+///         "fileName": "main",
+///         "extension": "wgsl",
+///     }
+/// }
+/// ```
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct Files {
-    #[serde(flatten)]
-    pub map: Map<String, Value>,
+    pub map: HashMap<String, File>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+/// Encapsulates all data needed to emulate a file in
+/// gputoy virtual directory structure.
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct File {
+    /// Contents of file in plain text
     data: String,
-    dir: FilePath,
+    /// File path starting at / (project root)
+    dir: String,
+    /// Name of file
     #[serde(rename = "fileName")]
     file_name: String,
+    /// File extension
     extension: SupportedExtension,
+    /// Fetch url. If exists, then contents will be fetched
+    /// from remote URL on project load
     #[serde(skip_serializing_if = "Option::is_none")]
     fetch: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
-pub struct FilePath(String);
-
-impl AsRef<String> for FilePath {
-    fn as_ref(&self) -> &String {
-        &self.0
-    }
-}
-
-impl std::fmt::Display for FilePath {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.0)
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum SupportedExtension {
     Wgsl,
@@ -48,10 +56,12 @@ pub enum SupportedExtension {
 }
 
 impl SupportedExtension {
+    /// Returns true if file type can be used as a shader
     pub fn is_shader(&self) -> bool {
         matches!(self, Self::Wgsl | Self::Glsl)
     }
 
+    /// Returns true if file type can be used as a gpu buffer
     pub fn is_buffer(&self) -> bool {
         matches!(self, Self::Csv | Self::Png | Self::Jpeg | Self::Mp3)
     }

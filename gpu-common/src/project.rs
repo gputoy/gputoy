@@ -1,8 +1,10 @@
-use crate::{Files, ProjectConfig};
+use crate::{Config, Files};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct Project {
     pub files: Files,
     pub layout: Option<()>,
-    pub config: Option<ProjectConfig>,
+    pub config: Option<Config>,
 }
