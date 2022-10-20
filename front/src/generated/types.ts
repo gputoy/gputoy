@@ -19,6 +19,10 @@ export interface Credentials {
   username_or_email: string;
 }
 
+export interface LoginResponse {
+  userId: string;
+}
+
 export interface NewUser {
   email: string;
   password: string;
@@ -94,7 +98,18 @@ export interface ProjectResponse {
 }
 
 export interface Layout {
+  /**
+   * Currently opened file index within workspace
+   */
+  fileIndex?: number | null;
+  /**
+   * Is the left side status panel open
+   */
   isStatusOpen: boolean;
+  /**
+   * List of file identifiers which is open in workspace. Order of identifiers in vec is the order it is listed in the editor.
+   */
+  workspace: string[];
 }
 
 export interface ProjectUpsert {

@@ -1,18 +1,9 @@
-# TODO: remove pkgconfig and cmake once types crate is made
-# these are needed since winit is a dep of gpu-core
-
 [phases.setup]
 nixPkgs = ['rustup', 'openssl', 'cmake']
 
 [phases.install]
 cmds = ['rustup default stable']
-aptPkgs = [
-  'libssl-dev',
-  'build-essential',
-  'libfreetype6-dev',
-  'libfontconfig1-dev',
-  'xclip',
-]
+aptPkgs = ['libssl-dev', 'build-essential']
 
 [phases.build]
 cmds = ['cargo build --package gpu-back --release']

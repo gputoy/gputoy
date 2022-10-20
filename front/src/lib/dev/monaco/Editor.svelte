@@ -7,12 +7,20 @@
 	import dark from './dark'
 	import light from './light'
 
+	import { wFiles } from '$stores/project'
+
+	export let fileid: string
+	$: file = $wFiles.map[fileid]
+
 	let divEl: HTMLDivElement | null = null
 	let editor: monaco.editor.IStandaloneCodeEditor | undefined = undefined
 	let Monaco: any
 
+	// $: {
+	// 	editor?.setModel()
+	// }
+
 	onMount(async () => {
-		console.log(editor)
 		// @ts-ignore
 		self.MonacoEnvironment = {
 			getWorker: function (_moduleId: any, label: string) {
@@ -26,7 +34,7 @@
 		Monaco.editor.defineTheme('dark', dark)
 		Monaco.editor.defineTheme('light', light)
 		editor = Monaco.editor.create(divEl!, {
-			value: ['@fragment', 'fn main() -> vec4<f32> {', '\treturn vec4<f32>();', '}'].join('\n'),
+			value: file.data,
 			language: 'wgsl',
 			theme: 'dark',
 			automaticLayout: true,
@@ -45,6 +53,22 @@
 			}
 		})
 
+		editor?.getModel()?.onDidChangeContent((ev) => {
+			wFiles.update((files) => {
+				let map = { ...files.map }
+				map[fileid] = {
+					...map[fileid],
+					data: editor?.getModel()?.getValue() ?? ''
+				}
+				return {
+					...files,
+					map
+				}
+			})
+
+			console.log($wFiles)
+		})
+
 		theme.subscribe((newTheme) => Monaco.editor.setTheme(newTheme))
 
 		return () => {
@@ -53,7 +77,11 @@
 	})
 </script>
 
-<div bind:this={divEl} class="h-screen" />
+{#if file}
+	<div bind:this={divEl} class="h-screen" />
+{:else}
+	<div>No file</div>
+{/if}
 
 <style>
 	.h-screen {

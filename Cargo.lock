@@ -1391,7 +1391,7 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "gpu-common",
- "gpu-naga",
+ "gpu-compiler",
  "js-sys",
  "log",
  "serde",
@@ -1420,6 +1420,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "gpu-compiler"
+version = "0.1.0"
+dependencies = [
+ "naga 0.10.0",
+]
+
+[[package]]
 name = "gpu-descriptor"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1437,13 +1444,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "363e3677e55ad168fef68cf9de3a4a310b53124c5e784c53a1d70e92d23f2126"
 dependencies = [
  "bitflags",
-]
-
-[[package]]
-name = "gpu-naga"
-version = "0.1.0"
-dependencies = [
- "naga 0.10.0",
 ]
 
 [[package]]
@@ -1467,12 +1467,14 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "gpu-client",
- "gpu-naga",
+ "gpu-common",
+ "gpu-compiler",
  "js-sys",
  "lazy_static",
  "log",
  "ron 0.8.0",
  "serde",
+ "serde-wasm-bindgen",
  "serde_json",
  "thiserror",
  "wasm-bindgen",
@@ -2712,6 +2714,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "728eb6351430bccb993660dfffc5a72f91ccc1295abaa8ce19b27ebe4f75568b"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-wasm-bindgen"
+version = "0.4.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3b4c031cd0d9014307d82b8abf653c0290fbdaeb4c02d00c63cf52f728628bf"
+dependencies = [
+ "js-sys",
+ "serde",
+ "wasm-bindgen",
 ]
 
 [[package]]

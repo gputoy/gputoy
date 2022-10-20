@@ -3,13 +3,9 @@ members = [
   "gpu-back",
   "gpu-client",
   "gpu-common",
-  "gpu-naga",
+  "gpu-compiler",
   "gpu-wasm",
   "gpu-tauri",
   "gpu-schemas",
 ]
 resolver = "2"
-
-[profile.release]
-lto = true
-opt-level = 's'

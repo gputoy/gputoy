@@ -1,6 +1,5 @@
-#![cfg(target_arch = "wasm32")]
+// #![cfg(target_arch = "wasm32")]
 
-use gpu_client::context::Context as InnerContext;
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsValue};
 
@@ -13,9 +12,15 @@ pub fn __init() -> Result<(), JsValue> {
 }
 
 #[derive(Error, Debug)]
-enum Error {
+pub enum Error {
     #[error("Context init failed: {0}")]
     ContextInit(gpu_client::context::Error),
+    #[error("Context build failed: {0}")]
+    ContextBuild(gpu_client::context::Error),
+    #[error("Context render failed: {0}")]
+    ContextRender(gpu_client::context::Error),
+    #[error("Could not serialize from JsonValue: {0}")]
+    SerdeWasmBindgen(serde_wasm_bindgen::Error),
     #[error("Could not initialize logger")]
     LoggerInit,
 }
@@ -48,6 +53,18 @@ impl Context {
     #[wasm_bindgen]
     pub fn resize(&self, width: i32, height: i32) {
         log::info!("Resizing to: {} {}", width, height);
+    }
+
+    #[wasm_bindgen]
+    pub async fn build(&mut self, project: JsValue) -> Result<(), Error> {
+        let project = serde_wasm_bindgen::from_value(project).map_err(Error::SerdeWasmBindgen)?;
+        log::info!("Recieved project: {:?}", project);
+        self.0.build(&project).await.map_err(Error::ContextBuild)
+    }
+
+    #[wasm_bindgen]
+    pub async fn render(&self) -> Result<(), Error> {
+        self.0.render().await.map_err(Error::ContextRender)
     }
 }
 

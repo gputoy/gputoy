@@ -1,6 +1,14 @@
 <script lang="ts">
 	import IconButton from '$lib/buttons/IconButton.svelte'
+	import { build, render as context_render } from '$lib/context'
+	import { getProject } from '$stores/project'
 	import FaPlay from 'svelte-icons/fa/FaPlay.svelte'
+
+	let x = context_render
+
+	function handleBuild() {
+		build(getProject())
+	}
 </script>
 
 <div id="controlbar-container">
@@ -9,6 +17,10 @@
 		<IconButton size="md">
 			<FaPlay />
 		</IconButton>
+
+		<IconButton on:click={handleBuild}>Build</IconButton>
+
+		<IconButton on:click{context_render}>Render</IconButton>
 	</div>
 
 	<div class="right" />
