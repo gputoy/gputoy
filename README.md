@@ -2,7 +2,7 @@
 ## **Note**: Until webgpu is stabilized across all browsers, `gputoy` will only run on browsers in [this](https://caniuse.com/webgpu) list.
 # **gputoy**
 
-[gputoy](gputoy.io) is a gpu programming development enviroment designed to be as simple as possible to create and share creations. 
+[gputoy](https://gputoy.io) is a gpu programming development enviroment designed to be as simple as possible to create and share creations. 
 
 This project is in its early stages, but ideally it should satisfy the following requirements:
 
@@ -25,7 +25,7 @@ This project is in its early stages, but ideally it should satisfy the following
   * [gpu-back](gpu-back) - Backend crate that handles data storage, authentication, and api endpoints. Full list of endpoints can be found in the crate `README`.
   * [gpu-client](gpu-client) - Platform agnostic gputoy client library that is used in `gpu-wasm` and `gpu-tauri`. Handles building projects, rendering, and gpu resource IO.
   * [gpu-compiler](gpu-compiler) - Generates runnable for `gpu-client` by pre-processing and compiling project files and configs.
-  * [gpu-wasm](gpu-wasm) - Wasm client for running web application at [gputoy.io](gputoy.io).
+  * [gpu-wasm](gpu-wasm) - Wasm client for running web application at [gputoy.io/dev](https://gputoy.io/dev).
   * [gpu-tauri](gpu-tauri) - Tauri client for running native application. **(TODO)**
 
 ## Dependencies
