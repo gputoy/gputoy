@@ -1,10 +1,7 @@
 use chrono::NaiveDateTime;
-use gpu_core::project::{config::Config, Files};
+use gpu_common::{Config, Files, Layout};
 use serde::{Deserialize, Serialize};
-use sqlx::{
-    types::{Json, JsonValue},
-    FromRow,
-};
+use sqlx::{types::Json, FromRow};
 use uuid::Uuid;
 
 // CREATE TABLE projects (
@@ -21,13 +18,13 @@ use uuid::Uuid;
 //   CONSTRAINT forked_from_id FOREIGN KEY(id) REFERENCES projects(id)
 // );
 #[derive(Debug, FromRow, Serialize, Deserialize)]
-pub struct Project {
+pub struct ProjectRow {
     pub id: Uuid,
     pub title: String,
     pub description: Option<String>,
     pub files: Json<Files>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub layout: Option<JsonValue>,
+    pub layout: Option<Json<Layout>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<Json<Config>>,
     pub published: bool,
@@ -35,15 +32,4 @@ pub struct Project {
     pub updated_at: NaiveDateTime,
     pub author_id: Option<Uuid>,
     pub forked_from_id: Option<Uuid>,
-}
-
-impl TryInto<gpu_core::project::Project> for Project {
-    type Error = std::convert::Infallible;
-    fn try_into(self) -> Result<gpu_core::project::Project, Self::Error> {
-        Ok(gpu_core::project::Project {
-            config: self.config.map(|s| s.0),
-            files: self.files.0,
-            layout: Some(()),
-        })
-    }
 }

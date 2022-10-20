@@ -1,17 +1,17 @@
 <script lang="ts">
-	import context from '$lib/context';
-	let clientHeight: number;
-	let clientWidth: number;
-	let root: HTMLElement;
+	import context from '$lib/context'
+	let clientHeight: number
+	let clientWidth: number
+	let root: HTMLElement
 
 	// resize canvas inner size, canvas style, and webgpu surface
 	$: {
-		let canvas = root?.children[0] as HTMLCanvasElement;
+		let canvas = root?.children[0] as HTMLCanvasElement
 		if (canvas) {
-			canvas.width = clientWidth;
-			canvas.height = clientHeight;
-			canvas.setAttribute('style', `width: ${clientWidth}; height: ${clientHeight};`);
-			context?.resize(clientWidth, clientHeight);
+			canvas.width = clientWidth
+			canvas.height = clientHeight
+			canvas.setAttribute('style', `width: ${clientWidth}; height: ${clientHeight};`)
+			context?.resize(clientWidth, clientHeight)
 		}
 	}
 </script>

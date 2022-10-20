@@ -2,60 +2,29 @@ use std::{str::FromStr, sync::Arc};
 
 use actix_identity::Identity;
 use actix_web::{delete, get, post, web, HttpResponse};
-use chrono::NaiveDateTime;
-use gpu_core::project::{config::Config, Files};
-use serde::{Deserialize, Serialize};
-use sqlx::types::JsonValue;
+use gpu_common::realm::{ProjectResponse, ProjectUpsert};
 use uuid::Uuid;
 
 use crate::{
     realm::{error::ApiErrorType, ApiResult},
-    store::{model::Project, project::ProjectRepository},
+    store::{model::ProjectRow, project::ProjectRepository},
     util::{from_base64, to_base64},
 };
 
-#[derive(Debug, Deserialize)]
-pub struct ProjectUpsert {
-    pub id: Option<String>,
-    pub title: String,
-    pub description: Option<String>,
-    pub files: Files,
-    pub layout: Option<JsonValue>,
-    pub config: Option<Config>,
-    pub published: bool,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ProjectResponse {
-    pub id: String,
-    pub title: String,
-    pub description: Option<String>,
-    pub files: Files,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub layout: Option<JsonValue>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub config: Option<Config>,
-    pub published: bool,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
-    pub author_id: Option<Uuid>,
-    pub forked_from_id: Option<Uuid>,
-}
-
-impl From<Project> for ProjectResponse {
-    fn from(project: Project) -> Self {
+impl From<ProjectRow> for ProjectResponse {
+    fn from(project: ProjectRow) -> Self {
         Self {
             id: to_base64(&project.id),
             title: project.title,
             description: project.description,
             files: project.files.0,
-            layout: project.layout,
+            layout: project.layout.map(|c| c.0),
             config: project.config.map(|c| c.0),
             published: project.published,
             created_at: project.created_at,
             updated_at: project.updated_at,
-            author_id: project.author_id,
-            forked_from_id: project.forked_from_id,
+            author_id: project.author_id.as_ref().map(to_base64),
+            forked_from_id: project.forked_from_id.as_ref().map(to_base64),
         }
     }
 }
@@ -83,7 +52,7 @@ pub async fn post_project(
             .await
             .ok();
 
-        if let Some(author_id) = current_project.map(|s| s.author_id).flatten() {
+        if let Some(author_id) = current_project.and_then(|s| s.author_id) {
             if id != author_id {
                 return Err(("Project belongs to other user", ApiErrorType::Unauthorized).into());
             }
@@ -110,7 +79,7 @@ pub async fn get_project(
         .map_err(|_| ("Project not found", ApiErrorType::NotFound))?;
 
     if !project.published
-        && project.author_id.map(|id| id.to_string()) != identity.map(|i| i.id().ok()).flatten()
+        && project.author_id.map(|id| id.to_string()) != identity.and_then(|i| i.id().ok())
     {
         Err(("Project is private", ApiErrorType::Unauthorized).into())
     } else {

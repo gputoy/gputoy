@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Config",
+  "type": "object",
+  "properties": {
+    "limitFps": {
+      "default": 0,
+      "type": "integer",
+      "format": "uint32",
+      "minimum": 0.0
+    },
+    "perfLevel": {
+      "default": null,
+      "anyOf": [
+        {
+          "$ref": "#/definitions/PerformanceLevel"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "definitions": {
+    "PerformanceLevel": {
+      "type": "string",
+      "enum": [
+        "Default",
+        "PowerSaver"
+      ]
+    }
+  }
+}

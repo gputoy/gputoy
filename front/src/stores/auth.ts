@@ -1,5 +1,5 @@
-import vars from '$lib/vars';
-import { writable } from "svelte/store";
+import vars from '$lib/vars'
+import { writable } from "svelte/store"
 
 interface User {
   id: string,
@@ -12,7 +12,7 @@ interface User {
   active: boolean,
 }
 
-export const user = writable<User | null>(null);
+export const user = writable<User | null>(null)
 
 export async function login(username_or_email: string, password: string) {
   const loginRes = await fetch(vars.API_PATH + 'login', {
@@ -25,15 +25,15 @@ export async function login(username_or_email: string, password: string) {
       password
     }),
     credentials: 'include'
-  });
-  console.log("Returned res: ", loginRes);
+  })
+  console.log("Returned res: ", loginRes)
   if (loginRes.status == 401) {
-    user.set(null);
-    console.log("Invalid credentials");
+    user.set(null)
+    console.log("Invalid credentials")
     return
   }
   if (loginRes.status != 200) {
-    console.log("Unknown issue logging in: ", await loginRes.text());
+    console.log("Unknown issue logging in: ", await loginRes.text())
     return
   }
   getSession()
@@ -43,21 +43,21 @@ export async function logout() {
   const logoutRes = await fetch(vars.API_PATH + 'logout', {
     method: 'POST',
     credentials: 'include'
-  });
-  console.log("Logout res: ", logoutRes);
-  user.set(null);
+  })
+  console.log("Logout res: ", logoutRes)
+  user.set(null)
 }
 
 export async function getSession() {
   const userRes = await fetch(vars.API_PATH + 'me', {
     method: 'GET',
     credentials: 'include'
-  });
+  })
 
   if (userRes.status != 200) {
-    console.log("Unknown issue fetching user: ", await userRes.text());
-    return;
+    console.log("Unknown issue fetching user: ", await userRes.text())
+    return
   }
-  const json = await userRes.json();
-  user.set(json as User);
+  const json = await userRes.json()
+  user.set(json as User)
 }

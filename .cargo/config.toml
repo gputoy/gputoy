@@ -1,0 +1,14 @@
+[alias]
+
+deep-clean = "make deep-clean"
+
+wasm = "make wasm"
+wasm-prod = "make --profile production wasm"
+
+start = "make start"
+start-prod = "make --profile production start"
+
+api = "make api"
+api-prod = "make --profile production api"
+
+types = "make types"

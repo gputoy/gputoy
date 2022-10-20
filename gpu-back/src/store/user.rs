@@ -1,7 +1,8 @@
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::{realm::user::NewUser, store::model::UserRow};
+use crate::store::model::UserRow;
+use gpu_common::realm::NewUser;
 //use actix_web::{web::Data, FromRequest};
 use sqlx::PgPool;
 
@@ -29,21 +30,21 @@ impl UserRepository {
         .map_err(From::from)
     }
 
-    pub async fn find_by_username(&self, username: &String) -> Result<UserRow, Error> {
+    pub async fn find_by_username(&self, username: &str) -> Result<UserRow, Error> {
         sqlx::query_as!(UserRow, "SELECT * FROM users WHERE username = $1", username)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)
     }
 
-    pub async fn find_by_email(&self, email: &String) -> Result<UserRow, Error> {
+    pub async fn find_by_email(&self, email: &str) -> Result<UserRow, Error> {
         sqlx::query_as!(UserRow, "SELECT * FROM users WHERE email = $1", email)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)
     }
 
-    pub async fn find_by_id(&self, id: &String) -> Result<UserRow, Error> {
+    pub async fn find_by_id(&self, id: &str) -> Result<UserRow, Error> {
         let uuid = Uuid::parse_str(id)?;
         sqlx::query_as!(UserRow, "SELECT * FROM users WHERE id = $1", uuid)
             .fetch_one(&*self.pool)
@@ -51,27 +52,3 @@ impl UserRepository {
             .map_err(From::from)
     }
 }
-
-// impl FromRequest for UserRepository {
-//     type Error = ApiError;
-
-//     type Future = Ready<Result<Self, Self::Error>>;
-
-//     fn from_request(
-//         req: &actix_web::HttpRequest,
-//         payload: &mut actix_web::dev::Payload,
-//     ) -> Self::Future {
-//         let pool = Data::<Arc<PgPool>>::from_request(req, payload).into_inner();
-//         match pool {
-//             Ok(pool) => ready(Ok(UserRepository::new(&pool))),
-//             Err(err) => {
-//                 log::error!("Failed to retreieve user repository due to: {}", err);
-//                 ready(Err((
-//                     "Failed to acquire database",
-//                     ApiErrorType::InternalServerError,
-//                 )
-//                     .into()))
-//             }
-//         }
-//     }
-// }

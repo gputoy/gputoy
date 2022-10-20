@@ -35,7 +35,8 @@ async fn main() -> Result<(), Error> {
         .map(|p| p.parse::<u16>().expect("Port value invalid"))
         .expect("Port environment variable");
 
-    let cors_allowed = std::env::var("CORS_ALLOW").unwrap_or("http://localhost:3000".into());
+    let cors_allowed =
+        std::env::var("CORS_ALLOW").unwrap_or_else(|_| "http://localhost:3000".into());
 
     let redis_url = std::env::var("REDIS_URL").expect("Redis url environment variable");
 

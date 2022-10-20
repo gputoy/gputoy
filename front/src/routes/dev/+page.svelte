@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { init, stop } from '$lib/context';
-	import ControlBar from '$lib/editor/ControlBar.svelte';
-	import Editor from '$lib/editor/monaco/Editor.svelte';
-	import ProjectPane from '$lib/editor/panes/ProjectPane.svelte';
-	import Viewport from '$lib/editor/Viewport.svelte';
-	import { onDestroy, onMount } from 'svelte';
-	import { Pane, Splitpanes } from 'svelte-splitpanes';
+	import { init, stop } from '$lib/context'
+	import ControlBar from '$lib/dev/ControlBar.svelte'
+	import EditorPane from '$lib/dev/EditorPane.svelte'
+	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
+	import Viewport from '$lib/dev/Viewport.svelte'
+	import { onDestroy, onMount } from 'svelte'
+	import { Pane, Splitpanes } from 'svelte-splitpanes'
 
-	let clientHeight: number;
+	let clientHeight: number
 
-	onMount(init);
-	onDestroy(stop);
+	onMount(init)
+	onDestroy(stop)
 </script>
 
 <div class="root" bind:clientHeight>
 	<Splitpanes style="height: 100%;" theme="no-splitter">
 		<!-- ---------- project pane ------------- -->
-		<Pane size={10} snapSize={10} maxSize={10}>
+		<Pane size={10} snapSize={5} maxSize={10}>
 			<ProjectPane />
 		</Pane>
 
@@ -36,7 +36,7 @@
 				</Pane>
 				<!-- ---------- editor   ------------- -->
 				<Pane size={40} snapSize={10}>
-					<Editor />
+					<EditorPane />
 				</Pane>
 			</Splitpanes>
 		</Pane>

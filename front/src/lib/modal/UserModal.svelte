@@ -1,25 +1,25 @@
 <script lang="ts">
-	import Login from '$lib/user/Login.svelte';
-	import UserDashboard from '$lib/user/UserDashboard.svelte';
-	import { fade } from 'svelte/transition';
-	import { user } from '../../stores/auth';
-	export let show: boolean = false;
-	export let onHide: (() => void) | null | undefined;
-	let ref: HTMLElement | undefined;
+	import Login from '$lib/user/Login.svelte'
+	import UserDashboard from '$lib/user/UserDashboard.svelte'
+	import { fade } from 'svelte/transition'
+	import { user } from '../../stores/auth'
+	export let show: boolean = false
+	export let onHide: (() => void) | null | undefined
+	let ref: HTMLElement | undefined
 
 	$: {
-		if (show) document?.getElementById('login-focus')?.focus();
+		if (show) document?.getElementById('login-focus')?.focus()
 	}
 
 	const _fade = {
 		duration: 50
-	};
+	}
 
 	function onHandleBlur(event: any) {
-		console.log('blur ran for ', event);
-		if (!event) return;
+		console.log('blur ran for ', event)
+		if (!event) return
 		if (!event.currentTarget.contains(event.relatedTarget) && onHide) {
-			onHide();
+			onHide()
 		}
 	}
 </script>

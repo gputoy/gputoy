@@ -22,22 +22,25 @@ script = "rm -rf ./dist ./target ./front/pkg"
 
 # ----------------- Wasm build -------------------
 [tasks.wasm-dev]
+workspace = false
 condition = { profiles = ["development"] }
 description = "Generate wasm package"
 script = """\
   RUSTFLAGS=--cfg=web_sys_unstable_apis \
-  wasm-pack build ./gpu-wasm --out-dir ../front/pkg  --target web --mode no-install --dev\
+  wasm-pack build ./gpu-wasm --out-dir ../front/pkg  --target web --mode no-install --dev
 """
 
 [tasks.wasm-prod]
+workspace = false
 condition = { profiles = ["production"] }
 description = "Generate wasm package (release)"
 script = """\
   RUSTFLAGS=--cfg=web_sys_unstable_apis \
-  wasm-pack build ./gpu-wasm --out-dir ../front/pkg  --target web --mode no-install\
+  wasm-pack build gpu-wasm --out-dir ../front/pkg  --target web --mode no-install &&\
+  wasm-opt -Os -o front/pkg/gpu_wasm_bg.wasm front/pkg/gpu_wasm_bg.wasm 
 """
 
-[tasks.build-wasm]
+[tasks.wasm]
 description = "Building .wasm from gpu-wasm and outputting compiled module to front/pgk"
 workspace = false
 clear = true
@@ -49,7 +52,7 @@ condition = { profiles = ["development"] }
 description = "Serve backend"
 workspace = false
 script = """
-  RUST_LOG=debug cargo run --package gpu-back
+  RUST_LOG=info cargo run --package gpu-back
 """
 
 [tasks.api-prod]
@@ -57,21 +60,32 @@ condition = { profiles = ["production"] }
 description = "Serve backend"
 workspace = false
 script = """
-  RUST_LOG=info cargo run --package gpu-back --release
+  RUST_LOG=log cargo run --package gpu-back --release
 """
 
-# ----------------- Runners -------------------
-[tasks.dev]
+# ----------------- Front    -------------------
+[tasks.front-dev]
+condition = { profiles = ["development"] }
 description = "Building and running sveltekit server"
 workspace = false
 script = ["cd front", "npm run dev -- --port 3000"]
-dependencies = ["build-wasm"]
 
-[tasks.serve]
-description = "Serve frontend"
+[tasks.front-prod]
+condition = { profiles = ["production"] }
 workspace = false
-script = ["node ./dist/index.js"]
+script = ["cd front", "npm run build", "node ../dist/index.js"]
 
+[tasks.front]
+description = "Building .wasm from gpu-wasm and outputting compiled module to front/pgk"
+workspace = false
+dependencies = ["front-dev", "front-prod"]
+
+
+# ----------------- Runners -------------------
+[tasks.start]
+description = "Building and running sveltekit server"
+workspace = false
+dependencies = ["wasm", "front"]
 
 [tasks.api]
 description = "Building api from gpu-back"
@@ -85,11 +99,13 @@ workspace = false
 command = "sqlx"
 args = ["migrate", "run"]
 
+
+# ----------------- Types -----------------
+[tasks.types]
+description = "Make json schema and typescript types from rust types"
+workspace = false
+script = ["cargo run -p gpu-schemas", "cd front", "node generate_api_types.js"]
+
 # ----------------- Env -------------------
 [env]
 CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
-
-[env.dev]
-
-
-[env.prod]

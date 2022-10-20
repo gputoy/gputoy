@@ -1,7 +1,11 @@
 [workspace]
-members = ["gpu-back", "gpu-core", "gpu-naga", "gpu-wasm", "gpu-tauri"]
+members = [
+  "gpu-back",
+  "gpu-client",
+  "gpu-common",
+  "gpu-compiler",
+  "gpu-wasm",
+  "gpu-tauri",
+  "gpu-schemas",
+]
 resolver = "2"
-
-[profile.release]
-lto = true
-opt-level = 's'

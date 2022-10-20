@@ -1,4 +1,4 @@
-import type monaco from 'monaco-editor';
+import type monaco from 'monaco-editor'
 
 export default {
   base: "vs",
@@ -149,4 +149,4 @@ export default {
     "editorCursor.foreground": "#000000",
     "editorWhitespace.foreground": "#BFBFBF",
   }
-} as monaco.editor.IStandaloneThemeData;
+} as monaco.editor.IStandaloneThemeData

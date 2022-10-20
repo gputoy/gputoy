@@ -1,4 +1,4 @@
-import type monaco from 'monaco-editor';
+import type monaco from 'monaco-editor'
 
 export default {
   base: "vs-dark",
@@ -40,4 +40,4 @@ export default {
     "input.border": "none", // Input box border.
     "editorIndentGuide.background": "#FFFFFF20",
   },
-} as monaco.editor.IStandaloneThemeData;
+} as monaco.editor.IStandaloneThemeData
