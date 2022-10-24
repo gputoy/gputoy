@@ -4,12 +4,14 @@
 	import EditorPane from '$lib/dev/EditorPane.svelte'
 	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
 	import Viewport from '$lib/dev/Viewport.svelte'
+	import { initKeyControls } from '$stores/input'
 	import { onDestroy, onMount } from 'svelte'
 	import { Pane, Splitpanes } from 'svelte-splitpanes'
 
 	let clientHeight: number
 
 	onMount(init)
+	onMount(initKeyControls)
 	onDestroy(stop)
 </script>
 

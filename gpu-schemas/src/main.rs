@@ -39,6 +39,12 @@ fn main() -> std::io::Result<()> {
     let schema = &schema_for!(gpu_common::realm::LoginResponse);
     write_schema(&dir, "login_response", schema)?;
 
+    let schema = &schema_for!(gpu_common::realm::UserInfoResponse);
+    write_schema(&dir, "user_info_response", schema)?;
+
+    let schema = &schema_for!(gpu_common::Action);
+    write_schema(&dir, "action", schema)?;
+
     println!("Wrote schemas to {}", dir.to_string_lossy());
 
     Ok(())

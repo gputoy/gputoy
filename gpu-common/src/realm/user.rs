@@ -1,3 +1,4 @@
+use crate::user::UserConfig;
 use chrono::NaiveDateTime;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -36,6 +37,7 @@ pub struct UserInfoResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<String>,
     pub email_verified: bool,
+    pub config: Option<UserConfig>,
     pub active: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,

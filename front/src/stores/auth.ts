@@ -1,18 +1,8 @@
 import vars from '$lib/vars'
+import type { UserInfoResponse } from 'src/generated/types'
 import { writable } from "svelte/store"
 
-interface User {
-  id: string,
-  username: string,
-  email: string,
-  fullname: string | undefined,
-  bio: string | undefined,
-  imageUrl: string | undefined,
-  emailVerified: boolean,
-  active: boolean,
-}
-
-export const user = writable<User | null>(null)
+export const user = writable<UserInfoResponse | null>(null)
 
 export async function login(username_or_email: string, password: string) {
   const loginRes = await fetch(vars.API_PATH + 'login', {
@@ -59,5 +49,5 @@ export async function getSession() {
     return
   }
   const json = await userRes.json()
-  user.set(json as User)
+  user.set(json as UserInfoResponse)
 }

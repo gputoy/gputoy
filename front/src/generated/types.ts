@@ -7,6 +7,23 @@
 
 
 
+export type Action =
+  | {
+      togglePane: Pane;
+    }
+  | {
+      /**
+       * @minItems 2
+       * @maxItems 2
+       */
+      shiftPane: [Pane, number];
+    }
+  | "playPause"
+  | "reset"
+  | "rebuild";
+
+export type Pane = "editorPane" | "projectPane" | "resourcePane";
+
 export type PerformanceLevel = "Default" | "PowerSaver";
 
 export interface Config {
@@ -120,4 +137,24 @@ export interface ProjectUpsert {
   layout?: Layout | null;
   published: boolean;
   title: string;
+}
+
+export interface UserInfoResponse {
+  active: boolean;
+  bio?: string | null;
+  config?: UserConfig | null;
+  created_at: string;
+  email: string;
+  email_verified: boolean;
+  full_name?: string | null;
+  id: string;
+  image?: string | null;
+  updated_at: string;
+  username: string;
+}
+
+export interface UserConfig {
+  keybinds: {
+    [k: string]: Action;
+  };
 }
