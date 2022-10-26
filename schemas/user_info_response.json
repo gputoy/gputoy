@@ -4,11 +4,11 @@
   "type": "object",
   "required": [
     "active",
-    "created_at",
+    "createdAt",
     "email",
-    "email_verified",
+    "emailVerified",
     "id",
-    "updated_at",
+    "updatedAt",
     "username"
   ],
   "properties": {
@@ -31,17 +31,17 @@
         }
       ]
     },
-    "created_at": {
+    "createdAt": {
       "type": "string",
       "format": "partial-date-time"
     },
     "email": {
       "type": "string"
     },
-    "email_verified": {
+    "emailVerified": {
       "type": "boolean"
     },
-    "full_name": {
+    "fullName": {
       "type": [
         "string",
         "null"
@@ -56,7 +56,7 @@
         "null"
       ]
     },
-    "updated_at": {
+    "updatedAt": {
       "type": "string",
       "format": "partial-date-time"
     },

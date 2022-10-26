@@ -75,7 +75,7 @@ impl From<ApiErrorType> for ApiError {
     }
 }
 
-/// Actual error type to be send across-wire
+/// Actual error type to be sent across-wire
 #[derive(Serialize)]
 struct ApiErrorResponse {
     message: String,

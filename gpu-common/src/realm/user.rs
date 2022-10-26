@@ -25,7 +25,8 @@ pub struct NewUserResponse {
     pub id: String,
 }
 
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserInfoResponse {
     pub id: String,
     pub username: String,
