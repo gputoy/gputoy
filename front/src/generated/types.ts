@@ -143,13 +143,13 @@ export interface UserInfoResponse {
   active: boolean;
   bio?: string | null;
   config?: UserConfig | null;
-  created_at: string;
+  createdAt: string;
   email: string;
-  email_verified: boolean;
-  full_name?: string | null;
+  emailVerified: boolean;
+  fullName?: string | null;
   id: string;
   image?: string | null;
-  updated_at: string;
+  updatedAt: string;
   username: string;
 }
 

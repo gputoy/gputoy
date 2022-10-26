@@ -1,7 +1,7 @@
 import { browser } from "$app/environment"
 import type { Action } from "src/generated/types"
 import { writable } from "svelte/store"
-import { user } from "./auth"
+import { wUser } from "./auth"
 
 const DEFAULT_KEYMAP = {
     'C-g': 'playPause'
@@ -35,7 +35,7 @@ export function initKeyControls() {
 
     if (browser) {
         document.addEventListener("keydown", onKeyDown)
-        user.subscribe(u => keyMap = u?.config?.keybinds ?? DEFAULT_KEYMAP)
+        wUser.subscribe(u => keyMap = u?.config?.keybinds ?? DEFAULT_KEYMAP)
         return () => document.removeEventListener("keydown", onKeyDown)
     }
 }

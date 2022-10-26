@@ -1,13 +1,17 @@
 <script lang="ts">
 	import IconButton from '$lib/buttons/IconButton.svelte'
 	import { build, render as context_render } from '$lib/context'
-	import { getProject } from '$stores/project'
-	import FaPlay from 'svelte-icons/fa/FaPlay.svelte'
+	import { clearProject, getProject } from '$stores/project'
+	import Icon from 'svelte-awesome'
+	import play from 'svelte-awesome/icons/play'
 
 	let x = context_render
 
 	function handleBuild() {
 		build(getProject())
+	}
+	function handleClear() {
+		clearProject()
 	}
 </script>
 
@@ -15,12 +19,13 @@
 	<div class="left" />
 	<div class="middle">
 		<IconButton size="md">
-			<FaPlay />
+			<Icon data={play} />
 		</IconButton>
 
 		<IconButton on:click={handleBuild}>Build</IconButton>
 
-		<IconButton on:click{context_render}>Render</IconButton>
+		<IconButton on:click={context_render}>Render</IconButton>
+		<IconButton on:click={handleClear}>Clear</IconButton>
 	</div>
 
 	<div class="right" />
