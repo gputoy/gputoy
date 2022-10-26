@@ -4,11 +4,13 @@
 	import NavItem from '$lib/buttons/NavItem.svelte'
 	import UiThemeButton from '$lib/buttons/UiThemeButton.svelte'
 	import UserModal from '$lib/modal/UserModal.svelte'
+	import { wProjectId, wProjectMeta } from '$stores/project'
 	import { onMount } from 'svelte'
-	import FaUserCircle from 'svelte-icons/fa/FaUserCircle.svelte'
-	import GoRepoForked from 'svelte-icons/go/GoRepoForked.svelte'
+	import Icon from 'svelte-awesome'
+	import codeFork from 'svelte-awesome/icons/codeFork'
+	import user from 'svelte-awesome/icons/user'
 	import '../app.css'
-	import { getSession, user } from '../stores/auth'
+	import { getSession, wUser } from '../stores/auth'
 	import '../theme.css'
 	$: {
 		console.log('Route id: ', $page.routeId)
@@ -36,19 +38,27 @@
 			<NavItem title="Docs" current={$page.routeId === 'docs'} />
 		</ul>
 
-		<div>
+		{#if $wProjectId}
+			<div class="project-info">
+				<p>
+					{$wUser?.username ?? 'anonymous'}/{$wProjectMeta.title}
+				</p>
+			</div>
+		{/if}
+
+		<div class="navend">
 			<IconButton on:click={onToggleUserModal} text="Fork">
-				<GoRepoForked width={12} height={12} />
+				<Icon data={codeFork} />
 			</IconButton>
 			<UiThemeButton />
 
-			{#if $user}
-				<IconButton on:click={onToggleUserModal} text={$user.fullname ?? $user.username}>
-					<FaUserCircle />
+			{#if $wUser}
+				<IconButton on:click={onToggleUserModal} text={$wUser.fullName ?? $wUser.username}>
+					<Icon data={user} />
 				</IconButton>
 			{:else}
 				<IconButton on:click={onToggleUserModal} text="Sign in">
-					<FaUserCircle />
+					<Icon data={user} />
 				</IconButton>
 			{/if}
 		</div>
@@ -70,7 +80,10 @@
 		align-items: center;
 		overflow-y: scroll;
 	}
-	div {
+	.project-info {
+		font-size: var(--sm);
+	}
+	.navend {
 		height: 100%;
 		display: flex;
 		justify-content: center;

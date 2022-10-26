@@ -18,27 +18,28 @@ impl UserRepository {
     }
 
     pub async fn create(&self, new_user: NewUser) -> Result<UserRow, Error> {
-        sqlx::query_as!(
-            UserRow,
+        sqlx::query_as(
             "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *",
-            new_user.username,
-            new_user.email,
-            new_user.password
         )
+        .bind(new_user.username)
+        .bind(new_user.email)
+        .bind(new_user.password)
         .fetch_one(&*self.pool)
         .await
         .map_err(From::from)
     }
 
-    pub async fn find_by_username(&self, username: &str) -> Result<UserRow, Error> {
-        sqlx::query_as!(UserRow, "SELECT * FROM users WHERE username = $1", username)
+    pub async fn find_by_email(&self, email: &str) -> Result<UserRow, Error> {
+        sqlx::query_as("SELECT * FROM users WHERE email = $1")
+            .bind(email)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)
     }
 
-    pub async fn find_by_email(&self, email: &str) -> Result<UserRow, Error> {
-        sqlx::query_as!(UserRow, "SELECT * FROM users WHERE email = $1", email)
+    pub async fn find_by_username(&self, username: &str) -> Result<UserRow, Error> {
+        sqlx::query_as("SELECT * FROM users WHERE username = $1")
+            .bind(username)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)
@@ -46,7 +47,8 @@ impl UserRepository {
 
     pub async fn find_by_id(&self, id: &str) -> Result<UserRow, Error> {
         let uuid = Uuid::parse_str(id)?;
-        sqlx::query_as!(UserRow, "SELECT * FROM users WHERE id = $1", uuid)
+        sqlx::query_as("SELECT * FROM users WHERE id = $1")
+            .bind(uuid)
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)

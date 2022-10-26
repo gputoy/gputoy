@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Action",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "togglePane"
+      ],
+      "properties": {
+        "togglePane": {
+          "$ref": "#/definitions/Pane"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "shiftPane"
+      ],
+      "properties": {
+        "shiftPane": {
+          "type": "array",
+          "items": [
+            {
+              "$ref": "#/definitions/Pane"
+            },
+            {
+              "type": "integer",
+              "format": "int32"
+            }
+          ],
+          "maxItems": 2,
+          "minItems": 2
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "description": "Play/Pause the project",
+      "type": "string",
+      "enum": [
+        "playPause"
+      ]
+    },
+    {
+      "description": "Resets project to default state",
+      "type": "string",
+      "enum": [
+        "reset"
+      ]
+    },
+    {
+      "description": "Rebuilds project",
+      "type": "string",
+      "enum": [
+        "rebuild"
+      ]
+    }
+  ],
+  "definitions": {
+    "Pane": {
+      "type": "string",
+      "enum": [
+        "editorPane",
+        "projectPane",
+        "resourcePane"
+      ]
+    }
+  }
+}

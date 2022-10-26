@@ -2,7 +2,7 @@
 	import Login from '$lib/user/Login.svelte'
 	import UserDashboard from '$lib/user/UserDashboard.svelte'
 	import { fade } from 'svelte/transition'
-	import { user } from '../../stores/auth'
+	import { wUser } from '../../stores/auth'
 	export let show: boolean = false
 	export let onHide: (() => void) | null | undefined
 	let ref: HTMLElement | undefined
@@ -32,7 +32,7 @@
 	open={show}
 	on:blur|capture={onHandleBlur}
 >
-	{#if $user}
+	{#if $wUser}
 		<UserDashboard />
 	{:else}
 		<Login />

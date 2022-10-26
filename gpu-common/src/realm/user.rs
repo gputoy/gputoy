@@ -1,3 +1,4 @@
+use crate::user::UserConfig;
 use chrono::NaiveDateTime;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -24,7 +25,8 @@ pub struct NewUserResponse {
     pub id: String,
 }
 
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserInfoResponse {
     pub id: String,
     pub username: String,
@@ -36,6 +38,7 @@ pub struct UserInfoResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<String>,
     pub email_verified: bool,
+    pub config: Option<UserConfig>,
     pub active: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,

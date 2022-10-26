@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UserInfoResponse",
+  "type": "object",
+  "required": [
+    "active",
+    "createdAt",
+    "email",
+    "emailVerified",
+    "id",
+    "updatedAt",
+    "username"
+  ],
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "bio": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "config": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/UserConfig"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "partial-date-time"
+    },
+    "email": {
+      "type": "string"
+    },
+    "emailVerified": {
+      "type": "boolean"
+    },
+    "fullName": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "type": "string"
+    },
+    "image": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "partial-date-time"
+    },
+    "username": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "Action": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "togglePane"
+          ],
+          "properties": {
+            "togglePane": {
+              "$ref": "#/definitions/Pane"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "shiftPane"
+          ],
+          "properties": {
+            "shiftPane": {
+              "type": "array",
+              "items": [
+                {
+                  "$ref": "#/definitions/Pane"
+                },
+                {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              ],
+              "maxItems": 2,
+              "minItems": 2
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "description": "Play/Pause the project",
+          "type": "string",
+          "enum": [
+            "playPause"
+          ]
+        },
+        {
+          "description": "Resets project to default state",
+          "type": "string",
+          "enum": [
+            "reset"
+          ]
+        },
+        {
+          "description": "Rebuilds project",
+          "type": "string",
+          "enum": [
+            "rebuild"
+          ]
+        }
+      ]
+    },
+    "Pane": {
+      "type": "string",
+      "enum": [
+        "editorPane",
+        "projectPane",
+        "resourcePane"
+      ]
+    },
+    "UserConfig": {
+      "type": "object",
+      "required": [
+        "keybinds"
+      ],
+      "properties": {
+        "keybinds": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Action"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,46 +1,54 @@
 <script lang="ts">
-	import { init, stop } from '$lib/context'
+	import { stop } from '$lib/context'
 	import ControlBar from '$lib/dev/ControlBar.svelte'
 	import EditorPane from '$lib/dev/EditorPane.svelte'
 	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
+	import ProjectSelection from '$lib/dev/ProjectSelection.svelte'
 	import Viewport from '$lib/dev/Viewport.svelte'
+	import { initKeyControls } from '$stores/input'
+	import { wProjectId } from '$stores/project'
 	import { onDestroy, onMount } from 'svelte'
 	import { Pane, Splitpanes } from 'svelte-splitpanes'
 
 	let clientHeight: number
 
-	onMount(init)
+	// onMount(init)
+	onMount(initKeyControls)
 	onDestroy(stop)
 </script>
 
 <div class="root" bind:clientHeight>
-	<Splitpanes style="height: 100%;" theme="no-splitter">
-		<!-- ---------- project pane ------------- -->
-		<Pane size={10} snapSize={5} maxSize={10}>
-			<ProjectPane />
-		</Pane>
+	{#if $wProjectId}
+		<Splitpanes style="height: 100%;" theme="no-splitter">
+			<!-- ---------- project pane ------------- -->
+			<Pane size={10} snapSize={5} maxSize={10}>
+				<ProjectPane />
+			</Pane>
 
-		<Pane>
-			<Splitpanes style="height: 100%;" theme="modern-theme">
-				<Pane>
-					<Splitpanes horizontal theme="modern-theme">
-						<!-- ---------- viewport  ------------- -->
-						<Pane size={60}>
-							<Viewport />
-						</Pane>
-						<!-- ---------- control bar   ------------- -->
-						<Pane size={40} minSize={(48 / clientHeight) * 100} snapSize={5}>
-							<ControlBar />
-						</Pane>
-					</Splitpanes>
-				</Pane>
-				<!-- ---------- editor   ------------- -->
-				<Pane size={40} snapSize={10}>
-					<EditorPane />
-				</Pane>
-			</Splitpanes>
-		</Pane>
-	</Splitpanes>
+			<Pane>
+				<Splitpanes style="height: 100%;" theme="modern-theme">
+					<Pane>
+						<Splitpanes horizontal theme="modern-theme">
+							<!-- ---------- viewport  ------------- -->
+							<Pane size={60}>
+								<Viewport />
+							</Pane>
+							<!-- ---------- control bar   ------------- -->
+							<Pane size={40} minSize={(48 / clientHeight) * 100} snapSize={5}>
+								<ControlBar />
+							</Pane>
+						</Splitpanes>
+					</Pane>
+					<!-- ---------- editor   ------------- -->
+					<Pane size={40} snapSize={10}>
+						<EditorPane />
+					</Pane>
+				</Splitpanes>
+			</Pane>
+		</Splitpanes>
+	{:else}
+		<ProjectSelection />
+	{/if}
 </div>
 
 <style global lang="scss">
