@@ -38,10 +38,24 @@ pub struct UserInfoResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<String>,
     pub email_verified: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<UserConfig>,
     pub active: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateUserInfoArgs {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub full_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bio: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub image: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub config: Option<UserConfig>,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]

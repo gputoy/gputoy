@@ -23,15 +23,16 @@
 		background-color: var(--button);
 		outline: 1px solid var(--border-secondary);
 		border: none;
-		border-radius: 500px;
 		color: var(--text-color);
 		transition: all 0.15s ease;
 	}
 
 	.sm {
-		font-size: var(--sm);
-		height: calc(var(--3xl) - 4px);
-		min-width: calc(var(--3xl) - 4px);
+		padding: 0 4px;
+		font-size: var(--xs);
+		height: calc(var(--2xl) - 2px);
+		min-width: calc(var(--2xl) - 2px);
+		border-radius: 4px;
 	}
 
 	.sm :global(svg) {
@@ -43,6 +44,7 @@
 		font-size: var(--md);
 		height: var(--4xl);
 		min-width: var(--4xl);
+		border-radius: 6px;
 	}
 
 	.md :global(svg) {

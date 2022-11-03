@@ -20,7 +20,14 @@ export type Action =
     }
   | "playPause"
   | "reset"
-  | "rebuild";
+  | "rebuild"
+  | "toggleConsole"
+  | {
+      focus: Pane;
+    }
+  | "closeDocument"
+  | "nextDocument"
+  | "previosDocument";
 
 export type Pane = "editorPane" | "projectPane" | "resourcePane";
 
@@ -55,7 +62,7 @@ export type SupportedExtension = "wgsl" | "glsl" | "txt" | "md" | "json" | "csv"
 export interface Project {
   config?: Config | null;
   files: Files;
-  layout?: null;
+  layout?: Layout | null;
 }
 
 export interface Config {
@@ -100,20 +107,6 @@ export interface File {
   fileName: string;
 }
 
-export interface ProjectResponse {
-  authorId?: string | null;
-  config?: Config | null;
-  createdAt: string;
-  description?: string | null;
-  files: Files;
-  forkedFromId?: string | null;
-  id: string;
-  layout?: Layout | null;
-  published: boolean;
-  title: string;
-  updatedAt: string;
-}
-
 export interface Layout {
   /**
    * Currently opened file index within workspace
@@ -129,6 +122,20 @@ export interface Layout {
   workspace: string[];
 }
 
+export interface ProjectResponse {
+  authorId?: string | null;
+  config?: Config | null;
+  createdAt: string;
+  description?: string | null;
+  files: Files;
+  forkedFromId?: string | null;
+  id: string;
+  layout?: Layout | null;
+  published: boolean;
+  title: string;
+  updatedAt: string;
+}
+
 export interface ProjectUpsert {
   config?: Config | null;
   description?: string | null;
@@ -137,6 +144,41 @@ export interface ProjectUpsert {
   layout?: Layout | null;
   published: boolean;
   title: string;
+}
+
+export type LineNumberCOnfig = "normal" | "relative" | "off";
+
+export interface UpdateUserInfoArgs {
+  bio?: string | null;
+  config?: UserConfig | null;
+  fullName?: string | null;
+  image?: string | null;
+}
+
+export interface UserConfig {
+  editor: UserEditorConfig;
+  general: UserGeneralConfig;
+  keybinds: {
+    [k: string]: FilteredAction;
+  };
+  theme: {
+    [k: string]: string;
+  };
+}
+
+export interface UserEditorConfig {
+  fontFamily?: string | null;
+  fontSize?: number | null;
+  lineNumbers: LineNumberCOnfig;
+}
+
+export interface UserGeneralConfig {
+  projectPanelSize: number;
+}
+
+export interface FilteredAction {
+  action: Action;
+  condition?: string | null;
 }
 
 export interface UserInfoResponse {
@@ -151,10 +193,4 @@ export interface UserInfoResponse {
   image?: string | null;
   updatedAt: string;
   username: string;
-}
-
-export interface UserConfig {
-  keybinds: {
-    [k: string]: Action;
-  };
 }

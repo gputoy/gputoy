@@ -4,8 +4,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum Action {
-    // INTERNAL
+    /// Toggles pane open and closed
     TogglePane(Pane),
+    /// Shifts pane by specified amount
     ShiftPane(Pane, i32),
     /// Play/Pause the project
     PlayPause,
@@ -13,6 +14,16 @@ pub enum Action {
     Reset,
     /// Rebuilds project
     Rebuild,
+    /// Toggles Console
+    ToggleConsole,
+    /// Focuses pane
+    Focus(Pane),
+    /// Closes document in editor
+    CloseDocument,
+    /// Next document in editor
+    NextDocument,
+    /// Previous document in editor
+    PreviosDocument,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]

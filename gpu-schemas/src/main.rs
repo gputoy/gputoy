@@ -42,6 +42,9 @@ fn main() -> std::io::Result<()> {
     let schema = &schema_for!(gpu_common::realm::UserInfoResponse);
     write_schema(&dir, "user_info_response", schema)?;
 
+    let schema = &schema_for!(gpu_common::realm::UpdateUserInfoArgs);
+    write_schema(&dir, "update_user_info", schema)?;
+
     let schema = &schema_for!(gpu_common::Action);
     write_schema(&dir, "action", schema)?;
 

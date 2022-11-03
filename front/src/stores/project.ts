@@ -4,8 +4,9 @@ import debounce from 'lodash/debounce'
 import generate from 'project-name-generator'
 import { derived, get, writable } from 'svelte/store'
 import { v4 } from 'uuid'
-import type { Config, Files, Layout, Project, ProjectResponse, ProjectUpsert } from '../generated/types'
+import type { Config, Layout, Project, ProjectResponse, ProjectUpsert } from '../generated/types'
 import { wUser } from './auth'
+import makeFiles, { DEFAULT_FILES } from './project/files'
 
 /**
  * STATIC DEFAULTS
@@ -16,22 +17,6 @@ const DEFAULT_LAYOUT: Layout = {
     workspace: ["shaders/main.wgsl", "run.json"] as string[]
 } as const
 const DEFAULT_CONFIG: Config = {} as const
-const DEFAULT_FILES: Files = {
-    map: {
-        "shaders/main.wgsl": {
-            "data": "...",
-            "dir": "shaders",
-            "fileName": "main",
-            "extension": "wgsl",
-        },
-        "run.json": {
-            "data": "...",
-            "dir": "",
-            "fileName": "run",
-            "extension": "json"
-        }
-    }
-} as const
 
 
 export type ProjectMeta = {
@@ -46,13 +31,7 @@ export type ProjectMeta = {
 
 export const wProjectId = writable<string | null>(null)
 
-export const wFiles = {
-    ...writable<Files>(DEFAULT_FILES),
-    // writeFile: (fileid: string, data: string) => {
-    //     const map = self.map
-    //     console.log(map)
-    // }
-}
+export const wFiles = makeFiles()
 export const wLayout = writable<Layout>(DEFAULT_LAYOUT)
 export const wConfig = writable<Config>(DEFAULT_CONFIG)
 
@@ -70,7 +49,7 @@ export const wProjectMeta = writable<ProjectMeta>({
 export function getProject(): Project {
     return {
         files: get(wFiles),
-        layout: null,
+        layout: get(wLayout),
         config: get(wConfig),
     }
 }
@@ -260,7 +239,6 @@ export function clearProject() {
  */
 export const writeToLocalStorage = debounce(_writeToLocalStorage, 5000)
 export function _writeToLocalStorage(project: ProjectResponse) {
-    console.log("in write to local storage")
     localStorage.setItem(project.id, JSON.stringify(project))
 }
 

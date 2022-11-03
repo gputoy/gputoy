@@ -1,10 +1,10 @@
 body.dark-theme {
-  --font-heading: 'Raleway', monospace;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+  --font-heading: 'raleway', monospace;
+  --font-body: 'inter', sans-serif;
+  --font-mono: sfmono-regular, menlo, monaco, consolas, 'liberation mono', 'courier new',
     monospace;
   --pure-bg: #000000;
-  --nav-color: var(--primary-color);
+  --nav-color: var(--teriary-color);
   --primary-color: #0e0e0e;
   --secondary-color: #0f0f0f;
   --tertiary-color: #070707;
@@ -33,6 +33,7 @@ body.dark-theme {
 
   --border-primary: rgba(255, 255, 255, 0.2);
   --border-secondary: rgba(255, 255, 255, 0.15);
+  --border-tertiary: rgba(255, 255, 255, 0.1);
   --border-primary-size: 1px;
 
   --icon-sm: 16px;
@@ -95,6 +96,7 @@ body {
 
   --border-primary: rgb(141, 141, 141);
   --border-secondary: rgb(179, 179, 179);
+  --border-teriary: rgb(200, 200, 200);
   --border-primary-size: 1px;
 
   --icon-sm: 16px;

@@ -5,32 +5,41 @@
 	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
 	import ProjectSelection from '$lib/dev/ProjectSelection.svelte'
 	import Viewport from '$lib/dev/Viewport.svelte'
-	import { initKeyControls } from '$stores/input'
 	import { wProjectId } from '$stores/project'
-	import { onDestroy, onMount } from 'svelte'
-	import { Pane, Splitpanes } from 'svelte-splitpanes'
+	import { wUserGeneralConfig } from '$stores/userConfig'
+	import { onDestroy } from 'svelte'
+	import { Pane, Splitpanes, type IPaneSizingEvent } from 'svelte-splitpanes'
 
 	let clientHeight: number
+	let clientWidth: number
+
+	$: projectPanePct = (
+		($wUserGeneralConfig.projectPanelSize / (clientWidth ?? 1000)) *
+		100
+	).toString()
+
+	function resized(event: IPaneSizingEvent[]) {
+		console.log(event)
+	}
 
 	// onMount(init)
-	onMount(initKeyControls)
 	onDestroy(stop)
 </script>
 
-<div class="root" bind:clientHeight>
+<div class="dev-root" bind:clientHeight bind:clientWidth>
 	{#if $wProjectId}
-		<Splitpanes style="height: 100%;" theme="no-splitter">
+		<Splitpanes style="height: 100%;" theme="modern-theme" on:resized>
 			<!-- ---------- project pane ------------- -->
-			<Pane size={10} snapSize={5} maxSize={10}>
+			<Pane size={projectPanePct}>
 				<ProjectPane />
 			</Pane>
 
 			<Pane>
-				<Splitpanes style="height: 100%;" theme="modern-theme">
+				<Splitpanes style="height: 100%;" theme="modern-theme" on:resized>
 					<Pane>
-						<Splitpanes horizontal theme="modern-theme">
+						<Splitpanes horizontal theme="modern-theme" on:resized>
 							<!-- ---------- viewport  ------------- -->
-							<Pane size={60}>
+							<Pane size="60">
 								<Viewport />
 							</Pane>
 							<!-- ---------- control bar   ------------- -->
@@ -52,7 +61,7 @@
 </div>
 
 <style global lang="scss">
-	.root {
+	.dev-root {
 		height: 100%;
 		width: 100%;
 	}

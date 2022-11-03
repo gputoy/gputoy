@@ -72,6 +72,7 @@ async fn main() -> Result<(), Error> {
             .service(crate::realm::user::sign_up)
             .service(crate::realm::user::login)
             .service(crate::realm::user::user_info)
+            .service(crate::realm::user::update_user_info)
             .service(crate::realm::user::logout)
             .service(crate::realm::project::post_project)
             .service(crate::realm::project::get_project)

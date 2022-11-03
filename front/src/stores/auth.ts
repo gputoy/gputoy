@@ -1,6 +1,8 @@
+import { browser } from '$app/environment'
 import vars from '$lib/vars'
-import type { UserInfoResponse } from 'src/generated/types'
-import { writable } from "svelte/store"
+import type { UpdateUserInfoArgs, UserInfoResponse } from 'src/generated/types'
+import { get, writable } from "svelte/store"
+import { dUserConfig, setUserConfig } from './userConfig'
 
 export const wUser = writable<UserInfoResponse | null>(null)
 
@@ -46,8 +48,49 @@ export async function getSession() {
 
   if (userRes.status != 200) {
     console.log("Unknown issue fetching user: ", await userRes.text())
+    if (browser) {
+      loadLocalConfig()
+      return
+    }
+  }
+  const user = await userRes.json()
+  wUser.set(user)
+  setUserConfig(user.config)
+}
+
+export function loadLocalConfig() {
+  if (browser) {
+    const localConfig = localStorage.getItem('config:local')
+    if (localConfig)
+      setUserConfig(JSON.parse(localConfig) ?? {})
+    else
+      setUserConfig({})
+  } else {
+    setUserConfig({})
+  }
+}
+
+export async function updateUser() {
+  const user = get(wUser)
+  const config = get(dUserConfig)
+  const body: UpdateUserInfoArgs = {
+    ...user,
+    config,
+  }
+
+  const updateUserResponse = await fetch(vars.API_PATH + 'me', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body),
+    credentials: 'include'
+  })
+
+  if (updateUserResponse.status != 200) {
+    console.log("Unknown issue fetching user: ", await updateUserResponse.text())
     return
   }
-  const json = await userRes.json()
-  wUser.set(json as UserInfoResponse)
+  const updatedUser = await updateUserResponse.json()
+  wUser.set(updatedUser)
 }
