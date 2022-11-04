@@ -1,22 +1,15 @@
+import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from '$lib/consts/project'
+import vars from '$lib/consts/vars'
 import context, { init } from '$lib/context'
-import vars from '$lib/vars'
 import debounce from 'lodash/debounce'
 import generate from 'project-name-generator'
 import { derived, get, writable } from 'svelte/store'
 import { v4 } from 'uuid'
-import type { Config, Layout, Project, ProjectResponse, ProjectUpsert } from '../generated/types'
-import { wUser } from './auth'
-import makeFiles, { DEFAULT_FILES } from './project/files'
-
-/**
- * STATIC DEFAULTS
- */
-const DEFAULT_LAYOUT: Layout = {
-    isStatusOpen: true,
-    fileIndex: 0,
-    workspace: ["shaders/main.wgsl", "run.json"] as string[]
-} as const
-const DEFAULT_CONFIG: Config = {} as const
+import type { Project, ProjectResponse, ProjectUpsert } from '../../generated/types'
+import { wUser } from '../auth'
+import makeConfig from './config'
+import makeFiles from './files'
+import makeLayout from './layout'
 
 
 export type ProjectMeta = {
@@ -32,8 +25,8 @@ export type ProjectMeta = {
 export const wProjectId = writable<string | null>(null)
 
 export const wFiles = makeFiles()
-export const wLayout = writable<Layout>(DEFAULT_LAYOUT)
-export const wConfig = writable<Config>(DEFAULT_CONFIG)
+export const wLayout = makeLayout()
+export const wConfig = makeConfig()
 
 export const wProjectMeta = writable<ProjectMeta>({
     title: "New Project",
@@ -62,7 +55,7 @@ export const dCanModifyProject = derived(
     ([metadata, user]) => (user?.id ?? null) === metadata.authorId
 )
 
-const dProject = derived(
+export const dProject = derived(
     [wFiles, wConfig, wLayout, wProjectId, wProjectMeta],
     ([files, config, layout, id, meta]): ProjectResponse | null => {
         if (!id) return null
@@ -241,4 +234,3 @@ export const writeToLocalStorage = debounce(_writeToLocalStorage, 5000)
 export function _writeToLocalStorage(project: ProjectResponse) {
     localStorage.setItem(project.id, JSON.stringify(project))
 }
-

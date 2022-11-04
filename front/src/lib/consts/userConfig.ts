@@ -13,21 +13,34 @@ export const DEFAULT_USER_EDITOR_CONFIG: UserEditorConfig = {
 export const DEFAULT_USER_KEYBINDS: { [key: string]: FilteredAction } = {
 
     'C-g': {
-        action: 'toggleConsole'
+        action: { ty: 'toggleConsole' }
     },
     'C-q': {
         action: {
-            togglePane: 'projectPane'
+            ty: 'togglePanel',
+            c: 'projectPanel'
         }
     },
     'C-y': {
         action: {
-            togglePane: 'editorPane'
+            ty: 'togglePanel',
+            c: 'editorPanel'
         }
     },
     'C-r': {
         action: {
-            togglePane: 'resourcePane'
+            ty: 'togglePanel',
+            c: 'resourcePanel'
+        }
+    },
+    'C-j': {
+        action: {
+            ty: 'previousDocument'
+        }
+    },
+    'C-k': {
+        action: {
+            ty: 'nextDocument'
         }
     }
 

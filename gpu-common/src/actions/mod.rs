@@ -1,13 +1,15 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::Panel;
+
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase", tag = "ty", content = "c")]
 pub enum Action {
     /// Toggles pane open and closed
-    TogglePane(Pane),
+    TogglePanel(Panel),
     /// Shifts pane by specified amount
-    ShiftPane(Pane, i32),
+    ShiftPanel(ShiftPaneArgs),
     /// Play/Pause the project
     PlayPause,
     /// Resets project to default state
@@ -17,19 +19,17 @@ pub enum Action {
     /// Toggles Console
     ToggleConsole,
     /// Focuses pane
-    Focus(Pane),
+    Focus(Panel),
     /// Closes document in editor
     CloseDocument,
     /// Next document in editor
     NextDocument,
     /// Previous document in editor
-    PreviosDocument,
+    PreviousDocument,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub enum Pane {
-    EditorPane,
-    ProjectPane,
-    ResourcePane,
+pub struct ShiftPaneArgs {
+    pane: Panel,
+    shift: i32,
 }

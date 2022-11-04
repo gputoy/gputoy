@@ -1,19 +1,12 @@
-import type { Action } from "src/generated/types"
-import { get, writable } from "svelte/store"
+import { pushAction } from "$lib/actions"
+import { get } from "svelte/store"
 import { wUserConfigOpen, wUserModalOpen } from "./ui"
 import { wUserKeybinds } from "./userConfig"
-
-export const actionHistory = writable<Action[]>([])
-
-export function pushAction(action: Action) {
-    console.log(action)
-}
 
 export function toKeyIdx(ev: KeyboardEvent): string {
     return (ev.ctrlKey ? 'C-' : '') + (ev.shiftKey ? 'S-' : '') + (ev.altKey ? 'A-' : '') + ev.key
 }
 function onKeyDown(ev: KeyboardEvent) {
-    console.log(ev, ev.ctrlKey, ev.shiftKey, ev.altKey)
     if (ev.key === 'Control' || ev.key === 'Shift' || ev.key === 'Alt') return
 
     if (ev.key === 'Escape') {
@@ -22,10 +15,16 @@ function onKeyDown(ev: KeyboardEvent) {
     }
 
     let keyidx = toKeyIdx(ev)
+    console.log('Got key', keyidx)
     let filteredAction = get(wUserKeybinds)[keyidx]
     // TODO: use filtered action conditional
     if (filteredAction === undefined) return
-
+    console.log('Got action: ', filteredAction.action)
     pushAction(filteredAction.action)
     ev.preventDefault()
+    ev.stopImmediatePropagation()
+}
+export function initKeys() {
+    document.addEventListener('keydown', onKeyDown, { capture: true })
+    return document.removeEventListener('keydown', onKeyDown)
 }

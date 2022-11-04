@@ -12,4 +12,24 @@ pub struct Layout {
     /// Currently opened file index within workspace
     #[serde(rename = "fileIndex")]
     workspace_file_index: Option<usize>,
+    /// Panel settings for projectPanel
+    project_panel: PanelState,
+    /// Panel settings for editorPanel
+    editor_panel: PanelState,
+    /// Panel settings for resourcePanel
+    resource_panel: PanelState,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum Panel {
+    EditorPanel,
+    ProjectPanel,
+    ResourcePanel,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PanelState {
+    show: bool,
+    size: f32,
 }

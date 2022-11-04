@@ -1,5 +1,5 @@
 <script lang="ts">
-	import IconButton from '$lib/buttons/IconButton.svelte'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import { initNewProject, loadAllProjects, setProject } from '$stores/project'
 	import type { ProjectResponse } from 'src/generated/types'
 	import Icon from 'svelte-awesome'

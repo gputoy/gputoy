@@ -1,5 +1,5 @@
 import { browser } from '$app/environment'
-import vars from '$lib/vars'
+import vars from '$lib/consts/vars'
 import type { UpdateUserInfoArgs, UserInfoResponse } from 'src/generated/types'
 import { get, writable } from "svelte/store"
 import { dUserConfig, setUserConfig } from './userConfig'
@@ -55,6 +55,7 @@ export async function getSession() {
   }
   const user = await userRes.json()
   wUser.set(user)
+  console.log(user.config)
   setUserConfig(user.config)
 }
 

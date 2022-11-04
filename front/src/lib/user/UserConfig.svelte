@@ -1,5 +1,5 @@
 <script lang="ts">
-	import IconButton from '$lib/buttons/IconButton.svelte'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import {
 		EDITOR_CONFIG_KEYS,
 		GENERAL_CONFIG_KEYS,
@@ -90,8 +90,12 @@
 <style>
 	dialog {
 		width: 50%;
+		min-width: fit-content;
+		max-width: 800px;
 		padding: 0px;
-		background-color: var(--pure-bg);
+		background-color: var(--transparent-high);
+		backdrop-filter: blur(16px);
+		border-radius: 6px;
 	}
 	.modal {
 		display: flex;
@@ -105,7 +109,7 @@
 		justify-content: space-between;
 		align-items: center;
 		padding-inline: 1rem;
-		background-color: var(--tertiary-color);
+		background-color: var(--transparent);
 		height: 4rem;
 		border-bottom: 1px solid var(--border-secondary);
 	}
@@ -120,8 +124,10 @@
 	.category-list {
 		flex: 0 0 auto;
 		border-right: 1px solid var(--border-secondary);
+		padding-top: 1rem;
 	}
 	.category-body {
+		background-color: var(--pure-bg);
 		padding: 1rem;
 		height: 100%;
 		flex: 1 1 auto;
@@ -133,9 +139,9 @@
 	.category {
 		color: var(--text-accent-color);
 		font-size: var(--sm);
+		cursor: pointer;
 		padding: 4px;
 		padding-inline: 1rem;
-		border-bottom: 1px solid var(--border-tertiary);
 	}
 	.unit {
 		margin-left: 5px;

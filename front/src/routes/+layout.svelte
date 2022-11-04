@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores'
-	import IconButton from '$lib/buttons/IconButton.svelte'
-	import NavItem from '$lib/buttons/NavItem.svelte'
-	import UiThemeButton from '$lib/buttons/UiThemeButton.svelte'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
+	import NavItem from '$lib/components/buttons/NavItem.svelte'
+	import UiThemeButton from '$lib/components/buttons/UiThemeButton.svelte'
 	import UserConfig from '$lib/user/UserConfig.svelte'
 	import UserModal from '$lib/user/UserModal.svelte'
 	import { wProjectId, wProjectMeta } from '$stores/project'
@@ -99,6 +99,7 @@
 		background-color: var(--nav-color);
 		justify-content: space-between;
 		align-items: center;
+		border-bottom: 1px solid var(--border-primary);
 	}
 	#link-container {
 		display: flex;

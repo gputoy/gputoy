@@ -9,27 +9,45 @@
 
 export type Action =
   | {
-      togglePane: Pane;
+      c: Panel;
+      ty: "togglePanel";
     }
   | {
-      /**
-       * @minItems 2
-       * @maxItems 2
-       */
-      shiftPane: [Pane, number];
+      c: ShiftPaneArgs;
+      ty: "shiftPanel";
     }
-  | "playPause"
-  | "reset"
-  | "rebuild"
-  | "toggleConsole"
   | {
-      focus: Pane;
+      ty: "playPause";
     }
-  | "closeDocument"
-  | "nextDocument"
-  | "previosDocument";
+  | {
+      ty: "reset";
+    }
+  | {
+      ty: "rebuild";
+    }
+  | {
+      ty: "toggleConsole";
+    }
+  | {
+      c: Panel;
+      ty: "focus";
+    }
+  | {
+      ty: "closeDocument";
+    }
+  | {
+      ty: "nextDocument";
+    }
+  | {
+      ty: "previousDocument";
+    };
 
-export type Pane = "editorPane" | "projectPane" | "resourcePane";
+export type Panel = "editorPanel" | "projectPanel" | "resourcePanel";
+
+export interface ShiftPaneArgs {
+  pane: Panel;
+  shift: number;
+}
 
 export type PerformanceLevel = "Default" | "PowerSaver";
 
@@ -109,6 +127,10 @@ export interface File {
 
 export interface Layout {
   /**
+   * Panel settings for editorPanel
+   */
+  editorPanel: PanelState;
+  /**
    * Currently opened file index within workspace
    */
   fileIndex?: number | null;
@@ -117,9 +139,22 @@ export interface Layout {
    */
   isStatusOpen: boolean;
   /**
+   * Panel settings for projectPanel
+   */
+  projectPanel: PanelState;
+  /**
+   * Panel settings for resourcePanel
+   */
+  resourcePanel: PanelState;
+  /**
    * List of file identifiers which is open in workspace. Order of identifiers in vec is the order it is listed in the editor.
    */
   workspace: string[];
+}
+
+export interface PanelState {
+  show: boolean;
+  size: number;
 }
 
 export interface ProjectResponse {

@@ -110,10 +110,21 @@
     "Layout": {
       "type": "object",
       "required": [
+        "editorPanel",
         "isStatusOpen",
+        "projectPanel",
+        "resourcePanel",
         "workspace"
       ],
       "properties": {
+        "editorPanel": {
+          "description": "Panel settings for editorPanel",
+          "allOf": [
+            {
+              "$ref": "#/definitions/PanelState"
+            }
+          ]
+        },
         "fileIndex": {
           "description": "Currently opened file index within workspace",
           "type": [
@@ -127,12 +138,44 @@
           "description": "Is the left side status panel open",
           "type": "boolean"
         },
+        "projectPanel": {
+          "description": "Panel settings for projectPanel",
+          "allOf": [
+            {
+              "$ref": "#/definitions/PanelState"
+            }
+          ]
+        },
+        "resourcePanel": {
+          "description": "Panel settings for resourcePanel",
+          "allOf": [
+            {
+              "$ref": "#/definitions/PanelState"
+            }
+          ]
+        },
         "workspace": {
           "description": "List of file identifiers which is open in workspace. Order of identifiers in vec is the order it is listed in the editor.",
           "type": "array",
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "PanelState": {
+      "type": "object",
+      "required": [
+        "show",
+        "size"
+      ],
+      "properties": {
+        "show": {
+          "type": "boolean"
+        },
+        "size": {
+          "type": "number",
+          "format": "float"
         }
       }
     },
