@@ -3,70 +3,192 @@
   "title": "Action",
   "oneOf": [
     {
+      "description": "Toggles pane open and closed",
       "type": "object",
       "required": [
-        "togglePane"
+        "c",
+        "ty"
       ],
       "properties": {
-        "togglePane": {
-          "$ref": "#/definitions/Pane"
+        "c": {
+          "$ref": "#/definitions/Panel"
+        },
+        "ty": {
+          "type": "string",
+          "enum": [
+            "togglePanel"
+          ]
         }
-      },
-      "additionalProperties": false
+      }
     },
     {
+      "description": "Shifts pane by specified amount",
       "type": "object",
       "required": [
-        "shiftPane"
+        "c",
+        "ty"
       ],
       "properties": {
-        "shiftPane": {
-          "type": "array",
-          "items": [
-            {
-              "$ref": "#/definitions/Pane"
-            },
-            {
-              "type": "integer",
-              "format": "int32"
-            }
-          ],
-          "maxItems": 2,
-          "minItems": 2
+        "c": {
+          "$ref": "#/definitions/ShiftPaneArgs"
+        },
+        "ty": {
+          "type": "string",
+          "enum": [
+            "shiftPanel"
+          ]
         }
-      },
-      "additionalProperties": false
+      }
     },
     {
       "description": "Play/Pause the project",
-      "type": "string",
-      "enum": [
-        "playPause"
-      ]
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "playPause"
+          ]
+        }
+      }
     },
     {
       "description": "Resets project to default state",
-      "type": "string",
-      "enum": [
-        "reset"
-      ]
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "reset"
+          ]
+        }
+      }
     },
     {
       "description": "Rebuilds project",
-      "type": "string",
-      "enum": [
-        "rebuild"
-      ]
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "rebuild"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Toggles Console",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "toggleConsole"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Focuses pane",
+      "type": "object",
+      "required": [
+        "c",
+        "ty"
+      ],
+      "properties": {
+        "c": {
+          "$ref": "#/definitions/Panel"
+        },
+        "ty": {
+          "type": "string",
+          "enum": [
+            "focus"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Closes document in editor",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "closeDocument"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Next document in editor",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "nextDocument"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Previous document in editor",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "previousDocument"
+          ]
+        }
+      }
     }
   ],
   "definitions": {
-    "Pane": {
+    "Panel": {
       "type": "string",
       "enum": [
-        "editorPane",
-        "projectPane",
-        "resourcePane"
+        "editorPanel",
+        "projectPanel",
+        "resourcePanel"
       ]
+    },
+    "ShiftPaneArgs": {
+      "type": "object",
+      "required": [
+        "pane",
+        "shift"
+      ],
+      "properties": {
+        "pane": {
+          "$ref": "#/definitions/Panel"
+        },
+        "shift": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
     }
   }
 }

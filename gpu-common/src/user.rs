@@ -3,7 +3,48 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UserConfig {
-    pub keybinds: HashMap<String, Action>,
+    pub keybinds: HashMap<String, FilteredAction>,
+    pub editor: UserEditorConfig,
+    pub theme: HashMap<String, String>,
+    pub general: UserGeneralConfig,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UserKeymap {
+    #[serde(flatten)]
+    pub map: HashMap<String, FilteredAction>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct FilteredAction {
+    pub action: Action,
+    pub condition: Option<String>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UserEditorConfig {
+    font_family: Option<String>,
+    font_size: Option<u32>,
+    line_numbers: LineNumberCOnfig,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum LineNumberCOnfig {
+    #[default]
+    Normal,
+    Relative,
+    Off,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UserGeneralConfig {
+    project_panel_size: u32,
 }

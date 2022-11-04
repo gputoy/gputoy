@@ -1,10 +1,13 @@
-import { sveltekit } from '@sveltejs/kit/vite';
-import path from 'path';
-import type { UserConfig } from 'vite';
-
+import { sveltekit } from '@sveltejs/kit/vite'
+import path from 'path'
+import type { UserConfig } from 'vite'
+const prefix = `monaco-editor/esm/vs`
 const config: UserConfig = {
+	build: {
+		target: ['es2020'],
+	},
 	optimizeDeps: {
-		exclude: ['svelte-navigator']
+		exclude: ['svelte-navigator'],
 	},
 	plugins: [sveltekit()],
 	server: {
@@ -22,6 +25,6 @@ const config: UserConfig = {
 			"$stores": path.resolve(__dirname, './src/stores'),
 		}
 	}
-};
+}
 
-export default config;
+export default config

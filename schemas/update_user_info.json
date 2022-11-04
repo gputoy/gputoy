@@ -1,0 +1,319 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UpdateUserInfoArgs",
+  "type": "object",
+  "properties": {
+    "bio": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "config": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/UserConfig"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fullName": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "image": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "definitions": {
+    "Action": {
+      "oneOf": [
+        {
+          "description": "Toggles pane open and closed",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "$ref": "#/definitions/Panel"
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "togglePanel"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Shifts pane by specified amount",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "$ref": "#/definitions/ShiftPaneArgs"
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "shiftPanel"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Play/Pause the project",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "playPause"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Resets project to default state",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "reset"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Rebuilds project",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "rebuild"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Toggles Console",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "toggleConsole"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Focuses pane",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "$ref": "#/definitions/Panel"
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "focus"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Closes document in editor",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "closeDocument"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Next document in editor",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "nextDocument"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Previous document in editor",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "previousDocument"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "FilteredAction": {
+      "type": "object",
+      "required": [
+        "action"
+      ],
+      "properties": {
+        "action": {
+          "$ref": "#/definitions/Action"
+        },
+        "condition": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "LineNumberCOnfig": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "relative",
+        "off"
+      ]
+    },
+    "Panel": {
+      "type": "string",
+      "enum": [
+        "editorPanel",
+        "projectPanel",
+        "resourcePanel"
+      ]
+    },
+    "ShiftPaneArgs": {
+      "type": "object",
+      "required": [
+        "pane",
+        "shift"
+      ],
+      "properties": {
+        "pane": {
+          "$ref": "#/definitions/Panel"
+        },
+        "shift": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "UserConfig": {
+      "type": "object",
+      "required": [
+        "editor",
+        "general",
+        "keybinds",
+        "theme"
+      ],
+      "properties": {
+        "editor": {
+          "$ref": "#/definitions/UserEditorConfig"
+        },
+        "general": {
+          "$ref": "#/definitions/UserGeneralConfig"
+        },
+        "keybinds": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FilteredAction"
+          }
+        },
+        "theme": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "UserEditorConfig": {
+      "type": "object",
+      "required": [
+        "lineNumbers"
+      ],
+      "properties": {
+        "fontFamily": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fontSize": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "lineNumbers": {
+          "$ref": "#/definitions/LineNumberCOnfig"
+        }
+      }
+    },
+    "UserGeneralConfig": {
+      "type": "object",
+      "required": [
+        "projectPanelSize"
+      ],
+      "properties": {
+        "projectPanelSize": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      }
+    }
+  }
+}

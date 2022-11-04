@@ -1,5 +1,5 @@
 <script lang="ts">
-	import IconButton from '$lib/buttons/IconButton.svelte'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import { logout } from '$stores/auth'
 </script>
 

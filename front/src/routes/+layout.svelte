@@ -1,32 +1,22 @@
 <script lang="ts">
 	import { page } from '$app/stores'
-	import IconButton from '$lib/buttons/IconButton.svelte'
-	import NavItem from '$lib/buttons/NavItem.svelte'
-	import UiThemeButton from '$lib/buttons/UiThemeButton.svelte'
-	import UserModal from '$lib/modal/UserModal.svelte'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
+	import NavItem from '$lib/components/buttons/NavItem.svelte'
+	import UiThemeButton from '$lib/components/buttons/UiThemeButton.svelte'
+	import UserConfig from '$lib/user/UserConfig.svelte'
+	import UserModal from '$lib/user/UserModal.svelte'
 	import { wProjectId, wProjectMeta } from '$stores/project'
+	import { toggleUserConfig, toggleUserModal } from '$stores/ui'
 	import { onMount } from 'svelte'
 	import Icon from 'svelte-awesome'
 	import codeFork from 'svelte-awesome/icons/codeFork'
+	import gear from 'svelte-awesome/icons/gear'
 	import user from 'svelte-awesome/icons/user'
 	import '../app.css'
 	import { getSession, wUser } from '../stores/auth'
 	import '../theme.css'
-	$: {
-		console.log('Route id: ', $page.routeId)
-	}
 
 	onMount(getSession)
-
-	$: showUserModal = false
-
-	function onToggleUserModal() {
-		showUserModal = !showUserModal
-	}
-
-	function onHideUserModal() {
-		showUserModal = false
-	}
 </script>
 
 <header>
@@ -38,7 +28,7 @@
 			<NavItem title="Docs" current={$page.routeId === 'docs'} />
 		</ul>
 
-		{#if $wProjectId}
+		{#if $wProjectId && $page.routeId === 'dev'}
 			<div class="project-info">
 				<p>
 					{$wUser?.username ?? 'anonymous'}/{$wProjectMeta.title}
@@ -47,25 +37,29 @@
 		{/if}
 
 		<div class="navend">
-			<IconButton on:click={onToggleUserModal} text="Fork">
+			<IconButton on:click={toggleUserModal} text="Fork">
 				<Icon data={codeFork} />
 			</IconButton>
 			<UiThemeButton />
 
 			{#if $wUser}
-				<IconButton on:click={onToggleUserModal} text={$wUser.fullName ?? $wUser.username}>
+				<IconButton on:click={toggleUserModal} text={$wUser.fullName ?? $wUser.username}>
 					<Icon data={user} />
 				</IconButton>
 			{:else}
-				<IconButton on:click={onToggleUserModal} text="Sign in">
+				<IconButton on:click={toggleUserModal} text="Sign in">
 					<Icon data={user} />
 				</IconButton>
 			{/if}
+			<IconButton on:click={toggleUserConfig}>
+				<Icon data={gear} />
+			</IconButton>
 		</div>
 	</nav>
 </header>
 <main>
-	<UserModal show={showUserModal} onHide={onHideUserModal} />
+	<UserModal />
+	<UserConfig />
 	<slot />
 </main>
 
@@ -78,7 +72,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		overflow-y: scroll;
+		overflow-y: hidden;
 	}
 	.project-info {
 		font-size: var(--sm);
@@ -87,7 +81,7 @@
 		height: 100%;
 		display: flex;
 		justify-content: center;
-		gap: 0.25rem;
+		gap: 0.5rem;
 		margin-right: 0.25rem;
 		align-items: center;
 	}
@@ -105,6 +99,7 @@
 		background-color: var(--nav-color);
 		justify-content: space-between;
 		align-items: center;
+		border-bottom: 1px solid var(--border-primary);
 	}
 	#link-container {
 		display: flex;

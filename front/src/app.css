@@ -3,6 +3,10 @@
 @import '@fontsource/inter';
 @import '@fontsource/raleway';
 
+html {
+	height: 100%;
+}
+
 body {
 	margin: 0;
 	display: flex;
@@ -15,6 +19,10 @@ body {
 	overflow: hidden;
 	padding: 0px;
 	margin: 0px;
+}
+
+p {
+	color: var(--text-color);
 }
 
 ul {
@@ -35,6 +43,18 @@ h2 {
 	font-size: var(--3xl);
 }
 
+h3 {
+	color: var(--text-accent-color);
+	font-family: var(--font-heading);
+	font-weight: bold;
+	font-size: var(--2xl);
+}
+
+code {
+	color: var(--text-color);
+	font-weight: 600;
+}
+
 input {
 	color: var(--text-color);
 	background-color: var(--input-color);
@@ -48,6 +68,22 @@ input:focus {
 
 input:invalid {
 	outline: 1px var(--accent-color) solid;
+}
+
+textarea {
+	color: var(--text-accent-color);
+	outline: none;
+	border: none;
+}
+
+dialog {
+	background-color: var(--primary-color);
+	border: 1px solid var(--border-primary);
+}
+
+label {
+	color: var(--text-accent-color);
+	font-size: var(--sm);
 }
 
 #canvas {

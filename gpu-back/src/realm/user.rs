@@ -92,6 +92,19 @@ pub async fn user_info(
     Ok(HttpResponse::Ok().json(UserInfoResponse::from(user)))
 }
 
+#[post("/me")]
+pub async fn update_user_info(
+    ident: Identity,
+    user_repository: web::Data<Arc<UserRepository>>,
+    web::Json(update_user): web::Json<UpdateUserInfoArgs>,
+) -> ApiResult {
+    let id = ident
+        .id()
+        .map_err(|_| ("Invalid indentity", ApiErrorType::InternalServerError))?;
+    let updated_user = user_repository.update_user(&id, update_user).await?;
+    Ok(HttpResponse::Ok().json(UserInfoResponse::from(updated_user)))
+}
+
 #[post("/logout")]
 pub async fn logout(ident: Identity) -> ApiResult {
     ident.logout();

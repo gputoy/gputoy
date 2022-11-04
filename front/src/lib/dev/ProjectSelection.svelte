@@ -1,5 +1,5 @@
 <script lang="ts">
-	import IconButton from '$lib/buttons/IconButton.svelte'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import { initNewProject, loadAllProjects, setProject } from '$stores/project'
 	import type { ProjectResponse } from 'src/generated/types'
 	import Icon from 'svelte-awesome'
@@ -10,7 +10,7 @@
 	}
 </script>
 
-<div class="root">
+<div class="project-selection">
 	<div class="projects-container">
 		<div class="header">
 			<h2>Projects</h2>
@@ -25,7 +25,7 @@
 				{#each list as project}
 					<div class="project-item" on:click={() => onSetProject(project)}>
 						<span class="project-title">{project.title}</span>
-						<span class="project-title">{project.title}</span>
+						<span class="project-date" />
 					</div>
 				{/each}
 			{/await}
@@ -34,10 +34,11 @@
 </div>
 
 <style>
-	.root {
+	.project-selection {
 		display: flex;
 		flex-direction: column;
 		width: 100%;
+		height: 100%;
 		align-items: center;
 		justify-content: center;
 	}

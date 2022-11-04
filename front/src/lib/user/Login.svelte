@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { login } from '../../stores/auth'
+	import { login } from '$stores/auth'
 
-	let isOpen: boolean
 	let username_or_email: string = ''
 	let password: string = ''
 	let invalidIdentifier = false

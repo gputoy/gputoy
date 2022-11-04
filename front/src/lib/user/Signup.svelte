@@ -1,5 +1,5 @@
 <script lang="ts">
-	import vars from '$lib/vars'
+	import vars from '$lib/consts/vars'
 	let username: string = ''
 	let password: string = ''
 	let email: string = ''
