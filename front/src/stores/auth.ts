@@ -1,5 +1,4 @@
-import { browser } from '$app/environment'
-import vars from '$lib/consts/vars'
+import * as api from '$lib/core/api'
 import type { UpdateUserInfoArgs, UserInfoResponse } from 'src/generated/types'
 import { get, writable } from "svelte/store"
 import { dUserConfig, setUserConfig } from './userConfig'
@@ -7,91 +6,47 @@ import { dUserConfig, setUserConfig } from './userConfig'
 export const wUser = writable<UserInfoResponse | null>(null)
 
 export async function login(username_or_email: string, password: string) {
-  const loginRes = await fetch(vars.API_PATH + 'login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: new URLSearchParams({
-      username_or_email,
-      password
-    }),
-    credentials: 'include'
-  })
-  console.log("Returned res: ", loginRes)
-  if (loginRes.status == 401) {
-    wUser.set(null)
-    console.log("Invalid credentials")
-    return
-  }
-  if (loginRes.status != 200) {
-    console.log("Unknown issue logging in: ", await loginRes.text())
+  const response = await api.login(username_or_email, password)
+  if (response?.message) {
+    // TODO: turn this awful alert into a presentable error message
+    alert(`Recieved ${response.status} status on login response. Message: ${response.message}`)
     return
   }
   getSession()
 }
 
 export async function logout() {
-  const logoutRes = await fetch(vars.API_PATH + 'logout', {
-    method: 'POST',
-    credentials: 'include'
-  })
-  console.log("Logout res: ", logoutRes)
+  const response = await api.logout()
+  if (response?.message)
+    // TODO: turn this awful alert into a presentable error message
+    alert(`Recieved ${response.status} status on logout response. Message: ${response.message}`)
   wUser.set(null)
 }
 
 export async function getSession() {
-  const userRes = await fetch(vars.API_PATH + 'me', {
-    method: 'GET',
-    credentials: 'include'
-  })
-
-  if (userRes.status != 200) {
-    console.log("Unknown issue fetching user: ", await userRes.text())
-    if (browser) {
-      loadLocalConfig()
-      return
-    }
+  const response = await api.getSession()
+  if ('message' in response) {
+    // TODO: turn this awful log into a presentable error message
+    console.log(`Recieved ${response.status} status on getSession response. Message: ${response.message}`)
+    return
   }
-  const user = await userRes.json()
-  wUser.set(user)
-  console.log(user.config)
-  setUserConfig(user.config)
-}
-
-export function loadLocalConfig() {
-  if (browser) {
-    const localConfig = localStorage.getItem('config:local')
-    if (localConfig)
-      setUserConfig(JSON.parse(localConfig) ?? {})
-    else
-      setUserConfig({})
-  } else {
-    setUserConfig({})
-  }
+  wUser.set(response)
+  setUserConfig(response.config ?? undefined)
 }
 
 export async function updateUser() {
   const user = get(wUser)
   const config = get(dUserConfig)
-  const body: UpdateUserInfoArgs = {
+  const args: UpdateUserInfoArgs = {
     ...user,
     config,
   }
-
-  const updateUserResponse = await fetch(vars.API_PATH + 'me', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body),
-    credentials: 'include'
-  })
-
-  if (updateUserResponse.status != 200) {
-    console.log("Unknown issue fetching user: ", await updateUserResponse.text())
+  const response = await api.updateUser(args)
+  if ('message' in response) {
+    // TODO: turn this awful alert into a presentable error message
+    alert(`Recieved ${response.status} status on updateUser response. Message: ${response.message}`)
     return
   }
-  const updatedUser = await updateUserResponse.json()
-  wUser.set(updatedUser)
+  wUser.set(response)
+  setUserConfig(response.config ?? undefined)
 }

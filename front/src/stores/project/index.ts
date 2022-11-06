@@ -1,6 +1,7 @@
+import { browser } from '$app/environment'
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from '$lib/consts/project'
-import vars from '$lib/consts/vars'
-import context, { init } from '$lib/context'
+import * as api from '$lib/core/api'
+import context, { init } from '$lib/core/context'
 import debounce from 'lodash/debounce'
 import generate from 'project-name-generator'
 import { derived, get, writable } from 'svelte/store'
@@ -11,7 +12,12 @@ import makeConfig from './config'
 import makeFiles from './files'
 import makeLayout from './layout'
 
-
+/**
+ * Project metadata, basically everything besides files, layout, and config
+ * This is split so each of these stores of components of the project can be
+ * sunscribed to seperately
+ * TODO: maybe include this within gpu-core?
+ */
 export type ProjectMeta = {
     title: string,
     description?: string,
@@ -22,12 +28,31 @@ export type ProjectMeta = {
     forkedFromId?: string,
 }
 
-export const wProjectId = writable<string | null>(null)
+/**
+ * Data required to display project select ui
+ */
+export type ProjectSelectInfo = {
+    id: string,
+    title: string,
+    saveStatus: ProjectSaveStatus,
+    lastUpdated: Date,
+}
 
+/**
+ * remote: project was fetched from remote server
+ * 
+ * local: project was fetched from local storage
+ * 
+ * local-changes: project was available in both remote and local,
+ *                but local is more up to date
+ */
+export type ProjectSaveStatus = 'remote' | 'local' | 'local-changes'
+
+// Main project stores 
+export const wProjectId = writable<string | null>(null)
 export const wFiles = makeFiles()
 export const wLayout = makeLayout()
 export const wConfig = makeConfig()
-
 export const wProjectMeta = writable<ProjectMeta>({
     title: "New Project",
     description: "This is a new project",
@@ -36,7 +61,6 @@ export const wProjectMeta = writable<ProjectMeta>({
 } as ProjectMeta)
 
 /**
- * 
  * @returns Non-reactive get for project in store memory
  */
 export function getProject(): Project {
@@ -49,12 +73,16 @@ export function getProject(): Project {
 
 /**
  *  Reactive var which indicates if user can modify current project
+ *  If not, use will need to fork before modifying.
  */
 export const dCanModifyProject = derived(
     [wProjectMeta, wUser],
     ([metadata, user]) => (user?.id ?? null) === metadata.authorId
 )
 
+/**
+ * Reactive var for subscribing local storage save 
+ */
 export const dProject = derived(
     [wFiles, wConfig, wLayout, wProjectId, wProjectMeta],
     ([files, config, layout, id, meta]): ProjectResponse | null => {
@@ -76,12 +104,30 @@ export const dProject = derived(
     }
 )
 
+/**
+ * Writes to local storage only after the alloted amount of time after 
+ * last edit has occured
+ * TODO: add project save timing to user config
+ */
+const writeToLocalStorage = debounce(_writeToLocalStorage, 5000)
+function _writeToLocalStorage(project: ProjectResponse) {
+    // TODO: doing dates like this will probably cause a problem
+    if (browser) {
+        project.updatedAt = Date.now().toString()
+        localStorage.setItem(project.id, JSON.stringify(project))
+    }
+}
 dProject.subscribe(p => {
     if (p != null)
         writeToLocalStorage(p)
 })
 
+/**
+ * Creates default project and stores within project stores
+ * TODO: Init from templates instead of hardcoded default 
+ */
 export async function initNewProject() {
+    // defaults to silly two word title
     const title = generate().dashed
     const now = Date.now().toLocaleString()
     wFiles.set(DEFAULT_FILES)
@@ -95,6 +141,9 @@ export async function initNewProject() {
         createdAt: now,
         updatedAt: now
     })
+    // local projects need an id too...
+    // this will be used until the user decides to upload to remote,
+    // then the local storage entry should be removed
     wProjectId.set('local:' + v4())
     await init()
 }
@@ -106,18 +155,15 @@ export async function initNewProject() {
  * @returns 
  */
 export async function loadProject(projectId: string) {
-    const projectResponse = await fetch(vars.API_PATH + 'project/' + projectId, {
-        method: 'GET',
-        credentials: 'include'
-    })
-
-    const project = await projectResponse.json()
-    if ("message" in project) {
-        console.error("Failed to load project: ", project.message)
+    const response = await api.getProject(projectId)
+    if ('message' in response) {
+        // TODO: turn this awful alert into a presentable error message
+        alert(`Recieved ${response.status} status on getProject response. Message: ${response.message}`)
         return
     }
-    setProject(project, true)
+    setProject(response, true)
 }
+
 
 /**
  * Loads all projects belonging to user within remote storage and local storage
@@ -127,11 +173,15 @@ export async function loadAllProjects(): Promise<ProjectResponse[]> {
     let remoteProjects: ProjectResponse[] = []
     let localProjects: ProjectResponse[] = []
     if (userid) {
-        const myProjectsResponse = await fetch(vars.API_PATH + 'project/user/' + userid, {
-            method: 'GET',
-            credentials: 'include'
-        })
-        remoteProjects = await myProjectsResponse.json()
+        // TODO: switch out user projects call with call that only fetches
+        // needed project info (id, title, last updated) to reduce bandwith
+        const response = await api.getUserProjects(userid)
+        if ('message' in response) {
+            // TODO: turn this awful alert into a presentable error message
+            alert(`Recieved ${response.status} status on getUseProjects response. Message: ${response.message}`)
+        } else {
+            remoteProjects = response
+        }
     }
     localProjects = Object.keys(localStorage)
         .filter(k => k.startsWith("local:"))
@@ -153,7 +203,7 @@ export async function saveProject(published: boolean = false) {
     const layout = get(wLayout)
 
     const project: ProjectUpsert = {
-        id,
+        id: id?.startsWith('local') ? undefined : id,
         title,
         description,
         files,
@@ -162,18 +212,12 @@ export async function saveProject(published: boolean = false) {
         published
     }
 
-    const projectResponse = await fetch(vars.API_PATH + 'project', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(project)
-    })
-
-    const response = await projectResponse.json()
-    if ("message" in response) {
-        console.error("Something went wrong posting project: ", response.message)
+    const response = await api.updateProject(project)
+    if ('message' in response) {
+        // TODO: turn this awful alert into a presentable error message
+        alert(`Recieved ${response.status} status on login response. Message: ${response.message}`)
         return
     }
-
     setProject(response)
 }
 
@@ -224,13 +268,3 @@ export function clearProject() {
     context?.free()
 }
 
-
-/**
- * Writes to local storage only after the alloted amount of time after 
- * last edit has occured
- * TODO: add project save timing to user config
- */
-export const writeToLocalStorage = debounce(_writeToLocalStorage, 5000)
-export function _writeToLocalStorage(project: ProjectResponse) {
-    localStorage.setItem(project.id, JSON.stringify(project))
-}

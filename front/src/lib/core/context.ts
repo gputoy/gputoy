@@ -1,6 +1,7 @@
 import { browser } from '$app/environment'
 import type { Project } from 'src/generated/types'
-import { Context, default as init_module } from '../../pkg/gpu_wasm'
+
+import { Context, default as init_module } from '../../../pkg/gpu_wasm'
 
 var context: Context | undefined = undefined
 

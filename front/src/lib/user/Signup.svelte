@@ -1,5 +1,5 @@
 <script lang="ts">
-	import vars from '$lib/consts/vars'
+	import { signUp } from '$lib/core/api'
 	let username: string = ''
 	let password: string = ''
 	let email: string = ''
@@ -8,19 +8,7 @@
 	$: invalidEmail = isEmailInvalid(email)
 	$: invalidPassword = isPasswordInvalid(password)
 	async function onSubmit() {
-		const response = await fetch(vars.API_PATH + 'signup', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			},
-			body: new URLSearchParams({
-				username,
-				email,
-				password
-			})
-		})
-		const json = await response.json()
-		console.log('Response: ', json)
+		const result = await signUp({ username, email, password })
 	}
 
 	function isUsernameInvalid(username: string): boolean {

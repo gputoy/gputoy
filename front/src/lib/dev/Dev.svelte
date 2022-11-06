@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { stop } from '$lib/context'
+	import { stop } from '$lib/core/context'
 	import ControlBar from '$lib/dev/ControlBar.svelte'
 	import EditorPane from '$lib/dev/EditorPane.svelte'
 	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
@@ -15,7 +15,6 @@
 
 	function makeResizeHandler(panel: Panel, idx: number) {
 		return function resize(event: CustomEvent<IPaneSizingEvent[]>) {
-			console.log(event)
 			wLayout.setPanelSize(panel, event.detail[idx].size)
 		}
 	}

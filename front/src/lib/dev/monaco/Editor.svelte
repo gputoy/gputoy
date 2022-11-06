@@ -30,7 +30,6 @@
 	async function initEditor() {
 		self.MonacoEnvironment = {
 			getWorker(_, label) {
-				console.log('worker label: ', label)
 				if (label === 'json') {
 					return new jsonWorker()
 				}

@@ -19,8 +19,6 @@
 		let fileid = workspace[index]
 		if (fileid) wLayout.update((layout) => ({ ...layout, fileIndex: index }))
 	}
-
-	$: console.log('fileid: ', fileid)
 </script>
 
 <div class="file-tabs">

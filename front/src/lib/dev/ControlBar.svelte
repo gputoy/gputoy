@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
-	import { build, render as context_render } from '$lib/context'
+	import { build, render as context_render } from '$lib/core/context'
 	import { clearProject, getProject } from '$stores/project'
 
 	import Icon from 'svelte-awesome'

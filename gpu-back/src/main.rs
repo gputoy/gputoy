@@ -63,7 +63,9 @@ async fn main() -> Result<(), Error> {
             .wrap(
                 Cors::default()
                     .allowed_origin(&cors_allowed)
+                    .allowed_methods(vec!["GET", "POST", "OPTIONS"])
                     .supports_credentials()
+                    .allow_any_header()
                     .expose_any_header(),
             )
             .app_data(Data::new(pool.clone()))
