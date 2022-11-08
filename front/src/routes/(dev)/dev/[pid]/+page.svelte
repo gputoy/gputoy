@@ -5,7 +5,6 @@
 	import { onMount } from 'svelte'
 	export let data: ProjectResponse
 	onMount(() => {
-		console.log(data)
 		if (data) setProject(data, false)
 		else clearProject()
 	})

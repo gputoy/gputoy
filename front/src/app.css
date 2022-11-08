@@ -21,6 +21,7 @@ body {
 	margin: 0px;
 }
 
+
 p {
 	color: var(--text-color);
 }
@@ -60,6 +61,9 @@ input {
 	background-color: var(--input-color);
 	padding: 1rem;
 	border: none;
+	padding: 4px;
+	outline: 1px solid var(--border-secondary);
+	font-size: var(--xs);
 }
 
 input:focus {
@@ -68,6 +72,19 @@ input:focus {
 
 input:invalid {
 	outline: 1px var(--accent-color) solid;
+}
+
+select {
+	background-color: var(--input-color);
+	color: var(--text-color);
+	padding: 4px;
+	outline: 1px solid var(--border-secondary);
+	font-size: var(--xs);
+	border: none;
+}
+
+option {
+	background-color: var(--input-color);
 }
 
 textarea {
@@ -79,6 +96,7 @@ textarea {
 dialog {
 	background-color: var(--primary-color);
 	border: 1px solid var(--border-primary);
+	position: absolute;
 }
 
 label {
@@ -110,4 +128,10 @@ label {
 
 *::-webkit-scrollbar-thumb {
 	background-color: var(--glass-med);
+}
+
+.search-icon {
+	position: absolute;
+	translate: 4px 3px;
+	fill: var(--text-accent-color)
 }

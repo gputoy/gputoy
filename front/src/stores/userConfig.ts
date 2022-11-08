@@ -1,4 +1,6 @@
+import { browser } from "$app/environment"
 import { DEFAULT_USER_EDITOR_CONFIG, DEFAULT_USER_GENERAL_CONFIG, DEFAULT_USER_KEYBINDS, USER_CONFIG_META, type ConfigItemMeta, type ConfigKey, type ConfigScope, type GeneralConfigKey } from "$lib/consts/userConfig"
+import debounce from "lodash/debounce"
 import type { FilteredAction, UserConfig, UserEditorConfig, UserGeneralConfig } from "src/generated/types"
 import { derived, writable } from "svelte/store"
 
@@ -17,7 +19,21 @@ export const dUserConfig = derived(
         }
     })
 
-export function setUserConfig(config: Partial<UserConfig>) {
+/**
+ * Writes to local storage only after the alloted amount of time after 
+ * last edit has occured
+ */
+const writeToLocalStorage = debounce(_writeToLocalStorage, 5000)
+function _writeToLocalStorage(config: UserConfig) {
+    if (browser) {
+        localStorage.setItem('config', JSON.stringify(config))
+        localStorage.setItem('config:updated', JSON.stringify(Date.now()))
+    }
+}
+dUserConfig.subscribe(writeToLocalStorage)
+
+export function setUserConfig(config?: Partial<UserConfig>) {
+    if (!config) return
     wUserGeneralConfig.set({ ...DEFAULT_USER_GENERAL_CONFIG, ...config.general })
     wUserEditorConfig.set({ ...DEFAULT_USER_EDITOR_CONFIG, ...config.editor })
     wUserKeybinds.set({ ...DEFAULT_USER_KEYBINDS, ...config.keybinds })

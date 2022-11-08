@@ -15,6 +15,7 @@ pub struct NewUser {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Credentials {
     pub username_or_email: String,
     pub password: String,

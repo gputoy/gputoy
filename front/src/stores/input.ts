@@ -1,4 +1,4 @@
-import { pushAction } from "$lib/actions"
+import { pushAction } from "$lib/core/actions"
 import { get } from "svelte/store"
 import { wUserConfigOpen, wUserModalOpen } from "./ui"
 import { wUserKeybinds } from "./userConfig"
@@ -15,11 +15,9 @@ function onKeyDown(ev: KeyboardEvent) {
     }
 
     let keyidx = toKeyIdx(ev)
-    console.log('Got key', keyidx)
     let filteredAction = get(wUserKeybinds)[keyidx]
     // TODO: use filtered action conditional
     if (filteredAction === undefined) return
-    console.log('Got action: ', filteredAction.action)
     pushAction(filteredAction.action)
     ev.preventDefault()
     ev.stopImmediatePropagation()
