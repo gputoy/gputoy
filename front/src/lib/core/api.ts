@@ -85,13 +85,13 @@ export async function getSession(): Response<types.UserInfoResponse> {
         method: 'GET',
         credentials: 'include'
     })
-    const user = await userRes.json()
     if (userRes.status != 200) {
         return {
-            message: user.message,
+            message: 'Unauthorized',
             status: userRes.status
         }
     }
+    const user = await userRes.json()
     return user
 }
 

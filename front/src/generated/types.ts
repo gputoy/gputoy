@@ -58,7 +58,7 @@ export interface Config {
 
 export interface Credentials {
   password: string;
-  username_or_email: string;
+  usernameOrEmail: string;
 }
 
 export interface LoginResponse {

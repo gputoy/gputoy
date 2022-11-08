@@ -6,11 +6,12 @@
 	import UserConfig from '$lib/user/UserConfig.svelte'
 	import UserModal from '$lib/user/UserModal.svelte'
 	import { wUser } from '$stores/auth'
-	import { saveProject, wProjectId, wProjectMeta } from '$stores/project'
+	import { saveProject, wProjectMeta } from '$stores/project'
 	import { toggleUserConfig, toggleUserModal } from '$stores/ui'
 	import Icon from 'svelte-awesome'
 	import codeFork from 'svelte-awesome/icons/codeFork'
 	import gear from 'svelte-awesome/icons/gear'
+	import save from 'svelte-awesome/icons/save'
 	import user from 'svelte-awesome/icons/user'
 </script>
 
@@ -23,33 +24,41 @@
 			<NavItem title="Docs" current={$page.routeId === 'docs'} />
 		</ul>
 
-		{#if $wProjectId && $page.routeId === 'dev'}
-			<div class="project-info">
-				<p>
-					{$wUser?.username ?? 'anonymous'}/{$wProjectMeta.title}
-				</p>
-			</div>
-		{/if}
+		<div class="project-info">
+			<p>
+				{$wUser?.username ?? 'anonymous'}/{$wProjectMeta.title}
+			</p>
+		</div>
 
 		<div class="navend">
-			<IconButton on:click={() => saveProject(true)} text="Save" />
-			<IconButton on:click={toggleUserModal} text="Fork">
-				<Icon data={codeFork} />
-			</IconButton>
+			<div class="navend-container">
+				<IconButton on:click={() => saveProject(true)} disabled={$wUser == null} series="first">
+					<Icon data={save} />
+				</IconButton>
+				<IconButton on:click={toggleUserModal} text="Fork" series="last">
+					<Icon data={codeFork} />
+				</IconButton>
+			</div>
 			<UiThemeButton />
 
-			{#if $wUser}
-				<IconButton on:click={toggleUserModal} text={$wUser.fullName ?? $wUser.username}>
-					<Icon data={user} />
+			<div class="navend-container">
+				{#if $wUser}
+					<IconButton
+						on:click={toggleUserModal}
+						text={$wUser.fullName ?? $wUser.username}
+						series="first"
+					>
+						<Icon data={user} />
+					</IconButton>
+				{:else}
+					<IconButton on:click={toggleUserModal} text="Sign in" series="first">
+						<Icon data={user} />
+					</IconButton>
+				{/if}
+				<IconButton on:click={toggleUserConfig} series="last">
+					<Icon data={gear} />
 				</IconButton>
-			{:else}
-				<IconButton on:click={toggleUserModal} text="Sign in">
-					<Icon data={user} />
-				</IconButton>
-			{/if}
-			<IconButton on:click={toggleUserConfig}>
-				<Icon data={gear} />
-			</IconButton>
+			</div>
 		</div>
 	</nav>
 </header>
@@ -77,9 +86,14 @@
 		height: 100%;
 		display: flex;
 		justify-content: center;
-		gap: 0.5rem;
 		margin-right: 0.25rem;
+		gap: 0.25rem;
 		align-items: center;
+	}
+
+	.navend-container {
+		display: flex;
+		flex-direction: row;
 	}
 
 	header {

@@ -7,7 +7,7 @@
 </script>
 
 <button
-	class={'icon-button ' + size}
+	class={size}
 	{...$$restProps}
 	on:click
 	class:left-round={series == 'none' || series == 'first'}
@@ -27,16 +27,29 @@
 	div {
 		padding: 4px;
 	}
-	.icon-button {
+	button {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		background-color: var(--button);
 		border: 1px solid var(--border-secondary);
-		color: var(--text-color);
-		transition: all 0.15s ease;
+		color: var(--text-accent-color);
+	}
+	button:disabled {
+		color: var(--border-secondary);
 	}
 
+	button:hover:enabled {
+		background-color: var(--button-hover);
+		color: var(--text-color);
+		background-color: var(--glass-low);
+	}
+
+	button:active:enabled {
+		color: var(--accent-color);
+		background-color: var(--button-active);
+		outline: none;
+	}
 	.sm {
 		padding: 0 4px;
 		font-size: var(--xs);
@@ -71,16 +84,6 @@
 	.lg :global(svg) {
 		width: var(--icon-lg);
 		height: var(--icon-lg);
-	}
-
-	.icon-button:hover {
-		background-color: var(--button-hover);
-	}
-
-	.icon-button:active {
-		color: var(--accent-color);
-		background-color: var(--button-active);
-		outline: none;
 	}
 	.left-round {
 		border-top-left-radius: var(--border-radius);

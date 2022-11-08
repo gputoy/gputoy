@@ -23,9 +23,11 @@
   --9xl: 8rem;
 
   --card-shadow: none;
+
+  --z-modal: 1;
 }
 
-body.dark-theme {
+body.dark {
   --pure-bg: #000000;
   --nav-color: var(--teriary-color);
   --primary-color: #0e0e0e;
@@ -53,7 +55,7 @@ body.dark-theme {
 
   --input-color: rgba(255, 255, 255, 0.027);
 
-  --button: rgba(255, 255, 255, 0.12);
+  --button: rgba(255, 255, 255, 0);
   --button-hovered: rgba(255, 255, 255, 0.1);
   --button-active: rgba(0, 0, 0, 0.1);
 
@@ -63,7 +65,7 @@ body.dark-theme {
 }
 
 
-body {
+body.light {
 
   --pure-bg: #e0e0e0;
   --primary-color: #D3D3D3;
