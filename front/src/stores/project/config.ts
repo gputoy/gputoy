@@ -1,10 +1,9 @@
 import { DEFAULT_CONFIG } from "$lib/consts/project"
 import type { Config } from "src/generated/types"
-import { writable, type Writable } from "svelte/store"
+import { makeEnhanced } from "../enhanced"
 
-export type WritableConfig = Writable<Config> & {
+export type ConfigExtras = {
 }
-export default function makeConfig(): WritableConfig {
-    const config = writable<Config>(DEFAULT_CONFIG)
-    return { ...config }
-}
+export default makeEnhanced<Config, ConfigExtras>(DEFAULT_CONFIG, function (config) {
+    return {}
+}) 

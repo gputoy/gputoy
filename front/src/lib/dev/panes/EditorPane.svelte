@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { wFiles, wLayout } from '$stores/project'
-	import Editor from './monaco/Editor.svelte'
+	import Editor from '../monaco/Editor.svelte'
 
 	$: workspace = $wLayout.workspace
 	$: fileindex = $wLayout.fileIndex ?? null
@@ -29,7 +29,7 @@
 	{/each}
 </div>
 {#if fileid}
-	<Editor {fileid} />
+	<Editor />
 {:else}
 	<div>No file selected</div>
 {/if}
@@ -56,6 +56,6 @@
 	}
 
 	.selected {
-		background-color: var(--primary-color);
+		background-color: var(--background-alt);
 	}
 </style>

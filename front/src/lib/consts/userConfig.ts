@@ -1,7 +1,10 @@
-import type { FilteredAction, UserEditorConfig, UserGeneralConfig } from 'src/generated/types'
+import type { Keybinds } from '$lib/core/input'
+import type { UserEditorConfig, UserGeneralConfig } from 'src/generated/types'
 
 export const DEFAULT_USER_GENERAL_CONFIG: UserGeneralConfig = {
-    projectPanelSize: 200
+    projectPanelSize: 12,
+    editorPanelSize: 50,
+    resourcePanelSize: 40,
 } as const
 
 export const DEFAULT_USER_EDITOR_CONFIG: UserEditorConfig = {
@@ -10,7 +13,7 @@ export const DEFAULT_USER_EDITOR_CONFIG: UserEditorConfig = {
     fontSize: 12,
 } as const
 
-export const DEFAULT_USER_KEYBINDS: { [key: string]: FilteredAction } = {
+export const DEFAULT_USER_KEYBINDS: Keybinds = {
 
     'C-g': {
         action: { ty: 'toggleConsole' }
@@ -21,7 +24,7 @@ export const DEFAULT_USER_KEYBINDS: { [key: string]: FilteredAction } = {
             c: 'projectPanel'
         }
     },
-    'C-y': {
+    'C-e': {
         action: {
             ty: 'togglePanel',
             c: 'editorPanel'
@@ -42,7 +45,34 @@ export const DEFAULT_USER_KEYBINDS: { [key: string]: FilteredAction } = {
         action: {
             ty: 'nextDocument'
         }
-    }
+    },
+    'C-S-d': {
+        action: {
+            ty: 'toggleDebugPanel'
+        }
+    },
+    'C-s': {
+        action: {
+            ty: 'saveAllFiles'
+        }
+    },
+    'C-u': {
+        action: {
+            ty: 'closeFile'
+        }
+    },
+    'C-S-f': {
+        action: {
+            ty: 'fork'
+        }
+    },
+    'C-S-g': {
+        action: {
+            ty: 'publish'
+        },
+        condition: 'userLoggedIn'
+    },
+
 
 } as const
 
@@ -55,10 +85,24 @@ export const USER_CONFIG_META: ConfigMeta = {
     general: {
         projectPanelSize: {
             type: 'number',
-            description: 'How wide the project info pane is.',
-            units: 'px',
-            min: 100,
-            max: 400,
+            description: 'Default width of the project panel.',
+            units: '%',
+            min: 10,
+            max: 50,
+        },
+        editorPanelSize: {
+            type: 'number',
+            description: 'Default width of the editor panel.',
+            units: '%',
+            min: 10,
+            max: 90,
+        },
+        resourcePanelSize: {
+            type: 'number',
+            description: 'Default height for the resource panel',
+            units: '%',
+            min: 10,
+            max: 90,
         },
     },
     editor: {
@@ -82,7 +126,9 @@ export const USER_CONFIG_META: ConfigMeta = {
 } as const
 
 export const GENERAL_CONFIG_KEYS: readonly GeneralConfigKey[] = [
-    'projectPanelSize'
+    'projectPanelSize',
+    'editorPanelSize',
+    'resourcePanelSize'
 ] as const
 
 export const EDITOR_CONFIG_KEYS: readonly EditorConfigKey[] = [

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import { OnMount } from 'fractils'
 	import { fade } from 'svelte/transition'
 </script>
@@ -12,14 +13,14 @@
 	<div class="hero-container">
 		<OnMount>
 			<div class="header-container">
-				<h1 in:fade={{ delay: 500, duration: 500 }}>All those gigaflops, sitting idle</h1>
-				<h1 in:fade={{ delay: 1750, duration: 500 }}>Put them to work</h1>
+				<h1 in:fade={{ delay: 250, duration: 250 }}>All those gigaflops, sitting idle</h1>
+				<h1 in:fade={{ delay: 1500, duration: 250 }}>Put them to work</h1>
 			</div>
-			<p>
-				Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repudiandae nobis officiis
-				sapiente inventore voluptate a doloribus blanditiis distinctio ab laborum pariatur possimus,
-				odio commodi exercitationem sunt reiciendis. Suscipit, tempora unde!
-			</p>
+			<p in:fade={{ delay: 2250, duration: 250 }} />
+			<div class="hero-buttons">
+				<IconButton text="Sign up" size="lg" />
+				<IconButton text="Start Creating" size="lg" />
+			</div>
 			<!-- <h1>All those gigaflops, sitting idle</h1> -->
 		</OnMount>
 	</div>
@@ -33,17 +34,67 @@
 
 <style>
 	section {
+		--bg-size: 10px;
 		flex: 0 0 auto;
+		flex-direction: column;
 		height: 100%;
-		width: 50%;
+		width: 100%;
 		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-image: radial-gradient(var(--matrix-color) 20%, transparent 20%);
+		background-position: 0 0, var(--bg-size) var(--bg-size);
+		background-size: var(--bg-size) var(--bg-size);
+	}
+	section::after {
+		content: '';
+		--bg-size: 100%;
+		position: absolute;
+		left: -50%;
+		right: -50%;
+		top: -100%;
+		bottom: -100%;
+		background-position: 0 0, var(--bg-size) var(--bg-size);
+		background-size: calc(var(--bg-size) * 2);
+		background-image: linear-gradient(
+			152deg,
+			var(--background-content) 0%,
+			var(--accent-color) 50%,
+			var(--accent-color) 55%,
+			var(--background-content) 100%
+		);
+		animation: gradient 30s ease infinite;
+		mix-blend-mode: var(--blend-mode);
+		backdrop-filter: blur(16px);
+		filter: blur(16px);
+	}
+
+	@keyframes gradient {
+		0% {
+			transform: rotate(0deg);
+			background-position: 15% 0%;
+		}
+		50% {
+			background-position: 86% 100%;
+		}
+		100% {
+			/* transform: rotate(360deg); */
+			background-position: 15% 0%;
+		}
 	}
 
 	.hero-container {
+		width: 50%;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		flex-direction: column;
+		z-index: 1;
+	}
+	.hero-buttons {
+		display: flex;
+		flex-direction: row;
+		gap: 2rem;
 	}
 
 	.header-container {
@@ -54,7 +105,7 @@
 	}
 
 	h1 {
-		line-height: 0%;
+		margin-block: 10px;
 	}
 
 	p {
@@ -64,5 +115,6 @@
 		text-align: end;
 		font-size: var(--xl);
 		color: var(--text-accent-color);
+		margin-bottom: 2rem;
 	}
 </style>

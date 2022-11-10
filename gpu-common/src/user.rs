@@ -46,5 +46,7 @@ pub enum LineNumberCOnfig {
 #[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UserGeneralConfig {
-    project_panel_size: u32,
+    project_panel_size: f32,
+    editor_panel_size: f32,
+    resource_panel_size: f32,
 }

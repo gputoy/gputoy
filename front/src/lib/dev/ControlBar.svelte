@@ -54,7 +54,7 @@
 		width: calc(100% - 8px);
 		border-bottom: var(--border-secondary) solid 1px;
 		height: 32px;
-		background-color: var(--tertiary-color);
+		background-color: var(--background-menu);
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		justify-content: space-between;

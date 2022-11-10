@@ -47,6 +47,7 @@
 		width: 20%;
 		min-width: fit-content;
 		height: 100%;
+		box-shadow: var(--box-shadow);
 	}
 
 	.body {
@@ -54,13 +55,13 @@
 		display: flex;
 		flex-direction: row;
 		height: 100%;
-		background-color: var(--pure-bg);
+		background-color: var(--background-content);
 	}
 	.category-list {
 		flex: 0 0 auto;
 		border-right: 1px solid var(--border-secondary);
 		padding-top: 1rem;
-		background-color: var(--tertiary-color);
+		background-color: var(--background-menu);
 	}
 	.category-body {
 		padding: 1rem;

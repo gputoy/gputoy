@@ -22,6 +22,36 @@
       }
     },
     {
+      "description": "Toggles debug panel",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "toggleDebugPanel"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Toggle user preferences",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "toggleUserPreferences"
+          ]
+        }
+      }
+    },
+    {
       "description": "Shifts pane by specified amount",
       "type": "object",
       "required": [
@@ -160,6 +190,141 @@
           "type": "string",
           "enum": [
             "previousDocument"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Creates new project",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "createNewProject"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Creates new file",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "createNewFile"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Save project to remote",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "saveProjectToRemote"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Save current file",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "saveCurrentFile"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Save all files",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "saveAllFiles"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Fork project",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "fork"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Publish project",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "publish"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Close current file",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "closeFile"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Close project",
+      "type": "object",
+      "required": [
+        "ty"
+      ],
+      "properties": {
+        "ty": {
+          "type": "string",
+          "enum": [
+            "closeProject"
           ]
         }
       }
