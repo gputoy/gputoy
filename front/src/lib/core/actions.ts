@@ -52,6 +52,7 @@ export type SingleFilter = typeof FILTER_CONDITION_LIST[number]
 export function pushAction(action: Action) {
     switch (action.ty) {
         case 'playPause': playPause(); break
+        case 'openDocument': openDocument(action.c); break
         case 'nextDocument': shiftDoument(1); break
         case 'previousDocument': shiftDoument(-1); break
         case 'rebuild': rebuildProject(); break
@@ -85,6 +86,9 @@ export function reverseAction(action: Action) {
 function playPause() {
 }
 
+function openDocument(fileid: string) {
+    wLayout.openDocument(fileid)
+}
 function shiftDoument(shift: number) {
     wLayout.moveWorkspaceIdx(shift)
 }

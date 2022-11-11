@@ -80,6 +80,7 @@
 	.dev-root {
 		height: 100%;
 		width: 100%;
+		overflow: hidden;
 	}
 
 	.splitpanes.modern-theme {

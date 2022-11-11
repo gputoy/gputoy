@@ -30,6 +30,8 @@ pub enum Action {
     NextDocument,
     /// Previous document in editor
     PreviousDocument,
+    /// Opens document at specified id
+    OpenDocument(String),
 
     /// Creates new project
     CreateNewProject,

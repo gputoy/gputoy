@@ -16,6 +16,9 @@
 			<textarea class="desc clear" type="text" bind:value={$wProjectMeta.description} />
 		{:else}
 			<h1 class="title">{$wProjectMeta.title}</h1>
+			<p class="desc">
+				{$wProjectMeta.description}
+			</p>
 		{/if}
 	</div>
 	<div class="section">
@@ -49,5 +52,9 @@
 
 	textarea {
 		align-self: center;
+	}
+
+	.section {
+		border-bottom: 1px solid var(--border-secondary);
 	}
 </style>

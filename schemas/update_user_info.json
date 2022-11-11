@@ -228,6 +228,25 @@
           }
         },
         {
+          "description": "Opens document at specified id",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "type": "string"
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "openDocument"
+              ]
+            }
+          }
+        },
+        {
           "description": "Creates new project",
           "type": "object",
           "required": [

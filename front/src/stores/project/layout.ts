@@ -12,6 +12,7 @@ export type LayoutExtras = {
     setPanelSize: (panel: Panel, event: IPaneSizingEvent) => void
     moveWorkspaceIdx: (shift: number) => void
     closeWorkspaceFile: (idx?: number) => void
+    openDocument: (fileid: string) => void
 }
 export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layout) {
 
@@ -55,5 +56,17 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
             return l
         })
     }
-    return { togglePanel, setPanelSize, moveWorkspaceIdx, closeWorkspaceFile }
+
+    function openDocument(fileid: string) {
+        layout.update(l => {
+            let maybeIndex = l.workspace.indexOf(fileid)
+            // add file to workspace
+            if (maybeIndex < 0) {
+                maybeIndex = l.workspace.push(fileid) - 1
+            }
+            l.fileIndex = maybeIndex
+            return l
+        })
+    }
+    return { togglePanel, setPanelSize, moveWorkspaceIdx, closeWorkspaceFile, openDocument }
 }) 

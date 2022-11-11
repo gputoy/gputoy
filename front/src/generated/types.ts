@@ -48,6 +48,10 @@ export type Action =
       ty: "previousDocument";
     }
   | {
+      c: string;
+      ty: "openDocument";
+    }
+  | {
       ty: "createNewProject";
     }
   | {
