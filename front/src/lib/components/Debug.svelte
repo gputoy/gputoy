@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { wUser } from '$stores/auth'
-	import { dProject } from '$stores/project'
+	import { dCanModifyProject, dProject } from '$stores/project'
 	import { wDebugPanel, wMenuOpen, wUserConfigOpen, wUserModalOpen } from '$stores/ui'
 	import { dUserConfig } from '$stores/userConfig'
 	/** @ts-ignore */
 	import { JsonView } from '@zerodevx/svelte-json-view'
 	$: json = {
+		canModifyProject: $dCanModifyProject,
 		user: $wUser,
 		config: $dUserConfig,
 		project: $dProject,

@@ -38,7 +38,8 @@ pub struct UserEditorConfig {
 #[serde(rename_all = "camelCase")]
 pub enum LineNumberCOnfig {
     #[default]
-    Normal,
+    On,
+    Interval,
     Relative,
     Off,
 }

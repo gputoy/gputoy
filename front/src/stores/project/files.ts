@@ -1,4 +1,5 @@
 import { DEFAULT_FILES } from "$lib/consts/project"
+import { fromFiles, type FileTreeNode } from "$lib/core/fileTree"
 import type { File, Files } from "src/generated/types"
 import { get } from "svelte/store"
 import { makeEnhanced } from "../enhanced"
@@ -9,6 +10,7 @@ export type FilesExtras = {
     writeFile: (fileid: string, data: string) => void
     updateFileMeta: (fileid: string, meta: Partial<Omit<File, 'data'>>) => void
     removeFile: (fileid: string) => void
+    buildTree: () => FileTreeNode
 }
 export default makeEnhanced<Files, FilesExtras>(DEFAULT_FILES, function (files) {
 
@@ -49,5 +51,9 @@ export default makeEnhanced<Files, FilesExtras>(DEFAULT_FILES, function (files) 
         })
     }
 
-    return { newFile, getFile, writeFile, updateFileMeta, removeFile }
+    function buildTree(): FileTreeNode {
+        return fromFiles(get(files))
+    }
+
+    return { newFile, getFile, writeFile, updateFileMeta, removeFile, buildTree }
 }) 

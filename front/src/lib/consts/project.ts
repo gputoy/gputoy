@@ -30,6 +30,25 @@ export const DEFAULT_FILES: Files = {
             "fileName": "main",
             "extension": "wgsl",
         },
+        "/shaders/types.wgsl": {
+            "data": "...",
+            "dir": "shaders",
+            "fileName": "main",
+            "extension": "wgsl",
+        },
+
+        "/shaders/extras/component.wgsl": {
+            "data": "...",
+            "dir": "extras",
+            "fileName": "component",
+            "extension": "wgsl",
+        },
+        "/Readme.md": {
+            "data": "Welcome to this project!",
+            "dir": "",
+            "fileName": "Readme",
+            "extension": "md",
+        },
         "/run.json": {
             "data": "...",
             "dir": "",

@@ -8,7 +8,7 @@ export const DEFAULT_USER_GENERAL_CONFIG: UserGeneralConfig = {
 } as const
 
 export const DEFAULT_USER_EDITOR_CONFIG: UserEditorConfig = {
-    lineNumbers: 'normal',
+    lineNumbers: 'on',
     fontFamily: 'mono',
     fontSize: 12,
 } as const
@@ -120,7 +120,7 @@ export const USER_CONFIG_META: ConfigMeta = {
         lineNumbers: {
             type: 'select',
             description: 'How the code editor will display line numbers.',
-            options: ['normal', 'relative', 'off'] as Array<string>,
+            options: ['on', 'interval', 'relative', 'off'] as Array<string>,
         }
     }
 } as const

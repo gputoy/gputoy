@@ -384,7 +384,8 @@
     "LineNumberCOnfig": {
       "type": "string",
       "enum": [
-        "normal",
+        "on",
+        "interval",
         "relative",
         "off"
       ]

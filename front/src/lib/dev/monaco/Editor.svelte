@@ -107,7 +107,8 @@
 	function updateEditorConfig(config: UserEditorConfig) {
 		const options: editor.IEditorOptions & editor.IGlobalEditorOptions = {
 			fontSize: config.fontSize!,
-			fontFamily: config.fontFamily!
+			fontFamily: config.fontFamily!,
+			lineNumbers: config.lineNumbers
 		}
 		editorInstance?.updateOptions(options)
 	}

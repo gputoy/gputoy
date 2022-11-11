@@ -214,7 +214,7 @@ export interface ProjectUpsert {
   title: string;
 }
 
-export type LineNumberCOnfig = "normal" | "relative" | "off";
+export type LineNumberCOnfig = "on" | "interval" | "relative" | "off";
 
 export interface UpdateUserInfoArgs {
   bio?: string | null;
