@@ -1,4 +1,4 @@
-import { wLayout } from "$stores/project"
+import { clearProject, wLayout } from "$stores/project"
 import { wDebugPanel } from "$stores/ui"
 import { toast } from "@zerodevx/svelte-toast"
 import { isEqual } from "lodash"
@@ -62,6 +62,7 @@ export function pushAction(action: Action) {
         case 'focus': focusPane(action.c); break
         case 'toggleDebugPanel': toggleDebugPanel(); break
         case 'closeFile': closeCurrentFile(); break
+        case 'closeProject': closeProject(); break
 
         /** @ts-ignore */
         // There may be a case in the future where a new variant is added
@@ -116,3 +117,6 @@ function shiftPanel(c: ShiftPaneArgs) {
 function focusPane(c: string) {
 }
 
+function closeProject() {
+    clearProject()
+}

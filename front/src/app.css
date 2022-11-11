@@ -110,14 +110,14 @@ label {
 #canvas {
 	width: 100%;
 	height: 100%;
-	background-color: red;
+	background-color: rgba(0, 102, 255, 0.048);
 }
 
 /* ===== Scrollbar CSS ===== */
 /* Firefox */
 * {
 	scrollbar-width: thin;
-	scrollbar-color: #95769e #ffffff;
+	scrollbar-color: var(--background-alt) var(--background-content);
 }
 
 /* Chrome, Edge, and Safari */

@@ -53,6 +53,7 @@ export function toKeyIdx(ev: KeyboardEvent): string {
  */
 function onKeyDown(ev: KeyboardEvent) {
     if (ev.key === 'Control' || ev.key === 'Shift' || ev.key === 'Alt') return
+    if (!(ev.ctrlKey || ev.shiftKey || ev.altKey)) return
 
     if (ev.key === 'Escape') {
         wUserConfigOpen.set(false)

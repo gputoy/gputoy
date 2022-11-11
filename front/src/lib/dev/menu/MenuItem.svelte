@@ -7,6 +7,10 @@
 	import { MENUKEYS, MENU_MAP, type MenuEntry, type MenuKey } from './menu'
 
 	export let key: MenuKey
+	// When closed, skip the next call to open
+	// This is so clicking a menu entry doesn't immediately reopen it
+	let skipOpen = false
+	let timeout: number
 
 	$: boundActions = Object.fromEntries(
 		MENU_MAP[key]
@@ -15,13 +19,17 @@
 	)
 
 	function open() {
+		if (skipOpen) return
 		wMenuOpen.update((m: any) => {
 			MENUKEYS.forEach((k) => (m[k] = false))
 			m[key] = true
 			return m
 		})
 	}
-	function close() {
+	async function close() {
+		skipOpen = true
+		clearTimeout(timeout)
+		timeout = window.setTimeout(() => (skipOpen = false), 10)
 		wMenuOpen.update((m: any) => {
 			m[key] = false
 			return m

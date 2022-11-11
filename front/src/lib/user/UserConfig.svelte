@@ -46,6 +46,8 @@
 		border-left: 1px solid var(--border-primary);
 		width: 20%;
 		min-width: fit-content;
+		max-width: 50%;
+		width: 400px;
 		height: 100%;
 		box-shadow: var(--box-shadow);
 	}
@@ -64,12 +66,14 @@
 		background-color: var(--background-menu);
 	}
 	.category-body {
+		height: 100%;
 		padding: 1rem;
 		display: flex;
 		flex-direction: column;
 		width: 100%;
 		align-items: left;
 		gap: 1rem;
+		overflow: scroll;
 	}
 	.category {
 		color: var(--border-color);
