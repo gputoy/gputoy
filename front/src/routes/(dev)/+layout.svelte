@@ -32,18 +32,12 @@
 <header>
 	<nav>
 		<ul class="nav-start nav-region">
-			<a href="/" style="height: 18px; width: 18px;">
+			<a href="/" style="height: 18px; width: 18px; padding-inline: 4px;">
 				<Logo />
 			</a>
 			{#each MENUKEYS as key}
 				<MenuItem {key} />
 			{/each}
-			{#if $wLastInputAction}
-				<div class="input-helper">
-					<Key keycode={$wLastInputAction.code} />
-					<code>{$wLastInputAction.action?.ty ?? ''}</code>
-				</div>
-			{/if}
 		</ul>
 
 		<div class="nav-mid nav-region">
@@ -51,6 +45,14 @@
 		</div>
 
 		<div class="nav-end nav-region">
+			{#if $wLastInputAction}
+				<div class="input-helper">
+					<Key keycode={$wLastInputAction.code} />
+					{#if $wLastInputAction.action?.ty}
+						<code style="color: var(--text-accent-color);">{$wLastInputAction.action.ty}</code>
+					{/if}
+				</div>
+			{/if}
 			<div class="navend-container">
 				<IconButton on:click={() => saveProject(true)} disabled={$wUser == null} series="first">
 					<Icon data={save} />
@@ -106,25 +108,22 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.25rem;
 		margin: 0rem;
-		margin-left: 0.5rem;
-		margin-right: auto;
 		justify-content: left;
 	}
 	.nav-mid {
 		font-size: var(--sm);
 		justify-content: center;
 		text-align: center;
+		min-width: max-content;
+		padding-inline: 4px;
 	}
 	.nav-end {
 		height: 100%;
 		display: flex;
 		justify-content: right;
-		justify-self: start;
 		align-items: center;
-		margin-right: 0.25rem;
-		margin-left: auto;
 		gap: 0.25rem;
 	}
 
@@ -140,22 +139,23 @@
 		height: var(--navbar-height);
 	}
 	nav {
-		display: flex;
-		flex-direction: row;
-		height: 100%;
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
 		background-color: var(--nav-color);
-		justify-content: center;
+		gap: 4px;
 		align-items: center;
 		border-bottom: 1px solid var(--border-primary);
+		margin-inline: 4px;
 	}
 
 	.input-helper {
 		display: flex;
-		font-size: var(--xs);
 		align-items: center;
-		gap: 4px;
-		background-color: var(--background-alt);
+		gap: 8px;
+		font-size: var(--xs);
+		border: 1px solid var(--border-secondary);
+		border-radius: 4px;
 		height: 1rem;
-		padding: 6px;
+		padding: 3.5px 4px;
 	}
 </style>

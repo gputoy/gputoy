@@ -164,6 +164,7 @@ export async function loadProject(projectId: string) {
             return
         }
         setProject(JSON.parse(project), true)
+        return
     }
     const response = await api.getProject(projectId)
     if ('message' in response) {

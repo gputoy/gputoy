@@ -71,10 +71,12 @@
 <style>
 	.menu-button {
 		list-style-type: none;
-		font-size: var(--sm);
-		padding: 4px;
+		font-size: var(--xs);
+		padding: 8px;
 		cursor: pointer;
 		position: relative;
+		user-select: none;
+		font-weight: bolder;
 	}
 	.menu-button:hover {
 		background-color: var(--glass-med);
@@ -94,12 +96,13 @@
 	.menu li {
 		transition: none;
 		padding-inline: 0.5rem;
-		padding-block: 0.4rem;
-		margin-block: 0.25rem;
+		padding-block: 0.3rem;
+		margin-block: 0.2rem;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
+		font-weight: normal;
 	}
 	.menu li p {
 		margin: 0px;

@@ -76,6 +76,7 @@
 	.logo-container {
 		display: flex;
 		align-items: center;
+		margin-right: 4rem;
 	}
 
 	header {
