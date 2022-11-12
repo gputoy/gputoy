@@ -2,4 +2,4 @@
 target/
 dist/
 front/pkg/
-front/.svelte-kit/**
+front/.svelte-kit/
