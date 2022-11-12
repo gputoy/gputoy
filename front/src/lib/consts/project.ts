@@ -33,7 +33,7 @@ export const DEFAULT_FILES: Files = {
         "/shaders/types.wgsl": {
             "data": "...",
             "dir": "shaders",
-            "fileName": "main",
+            "fileName": "types",
             "extension": "wgsl",
         },
 
