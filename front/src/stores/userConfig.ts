@@ -1,12 +1,13 @@
 import { browser } from "$app/environment"
 import { DEFAULT_USER_EDITOR_CONFIG, DEFAULT_USER_GENERAL_CONFIG, DEFAULT_USER_KEYBINDS, USER_CONFIG_META, type ConfigItemMeta, type ConfigKey, type ConfigScope, type GeneralConfigKey } from "$lib/consts/userConfig"
+import type { Keybinds } from "$lib/core/input"
 import debounce from "lodash/debounce"
-import type { FilteredAction, UserConfig, UserEditorConfig, UserGeneralConfig } from "src/generated/types"
+import type { UserConfig, UserEditorConfig, UserGeneralConfig } from "src/generated/types"
 import { derived, writable } from "svelte/store"
 
 export const wUserGeneralConfig = writable<UserGeneralConfig>(DEFAULT_USER_GENERAL_CONFIG)
 export const wUserEditorConfig = writable<UserEditorConfig>(DEFAULT_USER_EDITOR_CONFIG)
-export const wUserKeybinds = writable<{ [key: string]: FilteredAction }>(DEFAULT_USER_KEYBINDS)
+export const wUserKeybinds = writable<Keybinds>(DEFAULT_USER_KEYBINDS)
 export const wUserTheme = writable<any>({})
 export const dUserConfig = derived(
     [wUserGeneralConfig, wUserEditorConfig, wUserKeybinds, wUserTheme],

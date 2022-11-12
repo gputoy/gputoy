@@ -1,36 +1,58 @@
 <script lang="ts">
-	import { page } from '$app/stores'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
-	import NavItem from '$lib/components/buttons/NavItem.svelte'
 	import UiThemeButton from '$lib/components/buttons/UiThemeButton.svelte'
+	import Debug from '$lib/components/Debug.svelte'
+	import Key from '$lib/components/Key.svelte'
+	import Logo from '$lib/components/Logo.svelte'
+	import { MENUKEYS } from '$lib/dev/menu/menu'
+	import MenuItem from '$lib/dev/menu/MenuItem.svelte'
 	import UserConfig from '$lib/user/UserConfig.svelte'
 	import UserModal from '$lib/user/UserModal.svelte'
 	import { wUser } from '$stores/auth'
-	import { saveProject, wProjectMeta } from '$stores/project'
+	import { wLastInputAction } from '$stores/input'
+	import { loadProject, saveProject, wProjectMeta } from '$stores/project'
 	import { toggleUserConfig, toggleUserModal } from '$stores/ui'
+	import { SvelteToast, type SvelteToastOptions } from '@zerodevx/svelte-toast'
+	import { onMount } from 'svelte'
 	import Icon from 'svelte-awesome'
 	import codeFork from 'svelte-awesome/icons/codeFork'
 	import gear from 'svelte-awesome/icons/gear'
 	import save from 'svelte-awesome/icons/save'
 	import user from 'svelte-awesome/icons/user'
+	const options: SvelteToastOptions = {}
+
+	onMount(() => {
+		const last = localStorage.getItem('last-project')
+		if (last) {
+			loadProject(last)
+		}
+	})
 </script>
 
 <header>
 	<nav>
-		<ul id="link-container">
-			<NavItem title="GPUToy" current={$page.routeId === ''} />
-			<NavItem title="Browse" route="/browse" current={$page.routeId === 'browse'} />
-			<NavItem title="Dev" route="/dev" current={$page.routeId === 'dev'} />
-			<NavItem title="Docs" current={$page.routeId === 'docs'} />
+		<ul class="nav-start nav-region">
+			<a href="/" style="height: 18px; width: 18px; padding-inline: 4px;">
+				<Logo />
+			</a>
+			{#each MENUKEYS as key}
+				<MenuItem {key} />
+			{/each}
 		</ul>
 
-		<div class="project-info">
-			<p>
-				{$wUser?.username ?? 'anonymous'}/{$wProjectMeta.title}
-			</p>
+		<div class="nav-mid nav-region">
+			{$wUser?.username ?? 'anonymous'}&nbsp;/&nbsp;{$wProjectMeta.title}
 		</div>
 
-		<div class="navend">
+		<div class="nav-end nav-region">
+			{#if $wLastInputAction}
+				<div class="input-helper">
+					<Key keycode={$wLastInputAction.code} />
+					{#if $wLastInputAction.action?.ty}
+						<code style="color: var(--text-accent-color);">{$wLastInputAction.action.ty}</code>
+					{/if}
+				</div>
+			{/if}
 			<div class="navend-container">
 				<IconButton on:click={() => saveProject(true)} disabled={$wUser == null} series="first">
 					<Icon data={save} />
@@ -65,6 +87,8 @@
 <main>
 	<UserModal />
 	<UserConfig />
+	<Debug />
+	<SvelteToast {options} />
 	<slot />
 </main>
 
@@ -79,16 +103,28 @@
 		align-items: center;
 		overflow-y: hidden;
 	}
-	.project-info {
-		font-size: var(--sm);
+
+	.nav-start {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.25rem;
+		margin: 0rem;
+		justify-content: left;
 	}
-	.navend {
+	.nav-mid {
+		font-size: var(--sm);
+		justify-content: center;
+		text-align: center;
+		min-width: max-content;
+		padding-inline: 4px;
+	}
+	.nav-end {
 		height: 100%;
 		display: flex;
-		justify-content: center;
-		margin-right: 0.25rem;
-		gap: 0.25rem;
+		justify-content: right;
 		align-items: center;
+		gap: 0.25rem;
 	}
 
 	.navend-container {
@@ -103,23 +139,23 @@
 		height: var(--navbar-height);
 	}
 	nav {
-		display: flex;
-		flex-direction: row;
-		height: 100%;
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
 		background-color: var(--nav-color);
-		justify-content: space-between;
+		gap: 4px;
 		align-items: center;
 		border-bottom: 1px solid var(--border-primary);
+		margin-inline: 4px;
 	}
-	#link-container {
+
+	.input-helper {
 		display: flex;
-		flex-direction: row;
-		gap: 0.5rem;
-		margin: 0rem;
-		margin-left: 0.25rem;
-	}
-	:global(*) {
-		transition: background-color 0.25s ease;
-		transition: color 0.05s ease;
+		align-items: center;
+		gap: 8px;
+		font-size: var(--xs);
+		border: 1px solid var(--border-secondary);
+		border-radius: 4px;
+		height: 1rem;
+		padding: 3.5px 4px;
 	}
 </style>

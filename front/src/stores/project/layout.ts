@@ -1,26 +1,36 @@
 
 import { DEFAULT_LAYOUT } from "$lib/consts/project"
+import type { GeneralConfigKey } from "$lib/consts/userConfig"
+import { wUserGeneralConfig } from "$stores/userConfig"
 import type { Layout, Panel } from "src/generated/types"
-import { writable, type Writable } from "svelte/store"
+import type { IPaneSizingEvent } from "svelte-splitpanes"
+import { get } from "svelte/store"
+import { makeEnhanced } from "../enhanced"
 
-export type WritableLayout = Writable<Layout> & {
+export type LayoutExtras = {
     togglePanel: (panel: Panel, set?: boolean) => void
-    setPanelSize: (panel: Panel, size: number) => void
+    setPanelSize: (panel: Panel, event: IPaneSizingEvent) => void
     moveWorkspaceIdx: (shift: number) => void
     closeWorkspaceFile: (idx?: number) => void
+    openDocument: (fileid: string) => void
 }
-export default function makeLayout(): WritableLayout {
-    const layout = writable<Layout>(DEFAULT_LAYOUT)
+export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layout) {
 
     function togglePanel(panel: Panel, set?: boolean) {
         layout.update(l => {
-            l[panel].show = set ?? !l[panel].show
+            let tooSmallToBeOpen = l[panel].size < 12
+            let expand = tooSmallToBeOpen || ((set !== undefined) ? set : !l[panel].show)
+            if (tooSmallToBeOpen) l[panel].size = get(wUserGeneralConfig)[(panel + 'Size') as GeneralConfigKey]
+            l[panel].show = expand
+            console.log('toggling', panel, expand, l[panel])
             return l
         })
     }
-    function setPanelSize(panel: Panel, size: number) {
+    function setPanelSize(panel: Panel, event: IPaneSizingEvent) {
         layout.update(l => {
-            l[panel].size = size
+            l[panel].size = event.size
+            if (event.size < event.min) l[panel].show = false
+            console.log('updating: ', event)
             return l
         })
     }
@@ -36,11 +46,27 @@ export default function makeLayout(): WritableLayout {
 
     function closeWorkspaceFile(idx?: number) {
         layout.update(l => {
-            if (!idx && !l.fileIndex) return l
+            console.log(l)
+            if (!idx && l.fileIndex == null) return l
             let closeIdx = idx ?? l.fileIndex!
             l.workspace.splice(closeIdx, 1)
+            console.log(l.workspace)
+            if (l.workspace.length > 0) l.fileIndex = Math.max(0, (l.fileIndex ?? 0) - 1)
+            else l.fileIndex = null
             return l
         })
     }
-    return { ...layout, togglePanel, setPanelSize, moveWorkspaceIdx, closeWorkspaceFile }
-}
+
+    function openDocument(fileid: string) {
+        layout.update(l => {
+            let maybeIndex = l.workspace.indexOf(fileid)
+            // add file to workspace
+            if (maybeIndex < 0) {
+                maybeIndex = l.workspace.push(fileid) - 1
+            }
+            l.fileIndex = maybeIndex
+            return l
+        })
+    }
+    return { togglePanel, setPanelSize, moveWorkspaceIdx, closeWorkspaceFile, openDocument }
+}) 

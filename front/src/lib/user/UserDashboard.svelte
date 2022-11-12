@@ -15,7 +15,7 @@
 	#root {
 		width: 600px;
 		height: fit-content;
-		background-color: var(--primary-color);
+		background-color: var(--background-alt);
 		box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.1);
 		border: 1px solid var(--border-secondary);
 	}
@@ -34,6 +34,6 @@
 
 	#tray {
 		height: 40px;
-		background-color: var(--tertiary-color);
+		background-color: var(--background-menu);
 	}
 </style>

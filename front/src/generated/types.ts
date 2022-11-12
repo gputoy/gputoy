@@ -13,6 +13,12 @@ export type Action =
       ty: "togglePanel";
     }
   | {
+      ty: "toggleDebugPanel";
+    }
+  | {
+      ty: "toggleUserPreferences";
+    }
+  | {
       c: ShiftPaneArgs;
       ty: "shiftPanel";
     }
@@ -40,6 +46,37 @@ export type Action =
     }
   | {
       ty: "previousDocument";
+    }
+  | {
+      c: string;
+      ty: "openDocument";
+    }
+  | {
+      ty: "createNewProject";
+    }
+  | {
+      ty: "createNewFile";
+    }
+  | {
+      ty: "saveProjectToRemote";
+    }
+  | {
+      ty: "saveCurrentFile";
+    }
+  | {
+      ty: "saveAllFiles";
+    }
+  | {
+      ty: "fork";
+    }
+  | {
+      ty: "publish";
+    }
+  | {
+      ty: "closeFile";
+    }
+  | {
+      ty: "closeProject";
     };
 
 export type Panel = "editorPanel" | "projectPanel" | "resourcePanel";
@@ -181,7 +218,7 @@ export interface ProjectUpsert {
   title: string;
 }
 
-export type LineNumberCOnfig = "normal" | "relative" | "off";
+export type LineNumberCOnfig = "on" | "interval" | "relative" | "off";
 
 export interface UpdateUserInfoArgs {
   bio?: string | null;
@@ -208,7 +245,9 @@ export interface UserEditorConfig {
 }
 
 export interface UserGeneralConfig {
+  editorPanelSize: number;
   projectPanelSize: number;
+  resourcePanelSize: number;
 }
 
 export interface FilteredAction {

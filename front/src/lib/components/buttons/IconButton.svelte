@@ -26,6 +26,7 @@
 <style>
 	div {
 		padding: 4px;
+		min-width: max-content;
 	}
 	button {
 		display: flex;

@@ -7,7 +7,7 @@ const config: UserConfig = {
 		target: ['es2020'],
 	},
 	optimizeDeps: {
-		exclude: ['svelte-navigator'],
+		exclude: ['svelte-navigator', 'svelte-json-view'],
 	},
 	plugins: [sveltekit()],
 	server: {

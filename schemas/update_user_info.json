@@ -55,6 +55,36 @@
           }
         },
         {
+          "description": "Toggles debug panel",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "toggleDebugPanel"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Toggle user preferences",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "toggleUserPreferences"
+              ]
+            }
+          }
+        },
+        {
           "description": "Shifts pane by specified amount",
           "type": "object",
           "required": [
@@ -196,6 +226,160 @@
               ]
             }
           }
+        },
+        {
+          "description": "Opens document at specified id",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "type": "string"
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "openDocument"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Creates new project",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "createNewProject"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Creates new file",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "createNewFile"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Save project to remote",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "saveProjectToRemote"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Save current file",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "saveCurrentFile"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Save all files",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "saveAllFiles"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Fork project",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "fork"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Publish project",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "publish"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Close current file",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "closeFile"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Close project",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "closeProject"
+              ]
+            }
+          }
         }
       ]
     },
@@ -219,7 +403,8 @@
     "LineNumberCOnfig": {
       "type": "string",
       "enum": [
-        "normal",
+        "on",
+        "interval",
         "relative",
         "off"
       ]
@@ -305,13 +490,22 @@
     "UserGeneralConfig": {
       "type": "object",
       "required": [
-        "projectPanelSize"
+        "editorPanelSize",
+        "projectPanelSize",
+        "resourcePanelSize"
       ],
       "properties": {
+        "editorPanelSize": {
+          "type": "number",
+          "format": "float"
+        },
         "projectPanelSize": {
-          "type": "integer",
-          "format": "uint32",
-          "minimum": 0.0
+          "type": "number",
+          "format": "float"
+        },
+        "resourcePanelSize": {
+          "type": "number",
+          "format": "float"
         }
       }
     }

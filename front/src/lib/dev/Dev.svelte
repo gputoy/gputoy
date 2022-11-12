@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { stop } from '$lib/core/context'
+	import { initKeys } from '$lib/core/input'
 	import ControlBar from '$lib/dev/ControlBar.svelte'
-	import EditorPane from '$lib/dev/EditorPane.svelte'
+	import EditorPane from '$lib/dev/panes/EditorPane.svelte'
 	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
 	import Viewport from '$lib/dev/Viewport.svelte'
-	import { initKeys } from '$stores/input'
 	import { wLayout } from '$stores/project'
 	import type { Panel } from 'src/generated/types'
 	import { onDestroy, onMount } from 'svelte'
@@ -15,7 +15,7 @@
 
 	function makeResizeHandler(panel: Panel, idx: number) {
 		return function resize(event: CustomEvent<IPaneSizingEvent[]>) {
-			wLayout.setPanelSize(panel, event.detail[idx].size)
+			wLayout.setPanelSize(panel, event.detail[idx])
 		}
 	}
 
@@ -80,11 +80,12 @@
 	.dev-root {
 		height: 100%;
 		width: 100%;
+		overflow: hidden;
 	}
 
 	.splitpanes.modern-theme {
 		.splitpanes__pane {
-			background-color: var(--pure-bg);
+			background-color: var(--background-content);
 		}
 		.splitpanes__splitter {
 			background-color: var(--border-primary);
@@ -125,7 +126,7 @@
 
 	.splitpanes.no-splitter {
 		.splitpanes__pane {
-			background-color: var(--pure-bg);
+			background-color: var(--background-content);
 		}
 		.splitpanes__splitter {
 			background-color: var(--border-primary);

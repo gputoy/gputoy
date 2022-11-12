@@ -1,13 +1,16 @@
 <script lang="ts">
-	export let keycode: string
+	export let keycode: string | null
 </script>
 
-<span>{keycode}</span>
+<span>{keycode ?? ''}</span>
 
 <style>
 	span {
+		display: inline;
 		background-color: var(--glass-med);
-		padding: 4px;
-		border-radius: 4px;
+		padding: 2px;
+		border-radius: 3px;
+		height: fit-content;
+		user-select: none;
 	}
 </style>

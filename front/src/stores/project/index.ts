@@ -2,11 +2,12 @@ import { browser } from '$app/environment'
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from '$lib/consts/project'
 import * as api from '$lib/core/api'
 import context, { init } from '$lib/core/context'
+import { toast } from '@zerodevx/svelte-toast'
 import debounce from 'lodash/debounce'
 import generate from 'project-name-generator'
+import type { Project, ProjectResponse, ProjectUpsert } from 'src/generated/types'
 import { derived, get, writable } from 'svelte/store'
 import { v4 } from 'uuid'
-import type { Project, ProjectResponse, ProjectUpsert } from '../../generated/types'
 import { wUser } from '../auth'
 import makeConfig from './config'
 import makeFiles from './files'
@@ -109,7 +110,7 @@ export const dProject = derived(
  * last edit has occured
  * TODO: add project save timing to user config
  */
-const writeToLocalStorage = debounce(_writeToLocalStorage, 5000)
+const writeToLocalStorage = debounce(_writeToLocalStorage, 500)
 function _writeToLocalStorage(project: ProjectResponse) {
     // TODO: doing dates like this will probably cause a problem
     if (browser) {
@@ -155,10 +156,20 @@ export async function initNewProject() {
  * @returns 
  */
 export async function loadProject(projectId: string) {
+    if (projectId.startsWith('local')) {
+        if (!browser) return
+        const project = localStorage.getItem(projectId)
+        if (!project) {
+            toast.push('Project not found in local storage: ' + projectId)
+            return
+        }
+        setProject(JSON.parse(project), true)
+        return
+    }
     const response = await api.getProject(projectId)
     if ('message' in response) {
         // TODO: turn this awful alert into a presentable error message
-        alert(`Recieved ${response.status} status on getProject response. Message: ${response.message}`)
+        toast.push(`Recieved ${response.status} status on getProject response. Message: ${response.message}`)
         return
     }
     setProject(response, true)
@@ -178,7 +189,7 @@ export async function loadAllProjects(): Promise<ProjectResponse[]> {
         const response = await api.getUserProjects(userid)
         if ('message' in response) {
             // TODO: turn this awful alert into a presentable error message
-            alert(`Recieved ${response.status} status on getUseProjects response. Message: ${response.message}`)
+            toast.push(`Recieved ${response.status} status on getUserProjects response. Message: ${response.message}`)
         } else {
             remoteProjects = response
         }
@@ -215,9 +226,10 @@ export async function saveProject(published: boolean = false) {
     const response = await api.updateProject(project)
     if ('message' in response) {
         // TODO: turn this awful alert into a presentable error message
-        alert(`Recieved ${response.status} status on login response. Message: ${response.message}`)
+        toast.push(`Recieved ${response.status} status on login response. Message: ${response.message}`)
         return
     }
+    toast.push('Project saved!')
     setProject(response)
 }
 
@@ -254,6 +266,10 @@ export function setProject(project: ProjectResponse, resetContext: boolean = fal
         forkedFromId: forkedFromId ?? undefined
     })
 
+    if (browser)
+        localStorage.setItem('last-project', project.id)
+
+
     if (resetContext) {
         context?.free()
         init()
@@ -265,6 +281,7 @@ export function clearProject() {
     // nothing else needs to be cleared as frontend will not display editor
     // when projectId is null
     wProjectId.set(null)
+    localStorage.removeItem('last-project')
     context?.free()
 }
 

@@ -1,16 +1,18 @@
 import { DEFAULT_FILES } from "$lib/consts/project"
+import { fromFiles, type FileTreeNode } from "$lib/core/fileTree"
 import type { File, Files } from "src/generated/types"
-import { get, writable, type Writable } from "svelte/store"
+import { get } from "svelte/store"
+import { makeEnhanced } from "../enhanced"
 
-export type WritableFiles = Writable<Files> & {
+export type FilesExtras = {
     newFile: (file: File) => string
     getFile: (fileid: string) => File | null
     writeFile: (fileid: string, data: string) => void
     updateFileMeta: (fileid: string, meta: Partial<Omit<File, 'data'>>) => void
     removeFile: (fileid: string) => void
+    buildTree: () => FileTreeNode
 }
-export default function makeFiles(): WritableFiles {
-    let files = writable(DEFAULT_FILES)
+export default makeEnhanced<Files, FilesExtras>(DEFAULT_FILES, function (files) {
 
     function newFile(file: File): string {
         const fileid = `${file.dir}/${file.fileName}.${file.extension}`
@@ -49,5 +51,9 @@ export default function makeFiles(): WritableFiles {
         })
     }
 
-    return { ...files, newFile, getFile, writeFile, updateFileMeta, removeFile }
-}
+    function buildTree(): FileTreeNode {
+        return fromFiles(get(files))
+    }
+
+    return { newFile, getFile, writeFile, updateFileMeta, removeFile, buildTree }
+}) 
