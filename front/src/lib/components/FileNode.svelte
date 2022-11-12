@@ -6,12 +6,18 @@
 		type FileTreeNodeChild,
 		type FileWithId
 	} from '$lib/core/fileTree'
+	import Icon from 'svelte-awesome'
+	import angleRight from 'svelte-awesome/icons/angleRight'
+	import FileIcon from './FileIcon.svelte'
 
 	export let fileNode: FileTreeNode
 	let open = false
 
 	function getFileName(f: FileTreeNodeChild) {
 		return getCanonicalName(f as FileWithId)
+	}
+	function getFileExtension(f: FileTreeNodeChild) {
+		return (f as FileWithId).extension
 	}
 	function toggleOpen() {
 		open = !open
@@ -33,6 +39,7 @@
 				<svelte:self fileNode={child} />
 			{:else if 'fileName' in child}
 				<li class="file entry" on:click={makeFileClickHandler(child)}>
+					<FileIcon extension={getFileExtension(child)} size={14} />
 					{getFileName(child)}
 				</li>
 			{/if}
@@ -41,6 +48,11 @@
 {:else}
 	<li class="dir">
 		<span class="entry" on:click={toggleOpen}>
+			<Icon
+				data={angleRight}
+				class="dir-icon"
+				style="width: 16px;{open ? 'transform: rotate(90deg);' : ''}"
+			/>
 			{fileNode.dir}
 		</span>
 		{#if open}
@@ -50,6 +62,7 @@
 						<svelte:self fileNode={child} />
 					{:else if 'fileName' in child}
 						<li class="file entry" on:click={makeFileClickHandler(child)}>
+							<FileIcon extension={getFileExtension(child)} size={14} class="file-icon" />
 							{getFileName(child)}
 						</li>
 					{/if}
@@ -67,7 +80,7 @@
 		padding-left: 1rem;
 		list-style: none;
 		gap: 0.5rem;
-		font-size: var(--sm);
+		font-size: var(--xs);
 	}
 
 	.file {
@@ -75,8 +88,11 @@
 	}
 
 	.entry {
+		display: flex;
+		align-items: center;
 		cursor: pointer;
 		position: relative;
+		gap: 4px;
 	}
 
 	.entry::before {
@@ -89,5 +105,11 @@
 
 	.entry:hover::before {
 		background-color: var(--glass-med);
+	}
+	.dir-icon {
+		width: 16px;
+	}
+	.file-icon {
+		position: absolute;
 	}
 </style>
