@@ -1,5 +1,5 @@
 
-import { DEFAULT_LAYOUT } from "$lib/consts/project"
+import { DEFAULT_DIR_NODE_STATE, DEFAULT_LAYOUT } from "$lib/consts/project"
 import type { GeneralConfigKey } from "$lib/consts/userConfig"
 import { wUserGeneralConfig } from "$stores/userConfig"
 import type { Layout, Panel } from "src/generated/types"
@@ -13,6 +13,7 @@ export type LayoutExtras = {
     moveWorkspaceIdx: (shift: number) => void
     closeWorkspaceFile: (idx?: number) => void
     openDocument: (fileid: string) => void
+    toggleDirOpen: (absoluteDir: string, set?: boolean) => void
 }
 export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layout) {
 
@@ -22,7 +23,6 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
             let expand = tooSmallToBeOpen || ((set !== undefined) ? set : !l[panel].show)
             if (tooSmallToBeOpen) l[panel].size = get(wUserGeneralConfig)[(panel + 'Size') as GeneralConfigKey]
             l[panel].show = expand
-            console.log('toggling', panel, expand, l[panel])
             return l
         })
     }
@@ -30,7 +30,6 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
         layout.update(l => {
             l[panel].size = event.size
             if (event.size < event.min) l[panel].show = false
-            console.log('updating: ', event)
             return l
         })
     }
@@ -46,11 +45,9 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
 
     function closeWorkspaceFile(idx?: number) {
         layout.update(l => {
-            console.log(l)
             if (!idx && l.fileIndex == null) return l
             let closeIdx = idx ?? l.fileIndex!
             l.workspace.splice(closeIdx, 1)
-            console.log(l.workspace)
             if (l.workspace.length > 0) l.fileIndex = Math.max(0, (l.fileIndex ?? 0) - 1)
             else l.fileIndex = null
             return l
@@ -68,5 +65,17 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
             return l
         })
     }
-    return { togglePanel, setPanelSize, moveWorkspaceIdx, closeWorkspaceFile, openDocument }
+
+    function toggleDirOpen(absoluteDir: string, set?: boolean) {
+        layout.update(l => {
+            if (!l.fileTreeState[absoluteDir]) {
+                l.fileTreeState[absoluteDir] = DEFAULT_DIR_NODE_STATE
+            }
+            const open = (set === undefined) ? !l.fileTreeState[absoluteDir].open : set
+            l.fileTreeState[absoluteDir] = { ...l.fileTreeState[absoluteDir], open }
+            return l
+        })
+    }
+
+    return { togglePanel, setPanelSize, moveWorkspaceIdx, closeWorkspaceFile, openDocument, toggleDirOpen }
 }) 

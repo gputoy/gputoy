@@ -72,7 +72,6 @@
 
 		// On destroy, dispose editor
 		return () => {
-			console.log('Disposing monaco editor')
 			editorInstance?.dispose()
 		}
 	}

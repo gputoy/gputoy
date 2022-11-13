@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -18,6 +20,8 @@ pub struct Layout {
     editor_panel: PanelState,
     /// Panel settings for resourcePanel
     resource_panel: PanelState,
+    /// State of file tree
+    file_tree_state: HashMap<String, DirNodeState>,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
@@ -32,4 +36,11 @@ pub enum Panel {
 pub struct PanelState {
     show: bool,
     size: f32,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DirNodeState {
+    open: bool,
+    is_renaming: bool,
 }

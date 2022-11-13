@@ -3,7 +3,6 @@
 
 	export let size = 32
 	export let extension: SupportedExtension
-	console.log('restprps', $$restProps)
 
 	function colorFromType(ext: SupportedExtension): string {
 		switch (ext) {

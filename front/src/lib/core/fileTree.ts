@@ -16,6 +16,10 @@ export type FileTreeNode = {
      */
     dir: string,
     /**
+     * Path from root
+     */
+    absoluteDir: string,
+    /**
      * Children of directory.
      * List entries can either be a file or another FileTreeNode
      */
@@ -23,7 +27,7 @@ export type FileTreeNode = {
 }
 
 /**
- * Transforms map representation of file system to tree for rendering.
+ * Transforms map representation to tree representation for rendering.
  * 
  * ```
  * {
@@ -56,16 +60,19 @@ export type FileTreeNode = {
  * @returns Tree representation of files 
  */
 export function fromFiles(files: Files): FileTreeNode {
-    let ret: FileTreeNode = { dir: '', children: [] }
+    let ret: FileTreeNode = { dir: '', absoluteDir: '', children: [] }
     let ptr = ret
 
     // add every file to tree in any order
     for (const [fileid, file] of Object.entries(files.map)) {
         const canonicalName = getCanonicalName(file)
         const paths = fileid.slice(1).split('/')
+        let absoluteDir = ''
 
         // find where to insert file, creating directories if needed
         for (const path of paths) {
+            absoluteDir += '/' + path
+
             // found location of file
             if (path === canonicalName) {
                 ptr.children.push({ ...file, id: fileid })
@@ -75,7 +82,7 @@ export function fromFiles(files: Files): FileTreeNode {
             let dirIndex = ptr.children.filter(entry => 'dir' in entry).map(entry => entry.dir).indexOf(path)
             // dir not present, create it
             if (dirIndex < 0) {
-                dirIndex = ptr.children.push({ dir: path, children: [] }) - 1
+                dirIndex = ptr.children.push({ dir: path, absoluteDir, children: [] }) - 1
             }
             // Move down the tree
             ptr = ptr.children[dirIndex] as FileTreeNode

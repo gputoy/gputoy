@@ -75,6 +75,21 @@
         }
       }
     },
+    "DirNodeState": {
+      "type": "object",
+      "required": [
+        "isRenaming",
+        "open"
+      ],
+      "properties": {
+        "isRenaming": {
+          "type": "boolean"
+        },
+        "open": {
+          "type": "boolean"
+        }
+      }
+    },
     "File": {
       "description": "Encapsulates all data needed to emulate a file in gputoy virtual directory structure.",
       "type": "object",
@@ -133,6 +148,7 @@
       "type": "object",
       "required": [
         "editorPanel",
+        "fileTreeState",
         "isStatusOpen",
         "projectPanel",
         "resourcePanel",
@@ -155,6 +171,13 @@
           ],
           "format": "uint",
           "minimum": 0.0
+        },
+        "fileTreeState": {
+          "description": "State of file tree",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/DirNodeState"
+          }
         },
         "isStatusOpen": {
           "description": "Is the left side status panel open",

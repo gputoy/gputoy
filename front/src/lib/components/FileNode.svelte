@@ -6,6 +6,7 @@
 		type FileTreeNodeChild,
 		type FileWithId
 	} from '$lib/core/fileTree'
+	import { wLayout } from '$stores/project'
 	import Icon from 'svelte-awesome'
 	import angleRight from 'svelte-awesome/icons/angleRight'
 	import FileIcon from './FileIcon.svelte'
@@ -20,7 +21,7 @@
 		return (f as FileWithId).extension
 	}
 	function toggleOpen() {
-		open = !open
+		wLayout.toggleDirOpen(fileNode.absoluteDir)
 	}
 	function makeFileClickHandler(file: FileWithId) {
 		return function () {
@@ -55,7 +56,7 @@
 			/>
 			{fileNode.dir}
 		</span>
-		{#if open}
+		{#if $wLayout.fileTreeState[fileNode.absoluteDir]?.open ?? false}
 			<ul>
 				{#each Object.values(fileNode.children) as child}
 					{#if 'children' in child}

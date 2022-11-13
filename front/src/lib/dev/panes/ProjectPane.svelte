@@ -5,7 +5,6 @@
 	let root: FileTreeNode | undefined
 	$: {
 		root = wFiles.buildTree()
-		console.log(root)
 	}
 </script>
 

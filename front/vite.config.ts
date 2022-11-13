@@ -1,7 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite'
 import path from 'path'
 import type { UserConfig } from 'vite'
-const prefix = `monaco-editor/esm/vs`
 const config: UserConfig = {
 	build: {
 		target: ['es2020'],

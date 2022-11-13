@@ -1,8 +1,12 @@
-import type { Config, Files, Layout } from "src/generated/types"
+import type { Config, DirNodeState, Files, Layout } from "src/generated/types"
 
 /**
  * STATIC DEFAULTS
  */
+export const DEFAULT_DIR_NODE_STATE: DirNodeState = {
+    open: false,
+    isRenaming: false,
+}
 export const DEFAULT_LAYOUT: Layout = {
     isStatusOpen: true,
     fileIndex: 0,
@@ -18,6 +22,12 @@ export const DEFAULT_LAYOUT: Layout = {
     resourcePanel: {
         show: true,
         size: 50,
+    },
+    fileTreeState: {
+        '/shaders': {
+            ...DEFAULT_DIR_NODE_STATE,
+            open: true,
+        }
     }
 
 } as const

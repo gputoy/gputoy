@@ -172,6 +172,12 @@ export interface Layout {
    */
   fileIndex?: number | null;
   /**
+   * State of file tree
+   */
+  fileTreeState: {
+    [k: string]: DirNodeState;
+  };
+  /**
    * Is the left side status panel open
    */
   isStatusOpen: boolean;
@@ -192,6 +198,11 @@ export interface Layout {
 export interface PanelState {
   show: boolean;
   size: number;
+}
+
+export interface DirNodeState {
+  isRenaming: boolean;
+  open: boolean;
 }
 
 export interface ProjectResponse {
