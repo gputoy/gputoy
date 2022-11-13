@@ -8,24 +8,16 @@ import { get } from "svelte/store"
 import { makeEnhanced } from "../enhanced"
 
 export type LayoutExtras = {
-    togglePanel: (panel: Panel, set?: boolean) => void
     setPanelSize: (panel: Panel, event: IPaneSizingEvent) => void
     moveWorkspaceIdx: (shift: number) => void
     closeWorkspaceFile: (idx?: number) => void
     openDocument: (fileid: string) => void
+    togglePanel: (panel: Panel, set?: boolean) => void
     toggleDirOpen: (absoluteDir: string, set?: boolean) => void
+    toggleAccordian: (accordian: string, set?: boolean) => void
 }
 export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layout) {
 
-    function togglePanel(panel: Panel, set?: boolean) {
-        layout.update(l => {
-            let tooSmallToBeOpen = l[panel].size < 12
-            let expand = tooSmallToBeOpen || ((set !== undefined) ? set : !l[panel].show)
-            if (tooSmallToBeOpen) l[panel].size = get(wUserGeneralConfig)[(panel + 'Size') as GeneralConfigKey]
-            l[panel].show = expand
-            return l
-        })
-    }
     function setPanelSize(panel: Panel, event: IPaneSizingEvent) {
         layout.update(l => {
             l[panel].size = event.size
@@ -66,6 +58,16 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
         })
     }
 
+    function togglePanel(panel: Panel, set?: boolean) {
+        layout.update(l => {
+            let tooSmallToBeOpen = l[panel].size < 12
+            let expand = tooSmallToBeOpen || ((set !== undefined) ? set : !l[panel].show)
+            if (tooSmallToBeOpen) l[panel].size = get(wUserGeneralConfig)[(panel + 'Size') as GeneralConfigKey]
+            l[panel].show = expand
+            return l
+        })
+    }
+
     function toggleDirOpen(absoluteDir: string, set?: boolean) {
         layout.update(l => {
             if (!l.fileTreeState[absoluteDir]) {
@@ -77,5 +79,12 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
         })
     }
 
-    return { togglePanel, setPanelSize, moveWorkspaceIdx, closeWorkspaceFile, openDocument, toggleDirOpen }
+    function toggleAccordian(accordian: string, set?: boolean) {
+        layout.update(l => {
+            l.accordianOpen[accordian] = (set === undefined) ? !l.accordianOpen[accordian] : set
+            return l
+        })
+    }
+
+    return { setPanelSize, moveWorkspaceIdx, closeWorkspaceFile, openDocument, togglePanel, toggleDirOpen, toggleAccordian }
 }) 

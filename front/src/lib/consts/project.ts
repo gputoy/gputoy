@@ -28,6 +28,10 @@ export const DEFAULT_LAYOUT: Layout = {
             ...DEFAULT_DIR_NODE_STATE,
             open: true,
         }
+    },
+    accordianOpen: {
+        'Summary': true,
+        'Files': true,
     }
 
 } as const

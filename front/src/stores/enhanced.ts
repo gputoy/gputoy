@@ -4,8 +4,6 @@ import { writable, type Writable } from "svelte/store"
  * T: Underlying type of store
  * 
  * E: Type for extra methods on store
- * 
- * These two types 
  */
 export type EnhancedWritable<Type, Extras> = Writable<Type> & Extras
 

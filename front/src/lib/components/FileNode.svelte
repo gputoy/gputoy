@@ -107,10 +107,4 @@
 	.entry:hover::before {
 		background-color: var(--glass-med);
 	}
-	.dir-icon {
-		width: 16px;
-	}
-	.file-icon {
-		position: absolute;
-	}
 </style>

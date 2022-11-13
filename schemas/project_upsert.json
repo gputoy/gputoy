@@ -147,6 +147,7 @@
     "Layout": {
       "type": "object",
       "required": [
+        "accordianOpen",
         "editorPanel",
         "fileTreeState",
         "isStatusOpen",
@@ -155,6 +156,13 @@
         "workspace"
       ],
       "properties": {
+        "accordianOpen": {
+          "description": "State of project panel accordians",
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
         "editorPanel": {
           "description": "Panel settings for editorPanel",
           "allOf": [

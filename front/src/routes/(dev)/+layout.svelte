@@ -145,7 +145,7 @@
 		gap: 4px;
 		align-items: center;
 		border-bottom: 1px solid var(--border-primary);
-		margin-inline: 4px;
+		padding-inline: 4px;
 	}
 
 	.input-helper {

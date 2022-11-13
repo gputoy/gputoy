@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Accordian from '$lib/components/Accordian.svelte'
 	import FileNode from '$lib/components/FileNode.svelte'
 	import type { FileTreeNode } from '$lib/core/fileTree'
 	import { dCanModifyProject, wFiles, wProjectMeta } from '$stores/project'
@@ -9,7 +10,7 @@
 </script>
 
 <div id="pane-root">
-	<div class="section">
+	<Accordian title="Summary">
 		{#if $dCanModifyProject}
 			<input class="title clear" type="text" bind:value={$wProjectMeta.title} />
 			<textarea class="desc clear" type="text" bind:value={$wProjectMeta.description} />
@@ -19,12 +20,12 @@
 				{$wProjectMeta.description}
 			</p>
 		{/if}
-	</div>
-	<div class="section">
+	</Accordian>
+	<Accordian title="Files">
 		{#if root}
 			<FileNode fileNode={root} />
 		{/if}
-	</div>
+	</Accordian>
 </div>
 
 <style>
@@ -51,9 +52,5 @@
 
 	textarea {
 		align-self: center;
-	}
-
-	.section {
-		border-bottom: 1px solid var(--border-secondary);
 	}
 </style>

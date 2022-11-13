@@ -41,8 +41,8 @@ body {
 
 body.dark {
   --background-content: #000000;
-  --nav-color: var(--teriary-color);
-  --background-alt: #0e0e0e;
+  --nav-color: var(--background-content);
+  --background-alt: #0a0a0a;
   --background-nav: #0f0f0f;
   --background-menu: #070707;
   --accent-color: #5c8aee;

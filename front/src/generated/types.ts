@@ -164,6 +164,12 @@ export interface File {
 
 export interface Layout {
   /**
+   * State of project panel accordians
+   */
+  accordianOpen: {
+    [k: string]: boolean;
+  };
+  /**
    * Panel settings for editorPanel
    */
   editorPanel: PanelState;

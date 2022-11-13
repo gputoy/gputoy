@@ -22,6 +22,8 @@ pub struct Layout {
     resource_panel: PanelState,
     /// State of file tree
     file_tree_state: HashMap<String, DirNodeState>,
+    /// State of project panel accordians
+    accordian_open: HashMap<String, bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
