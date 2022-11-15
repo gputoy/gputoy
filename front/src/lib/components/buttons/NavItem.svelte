@@ -34,7 +34,7 @@
 	.current > a {
 		/* background-color: var(--background-nav); */
 		background-color: var(--glass-low);
-		outline: 1px solid var(--border-secondary);
+		outline: var(--border2);
 		color: var(--accent-color);
 
 		font-weight: black;

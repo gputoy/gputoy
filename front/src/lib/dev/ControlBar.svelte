@@ -1,13 +1,8 @@
 <script lang="ts">
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
+	import Icon from '$lib/components/Icon.svelte'
 	import { build, render as context_render } from '$lib/core/context'
 	import { clearProject, getProject } from '$stores/project'
-
-	import Icon from 'svelte-awesome'
-	import circle from 'svelte-awesome/icons/circle'
-	import pause from 'svelte-awesome/icons/pause'
-	import play from 'svelte-awesome/icons/play'
-	import square from 'svelte-awesome/icons/square'
 
 	let x = context_render
 	let playing = false
@@ -23,23 +18,23 @@
 <div id="controlbar-container">
 	<div class="left button-container">
 		<IconButton smallIcons>
-			<Icon data={square} />
+			<Icon name="square" />
 		</IconButton>
 	</div>
 	<div class="middle button-container">
 		<IconButton series="first" smallIcons>
 			{#if playing}
-				<Icon data={pause} />
+				<Icon name="pause" />
 			{:else}
-				<Icon data={play} />
+				<Icon name="play" />
 			{/if}
 		</IconButton>
 		<IconButton series="middle" smallIcons>
-			<Icon data={square} />
+			<Icon name="square" />
 		</IconButton>
 		<div class="info">0.0 fps</div>
 		<IconButton series="last" smallIcons>
-			<Icon data={circle} />
+			<Icon name="circle" />
 		</IconButton>
 	</div>
 
@@ -52,7 +47,7 @@
 <style>
 	#controlbar-container {
 		width: calc(100% - 8px);
-		border-bottom: var(--border-secondary) solid 1px;
+		border-bottom: var(--border);
 		height: 32px;
 		background-color: var(--background-menu);
 		display: grid;
@@ -92,7 +87,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		border: 1px solid var(--border-secondary);
+		border: var(--border);
 		border-left: none;
 	}
 </style>

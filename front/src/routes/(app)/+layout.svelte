@@ -82,7 +82,7 @@
 	header {
 		z-index: 2;
 		flex: 0 0 auto;
-		border-bottom: var(--border-primary) var(--border-primary-size) solid;
+		border-bottom: var(--border);
 		height: 48px;
 	}
 	nav {
@@ -93,7 +93,7 @@
 		background-color: var(--nav-color);
 		justify-content: space-between;
 		align-items: center;
-		border-bottom: 1px solid var(--border-primary);
+		border-bottom: var(--border);
 	}
 	#link-container {
 		position: absolute;

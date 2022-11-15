@@ -47,7 +47,7 @@
 		flex-direction: column;
 		width: 50%;
 		min-height: 500px;
-		border: 1px solid var(--border-primary);
+		border: var(--border);
 	}
 	.project-list {
 		display: flex;
@@ -71,6 +71,6 @@
 		justify-content: space-between;
 		align-items: center;
 		flex: 0 0 auto;
-		border-bottom: 1px solid var(--border-primary);
+		border-bottom: var(--border);
 	}
 </style>

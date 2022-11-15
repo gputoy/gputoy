@@ -88,7 +88,7 @@
 		background-color: var(--background-menu);
 		font-size: var(--xs);
 		width: max-content;
-		border: 1px solid var(--border-primary);
+		border: var(--border);
 		list-style-type: none;
 		padding-block: 0.25rem;
 		box-shadow: var(--box-shadow);

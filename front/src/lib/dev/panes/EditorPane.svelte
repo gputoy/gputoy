@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Logo from '$lib/components/Logo.svelte'
 	import { wFiles, wLayout } from '$stores/project'
 	import Editor from '../monaco/Editor.svelte'
 
@@ -31,7 +32,10 @@
 {#if fileid}
 	<Editor />
 {:else}
-	<div>No file selected</div>
+	<div class="editor-helper">
+		<Logo size="100px" fill="var(--glass-med)" />
+		<h2 style="color: var(--glass-med)">Choose a file to get started!</h2>
+	</div>
 {/if}
 
 <style>
@@ -51,6 +55,15 @@
 		max-width: 10rem;
 		display: flex;
 		box-sizing: border-box;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.editor-helper {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 	}

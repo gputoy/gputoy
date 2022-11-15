@@ -7,8 +7,12 @@
 	import search from 'svelte-awesome/icons/search'
 	import { fly } from 'svelte/transition'
 
+	const lowerGeneralKeys: String[] = GENERAL_CONFIG_KEYS.map((s) => s.toLowerCase())
+	const lowerEditorKeys: String[] = EDITOR_CONFIG_KEYS.map((s) => s.toLowerCase())
+
 	let category = 'general'
 	let configSearch = ''
+	$: searchLower = configSearch.toLowerCase()
 </script>
 
 {#if $wUserConfigOpen}
@@ -23,13 +27,13 @@
 			<div class="category-body">
 				<input placeholder="Search" bind:value={configSearch} />
 				<Icon data={search} class="search-icon" />
-				{#each GENERAL_CONFIG_KEYS as k}
-					{#if k.includes(configSearch)}
+				{#each GENERAL_CONFIG_KEYS as k, i}
+					{#if lowerGeneralKeys[i].includes(searchLower)}
 						<ConfigItem key={k} scope="general" value={$wUserGeneralConfig[k]} />
 					{/if}
 				{/each}
-				{#each EDITOR_CONFIG_KEYS as k}
-					{#if k.includes(configSearch)}
+				{#each EDITOR_CONFIG_KEYS as k, i}
+					{#if lowerEditorKeys[i].includes(searchLower)}
 						<ConfigItem key={k} scope="editor" value={$wUserEditorConfig[k]} />
 					{/if}
 				{/each}
@@ -43,7 +47,7 @@
 		position: absolute;
 		z-index: var(--z-modal);
 		right: 0;
-		border-left: 1px solid var(--border-primary);
+		border-left: var(--border);
 		width: 20%;
 		min-width: fit-content;
 		max-width: 50%;
@@ -61,7 +65,7 @@
 	}
 	.category-list {
 		flex: 0 0 auto;
-		border-right: 1px solid var(--border-secondary);
+		border-right: var(--border2);
 		padding-top: 1rem;
 		background-color: var(--background-menu);
 	}

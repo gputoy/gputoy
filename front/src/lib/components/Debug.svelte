@@ -35,6 +35,6 @@
 		overflow-y: scroll;
 		background-color: var(--background-content);
 		padding: 1rem;
-		border: 1px solid var(--border-primary);
+		border: var(--border);
 	}
 </style>

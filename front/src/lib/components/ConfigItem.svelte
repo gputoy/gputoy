@@ -27,10 +27,16 @@
 			})
 			.join('')
 	}
+
+	$: kebabCaseKey = toKebabCase(key)
 </script>
 
 <div>
-	<label for={key}><code>{toKebabCase(key)}</code></label>
+	<label for={key}>
+		<code>
+			{kebabCaseKey}
+		</code>
+	</label>
 	<p>
 		{configMeta.description}
 	</p>
@@ -69,7 +75,7 @@
 	}
 	input {
 		padding: 4px;
-		outline: 1px solid var(--border-secondary);
+		outline: var(--border2);
 		font-size: var(--xs);
 	}
 	p {
@@ -85,5 +91,8 @@
 
 	input[type='number'] {
 		-moz-appearance: textfield;
+	}
+	.search-highlight {
+		background-color: red;
 	}
 </style>

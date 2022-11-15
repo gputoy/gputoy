@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let text: string | undefined = undefined
+	export let empty = false
 	export let size: string = 'sm'
 	type SeriesPositon = 'first' | 'middle' | 'last' | 'none'
 	export let series: SeriesPositon = 'none'
@@ -14,6 +15,7 @@
 	class:right-round={series == 'none' || series == 'last'}
 	class:no-left-border={series == 'middle' || series == 'last'}
 	class:small-icons={smallIcons}
+	class:empty
 >
 	<slot />
 	{#if text}
@@ -33,7 +35,7 @@
 		justify-content: center;
 		align-items: center;
 		background-color: var(--button);
-		border: 1px solid var(--border-secondary);
+		border: var(--border2);
 		color: var(--text-accent-color);
 	}
 	button:disabled {
@@ -100,5 +102,13 @@
 	.small-icons :global(svg) {
 		width: 12px;
 		height: 12px;
+	}
+	.empty {
+		border: none;
+		background-color: none;
+	}
+	.empty:hover {
+		background-color: transparent;
+		color: var(--text-color);
 	}
 </style>

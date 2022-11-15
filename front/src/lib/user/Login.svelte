@@ -77,7 +77,7 @@
 		background: #d8dfe4;
 		box-shadow: 8px 8px 43px #b8bec2, -8px -8px 43px #f8ffff; */
 		background-color: var(--background-alt);
-		border: var(--border-primary-size) solid var(--border-primary);
+		border: var(--border);
 		padding: 1rem;
 		display: flex;
 		flex-direction: column;

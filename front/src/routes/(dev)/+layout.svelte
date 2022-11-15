@@ -135,7 +135,7 @@
 	header {
 		z-index: 2;
 		flex: 0 0 auto;
-		border-bottom: var(--border-primary) var(--border-primary-size) solid;
+		border-bottom: var(--border);
 		height: var(--navbar-height);
 	}
 	nav {
@@ -144,7 +144,7 @@
 		background-color: var(--nav-color);
 		gap: 4px;
 		align-items: center;
-		border-bottom: 1px solid var(--border-primary);
+		border-bottom: var(--border);
 		padding-inline: 4px;
 	}
 
@@ -153,7 +153,7 @@
 		align-items: center;
 		gap: 8px;
 		font-size: var(--xs);
-		border: 1px solid var(--border-secondary);
+		border: var(--border);
 		border-radius: 4px;
 		height: 1rem;
 		padding: 3.5px 4px;
