@@ -1,9 +1,8 @@
 <script lang="ts">
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
+	import Icon from '$lib/components/Icon.svelte'
 	import { initNewProject, loadAllProjects, setProject } from '$stores/project'
 	import type { ProjectResponse } from 'src/generated/types'
-	import Icon from 'svelte-awesome'
-	import plus from 'svelte-awesome/icons/plus'
 	let projectList = loadAllProjects()
 	function onSetProject(project: ProjectResponse) {
 		setProject(project, true)
@@ -15,7 +14,7 @@
 		<div class="header">
 			<h2>Projects</h2>
 			<IconButton on:click={initNewProject} text="New project">
-				<Icon data={plus} />
+				<Icon name="plus" stroke thick />
 			</IconButton>
 		</div>
 		<div class="project-list">

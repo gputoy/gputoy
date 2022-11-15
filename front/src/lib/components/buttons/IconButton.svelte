@@ -37,6 +37,7 @@
 		background-color: var(--button);
 		border: var(--border2);
 		color: var(--text-accent-color);
+		box-shadow: var(--box-shadow);
 	}
 	button:disabled {
 		color: var(--border-secondary);
@@ -44,8 +45,7 @@
 
 	button:hover:enabled {
 		background-color: var(--button-hover);
-		color: var(--text-color);
-		background-color: var(--glass-low);
+		color: var(--text-important);
 	}
 
 	button:active:enabled {
@@ -105,10 +105,14 @@
 	}
 	.empty {
 		border: none;
-		background-color: none;
+		background-color: transparent;
+		box-shadow: none;
 	}
 	.empty:hover {
-		background-color: transparent;
-		color: var(--text-color);
+		background-color: transparent !important;
+		color: var(--text-important);
+	}
+	.empty:hover:global(svg) {
+		fill: var(--text-important);
 	}
 </style>

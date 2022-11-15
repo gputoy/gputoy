@@ -1,4 +1,7 @@
 <script lang="ts">
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
+	import FileIcon from '$lib/components/FileIcon.svelte'
+	import Icon from '$lib/components/Icon.svelte'
 	import Logo from '$lib/components/Logo.svelte'
 	import { wFiles, wLayout } from '$stores/project'
 	import Editor from '../monaco/Editor.svelte'
@@ -6,6 +9,8 @@
 	$: workspace = $wLayout.workspace
 	$: fileindex = $wLayout.fileIndex ?? null
 	$: fileid = fileindex != null ? workspace[fileindex] : null
+
+	$: highlight = workspace.map((v) => false)
 
 	function getFile(fileid: string) {
 		return $wFiles.map[fileid]
@@ -16,20 +21,49 @@
 		return file.fileName + '.' + file.extension
 	}
 
-	function setWorkspaceIndex(index: number) {
+	function handleClick(ev: MouseEvent, index: number) {
+		console.log(ev, index)
+		// middle click
+		if (ev.button == 1) {
+			wLayout.closeWorkspaceFile(index)
+			ev.preventDefault()
+			return
+		}
 		let fileid = workspace[index]
 		if (fileid) wLayout.update((layout) => ({ ...layout, fileIndex: index }))
 	}
+	function handleClose(index: number) {
+		wLayout.closeWorkspaceFile(index)
+	}
+	function handleMouseEnter(index: number) {
+		highlight[index] = true
+	}
+	function handleMouseLeave(index: number) {
+		highlight[index] = false
+	}
 </script>
 
-<div class="file-tabs">
-	{#each workspace as fileid, i}
-		<div class="file-tab" class:selected={i == fileindex} on:click={() => setWorkspaceIndex(i)}>
-			{getCanonicalName(fileid)}
-		</div>
-	{/each}
-</div>
 {#if fileid}
+	<div class="file-tabs">
+		{#each workspace as fileid, i}
+			<div
+				class="file-tab"
+				class:selected={i == fileindex}
+				on:mouseenter={() => handleMouseEnter(i)}
+				on:mouseleave={() => handleMouseLeave(i)}
+				on:mousedown={(ev) => handleClick(ev, i)}
+			>
+				<FileIcon extension={$wFiles.map[fileid].extension} size={14} />
+				<span>
+					{getCanonicalName(fileid)}
+				</span>
+				<IconButton empty size="xs" on:click={() => handleClose(i)}>
+					<Icon stroked thick name="x" style="visibility:{highlight[i] ? 'visible' : 'hidden'};" />
+				</IconButton>
+			</div>
+		{/each}
+		<div class="filler" />
+	</div>
 	<Editor />
 {:else}
 	<div class="editor-helper">
@@ -45,8 +79,8 @@
 	}
 
 	.file-tab {
-		font-size: var(--sm);
-		padding: 0.5rem;
+		font-size: var(--xs);
+		padding-left: 0.4rem;
 		cursor: pointer;
 		height: 100%;
 		width: fit-content;
@@ -57,6 +91,17 @@
 		box-sizing: border-box;
 		justify-content: center;
 		align-items: center;
+		border-bottom: var(--border2);
+		border-right: var(--border2);
+		user-select: none;
+		transition: none;
+	}
+	span {
+		margin-left: 0.4rem;
+	}
+	.filler {
+		flex: 1 1 auto;
+		border-bottom: var(--border2);
 	}
 
 	.editor-helper {
@@ -70,5 +115,7 @@
 
 	.selected {
 		background-color: var(--background-alt);
+		border-bottom: 1px solid transparent;
+		color: var(--text-important);
 	}
 </style>

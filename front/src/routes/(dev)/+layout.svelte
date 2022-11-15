@@ -2,6 +2,7 @@
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import UiThemeButton from '$lib/components/buttons/UiThemeButton.svelte'
 	import Debug from '$lib/components/Debug.svelte'
+	import Icon from '$lib/components/Icon.svelte'
 	import Key from '$lib/components/Key.svelte'
 	import Logo from '$lib/components/Logo.svelte'
 	import { MENUKEYS } from '$lib/dev/menu/menu'
@@ -14,11 +15,6 @@
 	import { toggleUserConfig, toggleUserModal } from '$stores/ui'
 	import { SvelteToast, type SvelteToastOptions } from '@zerodevx/svelte-toast'
 	import { onMount } from 'svelte'
-	import Icon from 'svelte-awesome'
-	import codeFork from 'svelte-awesome/icons/codeFork'
-	import gear from 'svelte-awesome/icons/gear'
-	import save from 'svelte-awesome/icons/save'
-	import user from 'svelte-awesome/icons/user'
 	const options: SvelteToastOptions = {}
 
 	onMount(() => {
@@ -55,10 +51,10 @@
 			{/if}
 			<div class="navend-container">
 				<IconButton on:click={() => saveProject(true)} disabled={$wUser == null} series="first">
-					<Icon data={save} />
+					<Icon name="save" stroked thick />
 				</IconButton>
 				<IconButton on:click={toggleUserModal} text="Fork" series="last">
-					<Icon data={codeFork} />
+					<Icon name="git-branch" stroked thick />
 				</IconButton>
 			</div>
 			<UiThemeButton />
@@ -70,15 +66,15 @@
 						text={$wUser.fullName ?? $wUser.username}
 						series="first"
 					>
-						<Icon data={user} />
+						<Icon name="user" stroked thick />
 					</IconButton>
 				{:else}
 					<IconButton on:click={toggleUserModal} text="Sign in" series="first">
-						<Icon data={user} />
+						<Icon name="user" stroked thick />
 					</IconButton>
 				{/if}
 				<IconButton on:click={toggleUserConfig} series="last">
-					<Icon data={gear} />
+					<Icon name="settings" stroked thick />
 				</IconButton>
 			</div>
 		</div>
@@ -144,7 +140,7 @@
 		background-color: var(--nav-color);
 		gap: 4px;
 		align-items: center;
-		border-bottom: var(--border);
+		border-bottom: 1px solid var(--border-primary);
 		padding-inline: 4px;
 	}
 

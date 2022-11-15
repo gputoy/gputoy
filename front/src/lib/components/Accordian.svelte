@@ -10,7 +10,11 @@
 </script>
 
 <div class="accordian-container">
-	<div class="accordian-title" on:click={handleClick}>
+	<div
+		class="accordian-title"
+		on:click={handleClick}
+		style="border-bottom: {open ? 'none' : 'var(--border2)'};"
+	>
 		<div class="accordian-title-left">
 			<Icon stroked name="chevron-right" rotation={open ? '90deg' : '0deg'} />
 			<p>

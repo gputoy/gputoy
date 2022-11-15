@@ -22,7 +22,7 @@
 
 <style>
 	* {
-		--inset: 3px;
+		--inset: 0rem;
 	}
 
 	.canvas-container {

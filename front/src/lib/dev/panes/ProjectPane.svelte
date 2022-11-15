@@ -50,7 +50,6 @@
 		height: 100%;
 		background-color: var(--background-content);
 		margin: 0;
-		border: 1px transparent solid;
 	}
 	.title {
 		margin-block: 0rem;

@@ -1,10 +1,9 @@
 <script lang="ts">
 	import ConfigItem from '$lib/components/ConfigItem.svelte'
+	import Icon from '$lib/components/Icon.svelte'
 	import { EDITOR_CONFIG_KEYS, GENERAL_CONFIG_KEYS } from '$lib/consts/userConfig'
 	import { wUserConfigOpen } from '$stores/ui'
 	import { wUserEditorConfig, wUserGeneralConfig } from '$stores/userConfig'
-	import Icon from 'svelte-awesome'
-	import search from 'svelte-awesome/icons/search'
 	import { fly } from 'svelte/transition'
 
 	const lowerGeneralKeys: String[] = GENERAL_CONFIG_KEYS.map((s) => s.toLowerCase())
@@ -26,7 +25,7 @@
 			</div>
 			<div class="category-body">
 				<input placeholder="Search" bind:value={configSearch} />
-				<Icon data={search} class="search-icon" />
+				<Icon name="search" stroked size="1em" style="position:absolute;translate: 3px 3px;" />
 				{#each GENERAL_CONFIG_KEYS as k, i}
 					{#if lowerGeneralKeys[i].includes(searchLower)}
 						<ConfigItem key={k} scope="general" value={$wUserGeneralConfig[k]} />

@@ -55,7 +55,6 @@
 		"@fontsource/inter": "4.5.12",
 		"@fontsource/jetbrains-mono": "4.5.10",
 		"@fontsource/raleway": "^4.5.10",
-		"feather-icons": "^4.29.0",
-		"svelte-awesome": "^3.0.0"
+		"feather-icons": "^4.29.0"
 	}
 }

@@ -21,9 +21,6 @@ body {
 	margin: 0px;
 }
 
-* {
-	transition: background-color 0.25s ease, color 0.05s ease;
-}
 
 p {
 	color: var(--text-color);
@@ -131,10 +128,4 @@ label {
 
 *::-webkit-scrollbar-thumb {
 	background-color: var(--glass-med);
-}
-
-.search-icon {
-	position: absolute;
-	translate: 4px 3px;
-	fill: var(--text-accent-color)
 }

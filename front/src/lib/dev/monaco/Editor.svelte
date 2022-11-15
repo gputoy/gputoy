@@ -62,7 +62,7 @@
 			},
 			padding: {
 				bottom: 10,
-				top: 10
+				top: 20
 			}
 		})
 

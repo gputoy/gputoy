@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from '$lib/components/Icon.svelte'
 	import { pushAction } from '$lib/core/actions'
 	import {
 		getCanonicalName,
@@ -7,12 +8,10 @@
 		type FileWithId
 	} from '$lib/core/fileTree'
 	import { wLayout } from '$stores/project'
-	import Icon from 'svelte-awesome'
-	import angleRight from 'svelte-awesome/icons/angleRight'
 	import FileIcon from './FileIcon.svelte'
 
 	export let fileNode: FileTreeNode
-	let open = false
+	$: open = $wLayout.fileTreeState[fileNode.absoluteDir]?.open ?? false
 
 	function getFileName(f: FileTreeNodeChild) {
 		return getCanonicalName(f as FileWithId)
@@ -49,14 +48,10 @@
 {:else}
 	<li class="dir">
 		<span class="entry" on:click={toggleOpen}>
-			<Icon
-				data={angleRight}
-				class="dir-icon"
-				style="width: 16px;{open ? 'transform: rotate(90deg);' : ''}"
-			/>
+			<Icon name="chevron-right" width="16px" height="16px" rotation={open ? '90deg' : '0deg'} />
 			{fileNode.dir}
 		</span>
-		{#if $wLayout.fileTreeState[fileNode.absoluteDir]?.open ?? false}
+		{#if open}
 			<ul>
 				{#each Object.values(fileNode.children) as child}
 					{#if 'children' in child}
@@ -94,6 +89,7 @@
 		cursor: pointer;
 		position: relative;
 		gap: 4px;
+		user-select: none;
 	}
 
 	.entry::before {
@@ -105,6 +101,6 @@
 	}
 
 	.entry:hover::before {
-		background-color: var(--glass-med);
+		background-color: var(--glass-low);
 	}
 </style>

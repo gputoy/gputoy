@@ -3,14 +3,12 @@
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import NavItem from '$lib/components/buttons/NavItem.svelte'
 	import UiThemeButton from '$lib/components/buttons/UiThemeButton.svelte'
+	import Icon from '$lib/components/Icon.svelte'
 	import Logo from '$lib/components/Logo.svelte'
 	import UserConfig from '$lib/user/UserConfig.svelte'
 	import UserModal from '$lib/user/UserModal.svelte'
 	import { wUser } from '$stores/auth'
 	import { toggleUserConfig, toggleUserModal } from '$stores/ui'
-	import Icon from 'svelte-awesome'
-	import gear from 'svelte-awesome/icons/gear'
-	import user from 'svelte-awesome/icons/user'
 </script>
 
 <header>
@@ -34,15 +32,15 @@
 						text={$wUser.fullName ?? $wUser.username}
 						series="first"
 					>
-						<Icon data={user} />
+						<Icon name="user" stroked thick />
 					</IconButton>
 				{:else}
 					<IconButton on:click={toggleUserModal} text="Sign in" series="first">
-						<Icon data={user} />
+						<Icon name="user" stroked thick />
 					</IconButton>
 				{/if}
 				<IconButton on:click={toggleUserConfig} series="last">
-					<Icon data={gear} />
+					<Icon name="settings" stroked thick />
 				</IconButton>
 			</div>
 		</div>

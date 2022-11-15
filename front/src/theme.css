@@ -57,7 +57,7 @@ body.dark {
   --text-important: #c7c7c7;
 
 
-  --glass-low: rgba(255, 255, 255, 0.014);
+  --glass-low: rgba(255, 255, 255, 0.033);
   --glass-med: rgba(255, 255, 255, 0.055);
   --glass-high: rgba(255, 255, 255, 0.11);
 
@@ -73,7 +73,7 @@ body.dark {
 
   --border-primary: rgba(255, 255, 255, 0.15);
   --border-secondary: rgba(255, 255, 255, 0.1);
-  --border-tertiary: rgba(255, 255, 255, 0.05);
+  --border-tertiary: rgba(255, 255, 255, 0.075);
 
   --border: 1px solid var(--border-primary);
   --border2: 1px solid var(--border-secondary);
@@ -105,7 +105,7 @@ body.light {
   --nav-color: var(--background-nav);
   --text-color: rgb(117, 117, 117);
   --text-accent-color: #585858;
-  --text-important: rgb(31, 31, 31);
+  --text-important: rgb(41, 41, 41);
 
   --glass-low: rgba(0, 0, 0, 0.1);
   --glass-med: rgba(0, 0, 0, 0.144);
@@ -117,16 +117,16 @@ body.light {
 
   --input-color: rgba(17, 17, 17, 0.034);
 
-  --button: rgba(255, 255, 255, 0.2);
-  --button-hovered: rgba(255, 255, 255, 0.1);
-  --button-active: rgba(0, 0, 0, 0.1);
+  --button: rgba(255, 255, 255, 0.4);
+  --button-hovered: rgba(255, 255, 255, 0.3);
+  --button-active: rgba(255, 255, 255, 0.877);
 
-  /* --border-primary: rgb(141, 141, 141);
+  --border-primary: rgb(207, 207, 207);
   --border-secondary: rgb(179, 179, 179);
-  --border-teriary: rgb(200, 200, 200); */
-  --border-primary: transparent;
+  --border-teriary: rgb(200, 200, 200);
+  /* --border-primary: ;
   --border-secondary: transparent;
-  --border-teriary: transparent;
+  --border-teriary: transparent; */
 
   --border: none;
   --border2: none;

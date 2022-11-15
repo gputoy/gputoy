@@ -1,15 +1,13 @@
 <script lang="ts">
+	import Icon from '$lib/components/Icon.svelte'
 	import { theme, toggle } from '$stores/theme'
-	import Icon from 'svelte-awesome'
-	import lightBulbO from 'svelte-awesome/icons/lightbulbO'
-	import moonO from 'svelte-awesome/icons/moonO'
 	import IconButton from './IconButton.svelte'
 </script>
 
 <IconButton on:click={toggle}>
 	{#if $theme == 'dark'}
-		<Icon data={lightBulbO} />
+		<Icon name="sun" stroked thick />
 	{:else}
-		<Icon data={moonO} />
+		<Icon name="moon" stroked thick />
 	{/if}
 </IconButton>
