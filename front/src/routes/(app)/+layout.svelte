@@ -103,8 +103,4 @@
 		margin: 0rem;
 		margin-left: 0.25rem;
 	}
-	:global(*) {
-		transition: background-color 0.25s ease;
-		transition: color 0.05s ease;
-	}
 </style>

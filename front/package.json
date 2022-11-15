@@ -30,6 +30,7 @@
 		"eslint": "^8.16.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^4.0.0",
+		"feather-icons": "^4.29.0",
 		"fractils": "^3.0.2",
 		"js-cookie": "^3.0.1",
 		"json-schema-to-typescript": "^11.0.2",
@@ -54,7 +55,6 @@
 		"@fontsource/fira-mono": "^4.5.0",
 		"@fontsource/inter": "4.5.12",
 		"@fontsource/jetbrains-mono": "4.5.10",
-		"@fontsource/raleway": "^4.5.10",
-		"feather-icons": "^4.29.0"
+		"@fontsource/raleway": "^4.5.10"
 	}
 }

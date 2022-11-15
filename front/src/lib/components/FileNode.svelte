@@ -48,7 +48,7 @@
 {:else}
 	<li class="dir">
 		<span class="entry" on:click={toggleOpen}>
-			<Icon name="chevron-right" width="16px" height="16px" rotation={open ? '90deg' : '0deg'} />
+			<Icon name="chevron-right" size="16px" rotation={open ? '90deg' : '0deg'} />
 			{fileNode.dir}
 		</span>
 		{#if open}

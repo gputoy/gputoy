@@ -2,16 +2,13 @@
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import { build, render as context_render } from '$lib/core/context'
-	import { clearProject, getProject } from '$stores/project'
+	import { getProject } from '$stores/project'
 
 	let x = context_render
 	let playing = false
 
 	function handleBuild() {
 		build(getProject())
-	}
-	function handleClear() {
-		clearProject()
 	}
 </script>
 
@@ -39,8 +36,12 @@
 	</div>
 
 	<div class="right button-container">
-		<IconButton on:click={context_render} series="first">Render</IconButton>
-		<IconButton on:click={handleClear} series="last">Clear</IconButton>
+		<IconButton on:click{handleBuild} series="first" text="Build">
+			<Icon name="tool" stroked thick />
+		</IconButton>
+		<IconButton on:click={context_render} series="last" text="Render">
+			<Icon name="monitor" stroked thick />
+		</IconButton>
 	</div>
 </div>
 

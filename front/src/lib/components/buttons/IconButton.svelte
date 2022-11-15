@@ -49,10 +49,12 @@
 	}
 
 	button:active:enabled {
-		color: var(--accent-color);
-		background-color: var(--button-active);
+		color: var(--text-important);
+		background-color: transparent;
+		box-shadow: none;
 		outline: none;
 	}
+
 	.sm {
 		padding: 0 4px;
 		font-size: var(--xs);

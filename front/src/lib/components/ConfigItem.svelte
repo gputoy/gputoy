@@ -92,7 +92,4 @@
 	input[type='number'] {
 		-moz-appearance: textfield;
 	}
-	.search-highlight {
-		background-color: red;
-	}
 </style>
