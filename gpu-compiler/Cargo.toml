@@ -4,7 +4,24 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+gpu-common = { path = "../gpu-common" }
+thiserror = "1.0.4"
+log = "0.4.17"
+serde = "1.0.147"
+regex = "1.7.0"
+lazy_static = "1.4.0"
 
 [dependencies.naga]
 version = "0.10.0"
-features = ["glsl-in", "wgsl-in", "wgsl-out", "serde", "serialize"]
+features = [
+    "glsl-in",
+    "wgsl-in",
+    "wgsl-out",
+    "serde",
+    "serialize",
+    "deserialize",
+]
+
+[dev-dependencies]
+serde_json = "1.0.87"
+walkdir = "2.3.2"

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { build, render as context_render } from '$lib/core/context'
+	import { build, introspect, render as context_render } from '$lib/core/context'
 	import { getProject } from '$stores/project'
 
 	let x = context_render
@@ -9,6 +9,9 @@
 
 	function handleBuild() {
 		build(getProject())
+	}
+	function handleIntrospect() {
+		introspect(getProject())
 	}
 </script>
 
@@ -36,7 +39,10 @@
 	</div>
 
 	<div class="right button-container">
-		<IconButton on:click{handleBuild} series="first" text="Build">
+		<IconButton on:click={handleIntrospect} series="first" text="Introspect">
+			<Icon name="code" stroked thick />
+		</IconButton>
+		<IconButton on:click={handleBuild} series="middle" text="Build">
 			<Icon name="tool" stroked thick />
 		</IconButton>
 		<IconButton on:click={context_render} series="last" text="Render">

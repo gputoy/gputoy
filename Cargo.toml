@@ -6,6 +6,5 @@ members = [
   "gpu-compiler",
   "gpu-wasm",
   "gpu-tauri",
-  "gpu-schemas",
 ]
 resolver = "2"

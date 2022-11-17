@@ -1,3 +1,4 @@
+use gpu_compiler::CompiledProject;
 use thiserror::Error;
 
 use winit::event_loop::EventLoop;
@@ -13,19 +14,26 @@ pub enum Error {
     NoAdapter,
     #[error(transparent)]
     DeviceCreationFailed(#[from] wgpu::RequestDeviceError),
+    #[error("Project build failed")]
+    ProjectBuildFailed,
+    #[error("No runner")]
+    NoRunner,
+    #[error(transparent)]
+    CompileError(gpu_compiler::Error),
 }
 
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Context {
-    window: winit::window::Window,
-    event_loop: EventLoop<()>,
-    instance: wgpu::Instance,
-    size: winit::dpi::PhysicalSize<u32>,
-    surface: wgpu::Surface,
-    adapter: wgpu::Adapter,
-    device: wgpu::Device,
-    queue: wgpu::Queue,
+    pub window: winit::window::Window,
+    pub event_loop: EventLoop<()>,
+    pub instance: wgpu::Instance,
+    pub size: winit::dpi::PhysicalSize<u32>,
+    pub surface: wgpu::Surface,
+    pub adapter: wgpu::Adapter,
+    pub device: wgpu::Device,
+    pub queue: wgpu::Queue,
+    pub runner: Option<crate::runner::Runner>,
 }
 
 impl Context {
@@ -86,6 +94,14 @@ impl Context {
             limits,
         };
         let (device, queue) = adapter.request_device(&desc, None).await?;
+        let surface_config = wgpu::SurfaceConfiguration {
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            format: surface.get_supported_formats(&adapter)[0],
+            width: size.width,
+            height: size.height,
+            present_mode: wgpu::PresentMode::Fifo,
+        };
+        surface.configure(&device, &surface_config);
 
         Ok(Context {
             event_loop,
@@ -96,14 +112,88 @@ impl Context {
             instance,
             size,
             surface,
+            runner: None,
         })
     }
 
-    pub async fn build(&mut self, _project: &gpu_common::Project) -> Result<(), Error> {
+    pub async fn introspect(
+        &mut self,
+        project: &gpu_common::Project,
+    ) -> Result<CompiledProject, Error> {
+        let mut compiler = gpu_compiler::Compiler::new();
+        let compiled_project = compiler.build(&project.files).map_err(Error::CompileError);
+        log::info!("Compiled project: {:?}", compiled_project);
+        compiled_project
+    }
+
+    pub async fn build(&mut self, project: &gpu_common::Project) -> Result<(), Error> {
+        let run_file = project
+            .files
+            .map
+            .get("/shaders/main.wgsl")
+            .ok_or(Error::ProjectBuildFailed)?;
+        let vertex = self
+            .device
+            .create_shader_module(wgpu::include_wgsl!("vertex.wgsl"));
+        let shader_desc = self
+            .device
+            .create_shader_module(wgpu::ShaderModuleDescriptor {
+                label: None,
+                source: wgpu::ShaderSource::Wgsl(run_file.into()),
+            });
+        let render_pipeline_layout =
+            self.device
+                .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                    label: Some("Pipeline layout"),
+                    bind_group_layouts: &[],
+                    push_constant_ranges: &[],
+                });
+        let render_pipeline = self
+            .device
+            .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+                label: Some("Render pipeline"),
+                layout: Some(&render_pipeline_layout),
+                vertex: wgpu::VertexState {
+                    module: &vertex,
+                    entry_point: "main",
+                    buffers: &[],
+                },
+                fragment: Some(wgpu::FragmentState {
+                    module: &shader_desc,
+                    entry_point: "fs_main",
+                    targets: &[Some(wgpu::ColorTargetState {
+                        format: self.surface.get_supported_formats(&self.adapter)[0],
+                        blend: Some(wgpu::BlendState::REPLACE),
+                        write_mask: wgpu::ColorWrites::ALL,
+                    })],
+                }),
+                multisample: wgpu::MultisampleState {
+                    count: 1,
+                    mask: !0,
+                    alpha_to_coverage_enabled: false,
+                },
+                multiview: None,
+                depth_stencil: None,
+                primitive: wgpu::PrimitiveState {
+                    topology: wgpu::PrimitiveTopology::TriangleList,
+                    strip_index_format: None,
+                    front_face: wgpu::FrontFace::Cw,
+                    cull_mode: None,
+                    unclipped_depth: false,
+                    polygon_mode: wgpu::PolygonMode::Fill,
+                    conservative: false,
+                },
+            });
+
+        self.runner = Some(crate::runner::Runner { render_pipeline });
         Ok(())
     }
 
     pub async fn render(&self) -> Result<(), Error> {
+        let Some(runner) = &self.runner else {
+            return Err(Error::NoRunner);
+        };
+        runner.render_frame(self);
         Ok(())
     }
 }

@@ -1,4 +1,5 @@
 import { browser } from '$app/environment'
+import { toast } from '@zerodevx/svelte-toast'
 import type { Project } from 'src/generated/types'
 
 import { Context, default as init_module } from '../../../pkg/gpu_wasm'
@@ -19,12 +20,25 @@ export async function build(project: Project) {
     console.error("js:context:build:error", e)
     return
   }
-  console.log("js:context:build", project)
+  console.log("js:context:build")
 }
 
 export async function render() {
-  await context?.render()
+  if (!context) {
+    toast.push("No context to render!")
+    return
+  }
+  context?.render()
   console.log("js:context:render")
+}
+
+export async function introspect(project: Project) {
+  if (!context) {
+    toast.push("Cannot introspect, context not ready")
+    return
+  }
+  let compileResult = context.introspect(project)
+  console.log("Compile result: ", compileResult)
 }
 
 export async function reset() {

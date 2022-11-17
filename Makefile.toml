@@ -104,7 +104,11 @@ args = ["migrate", "run"]
 [tasks.types]
 description = "Make json schema and typescript types from rust types"
 workspace = false
-script = ["cargo run -p gpu-schemas", "cd front", "node generate_api_types.js"]
+script = [
+  "cargo run -p gpu-common",
+  "cd front",
+  "node generate_common_types.js",
+]
 
 # ----------------- Env -------------------
 [env]

@@ -17,6 +17,8 @@ pub enum Error {
     ContextInit(gpu_client::context::Error),
     #[error("Context build failed: {0}")]
     ContextBuild(gpu_client::context::Error),
+    #[error("Context introspection failed: {0}")]
+    ContextIntrospect(gpu_client::context::Error),
     #[error("Context render failed: {0}")]
     ContextRender(gpu_client::context::Error),
     #[error("Could not serialize from JsonValue: {0}")]
@@ -34,6 +36,10 @@ impl From<Error> for JsValue {
 #[wasm_bindgen]
 #[derive(Debug)]
 pub struct Context(gpu_client::context::Context);
+
+#[wasm_bindgen]
+#[derive(Debug)]
+pub struct CompiledProject(gpu_compiler::CompiledProject);
 
 #[wasm_bindgen]
 impl Context {
@@ -60,6 +66,16 @@ impl Context {
         let project = serde_wasm_bindgen::from_value(project).map_err(Error::SerdeWasmBindgen)?;
         log::info!("Recieved project: {:?}", project);
         self.0.build(&project).await.map_err(Error::ContextBuild)
+    }
+
+    #[wasm_bindgen]
+    pub async fn introspect(&mut self, project: JsValue) -> Result<CompiledProject, Error> {
+        let project = serde_wasm_bindgen::from_value(project).map_err(Error::SerdeWasmBindgen)?;
+        self.0
+            .introspect(&project)
+            .await
+            .map(CompiledProject)
+            .map_err(Error::ContextIntrospect)
     }
 
     #[wasm_bindgen]
