@@ -12,6 +12,8 @@ lazy_static! {
         r#"@export\s+(?P<struct>struct\s+(?P<ident>[a-zA-Z_][a-zA-Z0-9]*)\s*\{[^}]*}\s*;)"#
     )
     .unwrap();
+    static ref RE_REPLACE_IMPORT: Regex = Regex::new(r#"@import\s+"#).unwrap();
+    static ref RE_REPLACE_EXPORT: Regex = Regex::new(r#"@export\s+"#).unwrap();
 }
 
 pub struct Compiler {
@@ -77,11 +79,8 @@ impl Compiler {
     }
 
     fn preprocess_file(&self, file: &gpu_common::File) -> gpu_common::File {
-        let data = RE_CAPTURE_IMPORT.replace_all(&file.data, |caps: &regex::Captures| {
-            caps["ident"].to_owned()
-        });
-        let data = RE_CAPTURE_EXPORT
-            .replace_all(&data, |caps: &regex::Captures| caps["struct"].to_owned());
+        let data = RE_REPLACE_IMPORT.replace_all(&file.data, "");
+        let data = RE_REPLACE_EXPORT.replace_all(&data, "");
         gpu_common::File {
             file_name: format!("{}_processed", file.file_name),
             data: data.into_owned(),
