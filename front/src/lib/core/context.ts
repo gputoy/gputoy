@@ -42,7 +42,7 @@ export async function introspect(files: Files) {
     toast.push("Cannot introspect, context not ready")
     return
   }
-  let compileResult = compiler?.analyze(files)
+  let compileResult = compiler?.prebuild(files)
   console.log("Compile result: ", compileResult)
 }
 

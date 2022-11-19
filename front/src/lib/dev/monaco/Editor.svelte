@@ -132,17 +132,14 @@
 			}
 		}
 		editorInstance?.updateOptions(options)
-		Monaco?.editor.remeasureFonts()
-		console.log('in updateEditorConfig: ', vimMode, config.vimMode, editorInstance !== undefined)
 
 		if (!vimMode && config.vimMode && editorInstance) {
-			console.log('monaco vim:', MonacoVim)
-
 			vimMode = MonacoVim?.initVimMode(editorInstance, statusEl)
 		} else if (vimMode && !config.vimMode) {
 			vimMode.dispose()
 			vimMode = undefined
 		}
+		Monaco?.editor.remeasureFonts()
 	}
 
 	onMount(initEditor)

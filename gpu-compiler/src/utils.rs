@@ -1,9 +1,15 @@
 #![cfg(test)]
-use std::{io::Read, path::Path};
 
 use gpu_common::{File, Files, SupportedExtension};
+use std::{io::Read, path::Path};
 use walkdir::WalkDir;
 
+/// USED FOR TESTING PURPOSES ONLY
+///
+/// Converts directory to gpu_common::Files
+/// Writing out an entire Files struct in JSON is too cumbersome, especially dealing
+/// with the fact the file contents can't be formatted.
+/// This allows test Files to be created from a normal directory.
 pub fn files_from_dir<P: AsRef<Path>>(path: P) -> Option<Files> {
     let dir = WalkDir::new(&path).into_iter().filter_map(|e| e.ok());
     let mut ret = Files::default();

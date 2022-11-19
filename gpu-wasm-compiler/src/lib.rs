@@ -1,3 +1,4 @@
+use gpu_compiler::PrebuildResult;
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsValue};
 
@@ -31,9 +32,6 @@ impl From<Error> for JsValue {
 pub struct Compiler(gpu_compiler::Compiler);
 
 #[wasm_bindgen]
-pub struct CompiledProject(gpu_compiler::CompiledProject);
-
-#[wasm_bindgen]
 impl Compiler {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
@@ -41,12 +39,10 @@ impl Compiler {
     }
 
     #[wasm_bindgen]
-    pub fn analyze(&mut self, files: JsValue) -> Result<CompiledProject, Error> {
+    pub fn prebuild(&mut self, files: JsValue) -> Result<JsValue, Error> {
         let files: gpu_common::Files =
             serde_wasm_bindgen::from_value(files).map_err(Error::SerdeWasmBindgen)?;
-        self.0
-            .build(&files)
-            .map_err(Error::Compiler)
-            .map(CompiledProject)
+        let prebuild = self.0.prebuild(&files).map_err(Error::Compiler)?;
+        serde_wasm_bindgen::to_value(&prebuild).map_err(Error::SerdeWasmBindgen)
     }
 }
