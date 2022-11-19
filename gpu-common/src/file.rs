@@ -18,7 +18,7 @@ use strum_macros::{AsRefStr, EnumString};
 ///     }
 /// }
 /// ```
-#[derive(Debug, Serialize, Deserialize, JsonSchema, Default)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, Default, Clone)]
 pub struct Files {
     pub map: HashMap<String, File>,
 }
@@ -32,9 +32,10 @@ impl<'i> Index<&'i str> for Files {
             .unwrap_or_else(|| panic!("no file with id '{}'", name))
     }
 }
+
 /// Encapsulates all data needed to emulate a file in
 /// gputoy virtual directory structure.
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug, Serialize, Deserialize, JsonSchema, Clone)]
 pub struct File {
     /// Contents of file in plain text
     pub data: String,

@@ -32,6 +32,8 @@ pub struct UserEditorConfig {
     font_family: Option<String>,
     font_size: Option<u32>,
     line_numbers: LineNumberCOnfig,
+    vim_mode: bool,
+    minimap: bool,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]

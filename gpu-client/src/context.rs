@@ -1,4 +1,3 @@
-use gpu_compiler::CompiledProject;
 use thiserror::Error;
 
 use winit::event_loop::EventLoop;
@@ -114,16 +113,6 @@ impl Context {
             surface,
             runner: None,
         })
-    }
-
-    pub async fn introspect(
-        &mut self,
-        project: &gpu_common::Project,
-    ) -> Result<CompiledProject, Error> {
-        let mut compiler = gpu_compiler::Compiler::new();
-        let compiled_project = compiler.build(&project.files).map_err(Error::CompileError);
-        log::info!("Compiled project: {:?}", compiled_project);
-        compiled_project
     }
 
     pub async fn build(&mut self, project: &gpu_common::Project) -> Result<(), Error> {

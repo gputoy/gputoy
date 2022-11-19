@@ -11,6 +11,8 @@ export const DEFAULT_USER_EDITOR_CONFIG: UserEditorConfig = {
     lineNumbers: 'on',
     fontFamily: 'mono',
     fontSize: 12,
+    vimMode: false,
+    minimap: false,
 } as const
 
 export const DEFAULT_USER_KEYBINDS: Keybinds = {
@@ -121,6 +123,14 @@ export const USER_CONFIG_META: ConfigMeta = {
             type: 'select',
             description: 'How the code editor will display line numbers.',
             options: ['on', 'interval', 'relative', 'off'] as Array<string>,
+        },
+        vimMode: {
+            type: 'toggle',
+            description: 'Enable vim movements in code editor.',
+        },
+        minimap: {
+            type: "toggle",
+            description: 'Enable minimap in top right of editor that shows an overview of file.'
         }
     }
 } as const
@@ -134,7 +144,9 @@ export const GENERAL_CONFIG_KEYS: readonly GeneralConfigKey[] = [
 export const EDITOR_CONFIG_KEYS: readonly EditorConfigKey[] = [
     'fontFamily',
     'fontSize',
-    'lineNumbers'
+    'lineNumbers',
+    'vimMode',
+    'minimap'
 ] as const
 
 export type ConfigScope = 'general' | 'editor'

@@ -497,7 +497,9 @@
     "UserEditorConfig": {
       "type": "object",
       "required": [
-        "lineNumbers"
+        "lineNumbers",
+        "minimap",
+        "vimMode"
       ],
       "properties": {
         "fontFamily": {
@@ -516,6 +518,12 @@
         },
         "lineNumbers": {
           "$ref": "#/definitions/LineNumberCOnfig"
+        },
+        "minimap": {
+          "type": "boolean"
+        },
+        "vimMode": {
+          "type": "boolean"
         }
       }
     },

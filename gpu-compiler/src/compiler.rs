@@ -1,9 +1,10 @@
-use crate::error::Error;
-use gpu_common::Files;
+use crate::error::{self, Error};
+use codespan_reporting::diagnostic::Diagnostic;
 use lazy_static::lazy_static;
-use naga::FastHashMap;
+use naga::{front::wgsl::ParseError, FastHashMap};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use std::cell::RefCell;
 
 lazy_static! {
     static ref RE_CAPTURE_IMPORT: Regex =
@@ -17,8 +18,8 @@ lazy_static! {
 }
 
 pub struct Compiler {
-    wgsl_parser: naga::front::wgsl::Parser,
-    _glsl_parser: naga::front::glsl::Parser,
+    pub(crate) wgsl_parser: RefCell<naga::front::wgsl::Parser>,
+    _glsl_parser: RefCell<naga::front::glsl::Parser>,
     _internal_files: gpu_common::Files,
 }
 
@@ -28,51 +29,95 @@ impl Default for Compiler {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Match {
+    pub text: String,
+    pub start: usize,
+    pub end: usize,
+}
+
+impl From<regex::Match<'_>> for Match {
+    fn from(m: regex::Match) -> Self {
+        Match {
+            text: m.as_str().to_owned(),
+            start: m.start(),
+            end: m.end(),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FilePrebuildResult {
+    imports: Vec<Match>,
+    exports: FastHashMap<String, Match>,
+    processed_shader: gpu_common::File,
+    raw_module: Option<naga::Module>,
+    errors: Option<Vec<error::CompileError>>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CompiledProject {
+    pub file_builds: FastHashMap<String, FilePrebuildResult>,
+}
+
 impl Compiler {
     pub fn new() -> Self {
         Self {
-            wgsl_parser: naga::front::wgsl::Parser::new(),
-            _glsl_parser: naga::front::glsl::Parser::default(),
+            wgsl_parser: RefCell::new(naga::front::wgsl::Parser::new()),
+            _glsl_parser: RefCell::new(naga::front::glsl::Parser::default()),
             _internal_files: Default::default(),
         }
     }
     pub fn build(&mut self, files: &gpu_common::Files) -> Result<CompiledProject, Error> {
-        let capacity = files.map.len();
-        let mut raw_modules = FastHashMap::with_capacity_and_hasher(capacity, Default::default());
-        let file = files.map.get("/shaders/main.wgsl").unwrap();
-        let _imports = Self::get_file_imports(file);
-        let _exports = Self::get_file_exports(file);
-        let _p_file = self.preprocess_file(file);
-        let module = self
-            .wgsl_parser
-            .parse(&file.data)
-            .map_err(|err| Error::ParseError(file.canonical_name(), err))?;
-        module
-            .types
+        let prebuild: FastHashMap<String, _> = files
+            .map
             .iter()
-            .for_each(|(_, ty)| log::info!("{:?}", ty));
-        raw_modules.insert(file.canonical_name(), module);
+            .filter(|(_, file)| file.extension.is_shader())
+            .map(|(fileid, file)| (fileid.clone(), self.inspect_file(file)))
+            .collect();
+        log::info!("Prebuild: {prebuild:#?}");
 
         Ok(CompiledProject {
-            raw_modules,
-            transformed_files: Default::default(),
+            file_builds: prebuild,
         })
     }
 
-    fn get_file_imports(file: &gpu_common::File) -> Vec<&str> {
+    pub fn inspect_file(&self, file: &gpu_common::File) -> FilePrebuildResult {
+        let imports = Self::get_file_imports(file);
+        let exports = Self::get_file_exports(file);
+        let processed_shader = self.preprocess_file(file);
+        let (raw_module, errors) = match self.wgsl_parser.borrow_mut().parse(&processed_shader.data)
+        {
+            Ok(module) => (Some(module), None),
+            Err(err) => (
+                None,
+                Some(vec![(&err, processed_shader.data.as_ref()).into()]),
+            ),
+        };
+
+        FilePrebuildResult {
+            imports,
+            exports,
+            processed_shader,
+            raw_module,
+            errors,
+        }
+    }
+
+    fn get_file_imports(file: &gpu_common::File) -> Vec<Match> {
         RE_CAPTURE_IMPORT
             .captures_iter(&file.data)
-            .map(|cap| cap.name("ident").unwrap().as_str())
+            .map(|cap| cap.name("ident").unwrap().into())
             .collect()
     }
 
-    fn get_file_exports(file: &gpu_common::File) -> FastHashMap<&str, &str> {
+    fn get_file_exports(file: &gpu_common::File) -> FastHashMap<String, Match> {
         RE_CAPTURE_EXPORT
             .captures_iter(&file.data)
             .map(|cap| {
                 (
-                    cap.name("ident").unwrap().as_str(),
-                    cap.name("struct").unwrap().as_str(),
+                    cap.name("ident").unwrap().as_str().to_owned(),
+                    cap.name("struct").unwrap().into(),
                 )
             })
             .collect()
@@ -91,15 +136,10 @@ impl Compiler {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CompiledProject {
-    pub raw_modules: naga::FastHashMap<String, naga::Module>,
-    pub transformed_files: Files,
-    // pub types: naga::FastHashMap<String, TypeDesc>,
-}
-
 #[cfg(test)]
 mod tests {
+    use gpu_common::Files;
+
     use super::*;
     use std::{path::Path, vec};
 
@@ -115,7 +155,10 @@ mod tests {
         let shader = &files["/main.wgsl"];
 
         let imports = Compiler::get_file_imports(&shader);
-        assert_eq!(imports, vec!["FragIn", "TestStruct0", "TestStruct1"]);
+        assert_eq!(
+            imports.iter().map(|v| &v.text).collect::<Vec<_>>(),
+            vec!["FragIn", "TestStruct0", "TestStruct1"]
+        );
     }
 
     #[test]
@@ -129,7 +172,7 @@ mod tests {
             vec![&"MyStruct", &"FragIn"]
         );
         assert_eq!(
-            imports.values().collect::<Vec<_>>(),
+            imports.values().map(|v| &v.text).collect::<Vec<_>>(),
             vec![
                 &r#"struct MyStruct {
     field: vec3<f32>,

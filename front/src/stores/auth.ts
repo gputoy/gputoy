@@ -1,5 +1,6 @@
 import * as api from '$lib/core/api'
 import { toast } from '@zerodevx/svelte-toast'
+import Cookies from 'js-cookie'
 import type { UpdateUserInfoArgs, UserInfoResponse } from 'src/generated/types'
 import { get, writable } from "svelte/store"
 import { dUserConfig, setUserConfig } from './userConfig'
@@ -25,10 +26,15 @@ export async function logout() {
 }
 
 export async function getSession() {
-  const response = await api.getSession()
-  if ('message' in response) {
-    // TODO: turn this awful log into a presentable error message
-    toast.push(`Recieved ${response.status} status on getSession response. Message: ${response.message}`)
+  let response
+  if (Cookies.get('id'))
+    response = await api.getSession()
+
+  if (!response || 'message' in response) {
+    let configString = localStorage?.getItem('config')
+    let config = configString ? JSON.parse(configString) : undefined
+    console.log('setting config', config)
+    setUserConfig(config)
     return
   }
   wUser.set(response)

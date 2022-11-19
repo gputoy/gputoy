@@ -2,7 +2,8 @@
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import { build, introspect, render as context_render } from '$lib/core/context'
-	import { getProject } from '$stores/project'
+	import { getProject, wFiles } from '$stores/project'
+	import { get } from 'svelte/store'
 
 	let x = context_render
 	let playing = false
@@ -11,7 +12,7 @@
 		build(getProject())
 	}
 	function handleIntrospect() {
-		introspect(getProject())
+		introspect(get(wFiles))
 	}
 </script>
 

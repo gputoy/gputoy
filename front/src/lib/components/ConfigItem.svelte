@@ -15,6 +15,16 @@
 
 	function onChangeProp(ev: Event) {
 		const value = (ev.target as HTMLInputElement)?.value
+		console.log(ev)
+		if (validate(scope, key, value)) setProperty(scope, key, value)
+	}
+	function onToggleProp(ev: Event) {
+		const value = (ev.target as HTMLInputElement)?.value
+		setProperty(scope, key, value == 'on' ? true : false)
+	}
+	function onSelectProp(ev: Event) {
+		const value = (ev.target as HTMLSelectElement)?.value
+		console.log(ev)
 		if (validate(scope, key, value)) setProperty(scope, key, value)
 	}
 	// TODO: move to utils as this will be needed later in console
@@ -42,11 +52,13 @@
 	</p>
 	<div class="input-wrapper">
 		{#if configMeta.type === 'select'}
-			<select id={key}>
+			<select id={key} on:change={onSelectProp}>
 				{#each configMeta.options ?? [] as value}
 					<option {value}>{value}</option>
 				{/each}
 			</select>
+		{:else if configMeta.type === 'toggle'}
+			<input type="checkbox" on:change={onToggleProp} checked={value} />
 		{:else}
 			<input
 				id={key}

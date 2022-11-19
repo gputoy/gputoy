@@ -1,5 +1,6 @@
 import type monaco from 'monaco-editor'
 
+// TODO: use as reference https://github.com/Microsoft/vscode/blob/93028e44ea7752bd53e2471051acbe6362e157e9/src/vs/editor/standalone/common/themes.ts#L13
 export default {
   base: "vs-dark",
   inherit: true,

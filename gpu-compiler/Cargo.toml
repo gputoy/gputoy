@@ -11,6 +11,10 @@ serde = "1.0.147"
 regex = "1.7.0"
 lazy_static = "1.4.0"
 
+[dependencies.codespan-reporting]
+version = "0.11.1"
+features = ["serialization"]
+
 [dependencies.naga]
 version = "0.10.0"
 features = [

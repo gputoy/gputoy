@@ -259,6 +259,8 @@ export interface UserEditorConfig {
   fontFamily?: string | null;
   fontSize?: number | null;
   lineNumbers: LineNumberCOnfig;
+  minimap: boolean;
+  vimMode: boolean;
 }
 
 export interface UserGeneralConfig {

@@ -1,15 +1,20 @@
 import { browser } from '$app/environment'
 import { toast } from '@zerodevx/svelte-toast'
-import type { Project } from 'src/generated/types'
+import type { Files, Project } from 'src/generated/types'
 
-import { Context, default as init_module } from '../../../pkg/gpu_wasm'
+import { Context, default as init_client } from '$wasm/client/gpu_wasm_client'
+import { Compiler, default as init_compiler } from '$wasm/compiler/gpu_wasm_compiler'
 
 var context: Context | undefined = undefined
+var compiler: Compiler | undefined = undefined
 
 export async function init() {
   if (!browser || !("gpu" in navigator)) return
-  await init_module()
+  await init_client()
+  await init_compiler()
+
   context = await new Context()
+  compiler = new Compiler()
   console.log("js:context:init", context)
 }
 
@@ -32,12 +37,12 @@ export async function render() {
   console.log("js:context:render")
 }
 
-export async function introspect(project: Project) {
+export async function introspect(files: Files) {
   if (!context) {
     toast.push("Cannot introspect, context not ready")
     return
   }
-  let compileResult = context.introspect(project)
+  let compileResult = compiler?.analyze(files)
   console.log("Compile result: ", compileResult)
 }
 

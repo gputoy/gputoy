@@ -22,6 +22,12 @@
 			],
 			"$stores/*": [
 				"src/stores/*"
+			],
+			"$wasm": [
+				"pkg"
+			],
+			"$wasm/*": [
+				"pkg/*"
 			]
 		}
 	}

@@ -43,39 +43,53 @@
 	}
 </script>
 
-{#if fileid}
-	<div class="file-tabs">
-		{#each workspace as fileid, i}
-			<div
-				class="file-tab"
-				class:selected={i == fileindex}
-				on:mouseenter={() => handleMouseEnter(i)}
-				on:mouseleave={() => handleMouseLeave(i)}
-				on:mousedown={(ev) => handleClick(ev, i)}
-			>
-				<FileIcon extension={$wFiles.map[fileid].extension} size={14} />
-				<span>
-					{getCanonicalName(fileid)}
-				</span>
-				<IconButton empty size="xs" on:click={() => handleClose(i)}>
-					<Icon stroked thick name="x" style="visibility:{highlight[i] ? 'visible' : 'hidden'};" />
-				</IconButton>
-			</div>
-		{/each}
-		<div class="filler" />
-	</div>
-	<Editor />
-{:else}
-	<div class="editor-helper">
-		<Logo size="100px" fill="var(--glass-med)" />
-		<h2 style="color: var(--glass-med)">Choose a file to get started!</h2>
-	</div>
-{/if}
+<div class="editor-container">
+	{#if fileid}
+		<div class="file-tabs">
+			{#each workspace as fileid, i}
+				<div
+					class="file-tab"
+					class:selected={i == fileindex}
+					on:mouseenter={() => handleMouseEnter(i)}
+					on:mouseleave={() => handleMouseLeave(i)}
+					on:mousedown={(ev) => handleClick(ev, i)}
+				>
+					<FileIcon extension={$wFiles.map[fileid].extension} size={14} />
+					<span>
+						{getCanonicalName(fileid)}
+					</span>
+					<IconButton empty size="xs" on:click={() => handleClose(i)}>
+						<Icon
+							stroked
+							thick
+							name="x"
+							style="visibility:{highlight[i] ? 'visible' : 'hidden'};"
+						/>
+					</IconButton>
+				</div>
+			{/each}
+			<div class="filler" />
+		</div>
+		<Editor />
+	{:else}
+		<div class="editor-helper">
+			<Logo size="100px" fill="var(--glass-med)" />
+			<h2 style="color: var(--glass-med)">Choose a file to get started!</h2>
+		</div>
+	{/if}
+</div>
 
 <style>
 	.file-tabs {
 		height: 2rem;
 		display: flex;
+		flex: 0 0 auto;
+	}
+
+	.editor-container {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.file-tab {

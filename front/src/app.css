@@ -129,3 +129,29 @@ label {
 *::-webkit-scrollbar-thumb {
 	background-color: var(--glass-med);
 }
+
+/* vim editor mode */
+#status-root>span:nth-child(1) {
+	font-family: var(--font-mono);
+	text-transform: lowercase;
+}
+
+/* vim search */
+#status-root input {
+	font-family: var(--font-mono);
+	padding: 0;
+	background-color: transparent;
+	outline: none;
+}
+
+/* vim editor key helper */
+#status-root>span:nth-child(4) {
+	font-family: var(--font-mono);
+	text-transform: lowercase;
+	justify-self: right;
+}
+
+/* Vim edtior regexp message */
+#status-root>span:nth-child(2)>span:nth-child(2) {
+	display: none;
+}
