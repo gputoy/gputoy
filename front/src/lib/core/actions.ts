@@ -94,7 +94,6 @@ function shiftDoument(shift: number) {
 }
 
 function closeCurrentFile() {
-    console.log('in close file')
     wLayout.closeWorkspaceFile()
 }
 

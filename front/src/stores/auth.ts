@@ -33,7 +33,6 @@ export async function getSession() {
   if (!response || 'message' in response) {
     let configString = localStorage?.getItem('config')
     let config = configString ? JSON.parse(configString) : undefined
-    console.log('setting config', config)
     setUserConfig(config)
     return
   }

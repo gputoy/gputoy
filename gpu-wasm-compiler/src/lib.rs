@@ -1,4 +1,3 @@
-use gpu_compiler::PrebuildResult;
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsValue};
 

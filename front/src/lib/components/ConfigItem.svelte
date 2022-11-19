@@ -15,7 +15,6 @@
 
 	function onChangeProp(ev: Event) {
 		const value = (ev.target as HTMLInputElement)?.value
-		console.log(ev)
 		if (validate(scope, key, value)) setProperty(scope, key, value)
 	}
 	function onToggleProp(ev: Event) {
@@ -24,7 +23,6 @@
 	}
 	function onSelectProp(ev: Event) {
 		const value = (ev.target as HTMLSelectElement)?.value
-		console.log(ev)
 		if (validate(scope, key, value)) setProperty(scope, key, value)
 	}
 	// TODO: move to utils as this will be needed later in console

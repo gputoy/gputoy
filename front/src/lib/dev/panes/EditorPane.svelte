@@ -22,7 +22,6 @@
 	}
 
 	function handleClick(ev: MouseEvent, index: number) {
-		console.log(ev, index)
 		// middle click
 		if (ev.button == 1) {
 			wLayout.closeWorkspaceFile(index)
