@@ -1,4 +1,59 @@
-import type { File, Files } from "src/generated/types"
+import type { File, Files } from "$common"
+import { get, type Writable } from "svelte/store"
+
+export type FilesExtras = {
+    newFile: (file: File) => string
+    getFile: (fileid: string) => File | null
+    writeFile: (fileid: string, data: string) => void
+    updateFileMeta: (fileid: string, meta: Partial<Omit<File, 'data'>>) => void
+    removeFile: (fileid: string) => void
+    buildTree: () => FileTreeNode
+}
+export function initFilesMethods(files: Writable<Files>): FilesExtras {
+
+    function newFile(file: File): string {
+        const fileid = `${file.dir}/${file.fileName}.${file.extension}`
+        files.update(({ map }) => {
+            map[fileid] = file
+            return { map }
+        })
+        return fileid
+    }
+
+    function getFile(fileid: string): File | null {
+        return get(files).map[fileid] ?? null
+    }
+
+    function writeFile(fileid: string, data: string) {
+        files.update(({ map }) => {
+            map[fileid] = {
+                ...map[fileid],
+                data,
+            }
+            return { map }
+        })
+    }
+
+    function updateFileMeta(fileid: string, meta: Partial<Omit<File, 'data'>>) {
+        const file = getFile(fileid)
+        if (!file) return
+        removeFile(fileid)
+        newFile({ ...file, ...meta })
+    }
+
+    function removeFile(fileid: string) {
+        files.update(({ map }) => {
+            delete map[fileid]
+            return { map }
+        })
+    }
+
+    function buildTree(): FileTreeNode {
+        return treeFromFiles(get(files))
+    }
+
+    return { newFile, getFile, writeFile, updateFileMeta, removeFile, buildTree }
+}
 
 /**
  * File with cached id, so the file tree ui can easily 
@@ -59,7 +114,7 @@ export type FileTreeNode = {
  * @param files Files from store
  * @returns Tree representation of files 
  */
-export function fromFiles(files: Files): FileTreeNode {
+function treeFromFiles(files: Files): FileTreeNode {
     let ret: FileTreeNode = { dir: '', absoluteDir: '', children: [] }
     let ptr = ret
 

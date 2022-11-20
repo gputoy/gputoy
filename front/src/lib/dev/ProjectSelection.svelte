@@ -1,8 +1,8 @@
 <script lang="ts">
+	import type { ProjectResponse } from '$common'
+	import { initNewProject, loadAllProjects, setProject } from '$core/project'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { initNewProject, loadAllProjects, setProject } from '$stores/project'
-	import type { ProjectResponse } from 'src/generated/types'
 	let projectList = loadAllProjects()
 	function onSetProject(project: ProjectResponse) {
 		setProject(project, true)

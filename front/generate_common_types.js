@@ -29,12 +29,12 @@ async function main() {
       if (type.startsWith("/"))
         compiledTypes.add(type)
       else
-        compiledTypes.add('export ' + type.trim())
+        compiledTypes.add('export ' + type)
     }
   }
 
   let output = Array.from(compiledTypes).join('\n\n')
-  let outputPath = path.join(dirname, 'src', 'generated/types.ts')
+  let outputPath = path.join(dirname, 'src', 'core/common.ts')
 
   try {
     let existing = await fs.readFile(outputPath)

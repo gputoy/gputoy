@@ -21,8 +21,10 @@ const config: UserConfig = {
 	resolve: {
 		alias: {
 			"$lib": path.resolve(__dirname, './src/lib'),
-			"$stores": path.resolve(__dirname, './src/stores'),
-			"$wasm": path.resolve(__dirname, "./pkg")
+			"$stores": path.resolve(__dirname, './src/core/stores'),
+			"$wasm": path.resolve(__dirname, "./pkg"),
+			"$core": path.resolve(__dirname, "./src/core"),
+			"$common": path.resolve(__dirname, "./src/core/common")
 		}
 	}
 }

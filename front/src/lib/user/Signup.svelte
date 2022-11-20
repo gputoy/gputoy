@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { signUp } from '$lib/core/api'
+	import { signUp } from '$core/api'
 	let username: string = ''
 	let password: string = ''
 	let email: string = ''

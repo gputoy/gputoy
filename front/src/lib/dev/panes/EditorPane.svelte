@@ -3,8 +3,8 @@
 	import FileIcon from '$lib/components/FileIcon.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import Logo from '$lib/components/Logo.svelte'
-	import { wFiles, wLayout } from '$stores/project'
-	import Editor from '../monaco/Editor.svelte'
+	import Editor from '$lib/dev/MonacoEditor.svelte'
+	import { wFiles, wLayout } from '$stores'
 
 	$: workspace = $wLayout.workspace
 	$: fileindex = $wLayout.fileIndex ?? null

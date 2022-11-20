@@ -1,0 +1,266 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PrebuildResult",
+  "type": "object",
+  "required": [
+    "dependencyInfo",
+    "fileBuilds"
+  ],
+  "properties": {
+    "dependencyInfo": {
+      "$ref": "#/definitions/DependencyInfo"
+    },
+    "fileBuilds": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/FilePrebuildResult"
+      }
+    }
+  },
+  "definitions": {
+    "CompileError": {
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "span": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SourceLocation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "DependencyInfo": {
+      "type": "object",
+      "required": [
+        "deps"
+      ],
+      "properties": {
+        "deps": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FileDependencyInfo"
+          }
+        }
+      }
+    },
+    "File": {
+      "description": "Encapsulates all data needed to emulate a file in gputoy virtual directory structure.",
+      "type": "object",
+      "required": [
+        "data",
+        "dir",
+        "extension",
+        "fileName"
+      ],
+      "properties": {
+        "data": {
+          "description": "Contents of file in plain text",
+          "type": "string"
+        },
+        "dir": {
+          "description": "File path starting at / (project root)",
+          "type": "string"
+        },
+        "extension": {
+          "description": "File extension",
+          "allOf": [
+            {
+              "$ref": "#/definitions/SupportedExtension"
+            }
+          ]
+        },
+        "fetch": {
+          "description": "Fetch url. If exists, then contents will be fetched from remote URL on project load",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fileName": {
+          "description": "Name of file",
+          "type": "string"
+        }
+      }
+    },
+    "FileDependencyInfo": {
+      "type": "object",
+      "required": [
+        "exports",
+        "imports"
+      ],
+      "properties": {
+        "errors": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/CompileError"
+          }
+        },
+        "exports": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Match"
+          }
+        },
+        "imports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Match"
+          }
+        }
+      }
+    },
+    "FilePrebuildResult": {
+      "type": "object",
+      "required": [
+        "processedShader",
+        "rawModule"
+      ],
+      "properties": {
+        "errors": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/CompileError"
+          }
+        },
+        "processedShader": {
+          "$ref": "#/definitions/File"
+        },
+        "rawModule": {
+          "$ref": "#/definitions/ModuleProxy"
+        }
+      }
+    },
+    "Match": {
+      "description": "Identical to regex::Match, except the text is owned and it can be serialized. TODO: get refs to work within the compiler instead of owned strings.",
+      "type": "object",
+      "required": [
+        "end",
+        "start",
+        "text"
+      ],
+      "properties": {
+        "end": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "start": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0.0
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "ModuleProxy": {
+      "description": "naga::Module doesn't implement JsonSchema, so this struct will act as an approximate schema for Module.",
+      "type": "object",
+      "required": [
+        "constants",
+        "entryPoints",
+        "functions",
+        "globalVariables",
+        "types"
+      ],
+      "properties": {
+        "constants": {
+          "type": "array",
+          "items": {
+            "type": "null"
+          }
+        },
+        "entryPoints": {
+          "type": "array",
+          "items": {
+            "type": "null"
+          }
+        },
+        "functions": {
+          "type": "array",
+          "items": {
+            "type": "null"
+          }
+        },
+        "globalVariables": {
+          "type": "array",
+          "items": {
+            "type": "null"
+          }
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    "SourceLocation": {
+      "type": "object",
+      "required": [
+        "length",
+        "lineNumber",
+        "linePosition",
+        "offset"
+      ],
+      "properties": {
+        "length": {
+          "description": "Length in code units (in bytes) of the span.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "lineNumber": {
+          "description": "1-based line number.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "linePosition": {
+          "description": "1-based column of the start of this span",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "offset": {
+          "description": "0-based Offset in code units (in bytes) of the start of the span.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        }
+      }
+    },
+    "SupportedExtension": {
+      "type": "string",
+      "enum": [
+        "wgsl",
+        "glsl",
+        "txt",
+        "md",
+        "json",
+        "csv",
+        "png",
+        "jpeg",
+        "mp3"
+      ]
+    }
+  }
+}

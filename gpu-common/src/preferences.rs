@@ -5,11 +5,11 @@ use std::collections::HashMap;
 
 #[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct UserConfig {
+pub struct UserPrefs {
     pub keybinds: HashMap<String, FilteredAction>,
-    pub editor: UserEditorConfig,
+    pub editor: UserEditorPrefs,
     pub theme: HashMap<String, String>,
-    pub general: UserGeneralConfig,
+    pub general: UserGeneralPrefs,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
@@ -28,17 +28,17 @@ pub struct FilteredAction {
 
 #[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct UserEditorConfig {
+pub struct UserEditorPrefs {
     font_family: Option<String>,
     font_size: Option<u32>,
-    line_numbers: LineNumberCOnfig,
+    line_numbers: LineNumberPrefs,
     vim_mode: bool,
     minimap: bool,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub enum LineNumberCOnfig {
+pub enum LineNumberPrefs {
     #[default]
     On,
     Interval,
@@ -48,7 +48,7 @@ pub enum LineNumberCOnfig {
 
 #[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct UserGeneralConfig {
+pub struct UserGeneralPrefs {
     project_panel_size: f32,
     editor_panel_size: f32,
     resource_panel_size: f32,

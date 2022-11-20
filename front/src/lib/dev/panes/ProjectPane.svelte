@@ -1,10 +1,10 @@
 <script lang="ts">
+	import type { FileTreeNode } from '$core/files'
 	import Accordian from '$lib/components/Accordian.svelte'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import FileNode from '$lib/components/FileNode.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import type { FileTreeNode } from '$lib/core/fileTree'
-	import { wFiles, wProjectMeta } from '$stores/project'
+	import { wFiles, wProjectMeta } from '$stores'
 	let root: FileTreeNode | undefined
 	$: {
 		root = wFiles.buildTree()

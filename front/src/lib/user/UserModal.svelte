@@ -1,8 +1,7 @@
 <script lang="ts">
 	import Login from '$lib/user/Login.svelte'
 	import UserDashboard from '$lib/user/UserDashboard.svelte'
-	import { wUser } from '$stores/auth'
-	import { wUserModalOpen } from '$stores/ui'
+	import { wUser, wUserModalOpen } from '$stores'
 	let dialog: HTMLDialogElement
 
 	$: {

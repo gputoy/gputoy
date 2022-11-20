@@ -1,14 +1,14 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte'
-	import { pushAction } from '$lib/core/actions'
+	import { pushAction } from '$core/actions'
 	import {
 		getCanonicalName,
 		type FileTreeNode,
 		type FileTreeNodeChild,
 		type FileWithId
-	} from '$lib/core/fileTree'
-	import { wLayout } from '$stores/project'
-	import FileIcon from './FileIcon.svelte'
+	} from '$core/files'
+	import FileIcon from '$lib/components/FileIcon.svelte'
+	import Icon from '$lib/components/Icon.svelte'
+	import { wLayout } from '$stores'
 
 	export let fileNode: FileTreeNode
 	$: open = $wLayout.fileTreeState[fileNode.absoluteDir]?.open ?? false

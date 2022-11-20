@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { stop } from '$lib/core/context'
-	import { initKeys } from '$lib/core/input'
+	import type { Panel } from '$common'
+	import { stop } from '$core/context'
+	import { initKeys } from '$core/input'
 	import ControlBar from '$lib/dev/ControlBar.svelte'
 	import EditorPane from '$lib/dev/panes/EditorPane.svelte'
 	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
 	import Viewport from '$lib/dev/Viewport.svelte'
-	import { wLayout } from '$stores/project'
-	import type { Panel } from 'src/generated/types'
+	import { wLayout } from '$stores'
 	import { onDestroy, onMount } from 'svelte'
 	import { Pane, Splitpanes, type IPaneSizingEvent } from 'svelte-splitpanes'
 

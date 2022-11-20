@@ -222,7 +222,6 @@ export const monarch: Language = {
             [/\\./, "string.escape.invalid"],
             [/"/, { token: "string.quote", bracket: "@close", next: "@pop" }],
         ],
-
         whitespace: [
             [/[ \t\r\n]+/, "white"],
             [/\/\*/, "comment", "@comment"],

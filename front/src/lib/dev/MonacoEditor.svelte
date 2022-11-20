@@ -1,20 +1,18 @@
 <script lang="ts">
-	import { wFiles, wLayout } from '$stores/project'
-	import { theme } from '$stores/theme'
-	import { wUserEditorConfig } from '$stores/userConfig'
+	import type { File, Layout, UserEditorPrefs } from '$common'
+	import dark from '$core/monaco/dark'
+	import light from '$core/monaco/light'
+	import { wFiles, wLayout, wTheme, wUserEditorPrefs } from '$stores'
 	import type { editor, Position } from 'monaco-editor'
-	import type { File, Layout, UserEditorConfig } from 'src/generated/types'
 	import { onMount } from 'svelte'
 	import { get } from 'svelte/store'
-	import dark from './dark'
-	import light from './light'
 
+	import * as wgsl from '$core/monaco/wgsl'
 	import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 	import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 	import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 	import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 	import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
-	import * as wgsl from './wgsl'
 
 	let divEl: HTMLDivElement
 	let statusEl: HTMLDivElement
@@ -28,8 +26,8 @@
 	let cachedPositions: { [key: string]: Position | undefined } = {}
 
 	// Store subscriptions
-	theme.subscribe((newTheme) => Monaco?.editor.setTheme(newTheme))
-	wUserEditorConfig.subscribe(updateEditorConfig)
+	wTheme.subscribe((newTheme) => Monaco?.editor.setTheme(newTheme))
+	wUserEditorPrefs.subscribe(updateEditorConfig)
 	wLayout.subscribe(changeFileFromLayout)
 
 	// Initializes the monaco editor instance
@@ -81,9 +79,9 @@
 		})
 
 		// manually set theme and file on init
-		Monaco.editor.setTheme(get(theme))
+		Monaco.editor.setTheme(get(wTheme))
 		changeFileFromLayout(get(wLayout))
-		updateEditorConfig(get(wUserEditorConfig))
+		updateEditorConfig(get(wUserEditorPrefs))
 
 		// On destroy, dispose editor
 		return () => {
@@ -122,7 +120,7 @@
 	}
 
 	// Updates editor config based on user editor config
-	function updateEditorConfig(config: UserEditorConfig) {
+	function updateEditorConfig(config: UserEditorPrefs) {
 		const options: editor.IEditorOptions & editor.IGlobalEditorOptions = {
 			fontSize: config.fontSize!,
 			fontFamily: config.fontFamily!,

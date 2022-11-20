@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { login } from '$stores/auth'
+	import { wUser } from '$stores'
 
 	let username_or_email: string = ''
 	let password: string = ''
@@ -19,7 +19,7 @@
 		if (isIdentifierInvalid(username_or_email)) invalidIdentifier = true
 		if (isPasswordInvalid(password)) invalidPassword = true
 		if (invalidIdentifier || invalidPassword) return
-		const response = await login(username_or_email, password)
+		const response = await wUser.login(username_or_email, password)
 	}
 
 	function isIdentifierInvalid(username: string): boolean {

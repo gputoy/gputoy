@@ -24,7 +24,7 @@
     "config": {
       "anyOf": [
         {
-          "$ref": "#/definitions/UserConfig"
+          "$ref": "#/definitions/UserPrefs"
         },
         {
           "type": "null"
@@ -432,7 +432,7 @@
         }
       }
     },
-    "LineNumberCOnfig": {
+    "LineNumberPrefs": {
       "type": "string",
       "enum": [
         "on",
@@ -465,36 +465,7 @@
         }
       }
     },
-    "UserConfig": {
-      "type": "object",
-      "required": [
-        "editor",
-        "general",
-        "keybinds",
-        "theme"
-      ],
-      "properties": {
-        "editor": {
-          "$ref": "#/definitions/UserEditorConfig"
-        },
-        "general": {
-          "$ref": "#/definitions/UserGeneralConfig"
-        },
-        "keybinds": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/FilteredAction"
-          }
-        },
-        "theme": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "UserEditorConfig": {
+    "UserEditorPrefs": {
       "type": "object",
       "required": [
         "lineNumbers",
@@ -517,7 +488,7 @@
           "minimum": 0.0
         },
         "lineNumbers": {
-          "$ref": "#/definitions/LineNumberCOnfig"
+          "$ref": "#/definitions/LineNumberPrefs"
         },
         "minimap": {
           "type": "boolean"
@@ -527,7 +498,7 @@
         }
       }
     },
-    "UserGeneralConfig": {
+    "UserGeneralPrefs": {
       "type": "object",
       "required": [
         "editorPanelSize",
@@ -546,6 +517,35 @@
         "resourcePanelSize": {
           "type": "number",
           "format": "float"
+        }
+      }
+    },
+    "UserPrefs": {
+      "type": "object",
+      "required": [
+        "editor",
+        "general",
+        "keybinds",
+        "theme"
+      ],
+      "properties": {
+        "editor": {
+          "$ref": "#/definitions/UserEditorPrefs"
+        },
+        "general": {
+          "$ref": "#/definitions/UserGeneralPrefs"
+        },
+        "keybinds": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FilteredAction"
+          }
+        },
+        "theme": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
         }
       }
     }

@@ -1,17 +1,14 @@
-import { browser } from '$app/environment'
-import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from '$lib/consts/project'
-import * as api from '$lib/core/api'
-import context, { init } from '$lib/core/context'
-import { toast } from '@zerodevx/svelte-toast'
-import debounce from 'lodash/debounce'
-import generate from 'project-name-generator'
-import type { Project, ProjectResponse, ProjectUpsert } from 'src/generated/types'
-import { derived, get, writable } from 'svelte/store'
-import { v4 } from 'uuid'
-import { wUser } from '../auth'
-import makeConfig from './config'
-import makeFiles from './files'
-import makeLayout from './layout'
+import { browser } from "$app/environment"
+import type { Project, ProjectResponse, ProjectUpsert } from "$common"
+import * as api from '$core/api'
+import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from "$core/consts"
+import context, { init } from "$core/context"
+import { dProject, wConfig, wFiles, wLayout, wProjectId, wProjectMeta, wUser } from "$stores"
+import { toast } from "@zerodevx/svelte-toast"
+import debounce from "lodash/debounce"
+import generate from "project-name-generator"
+import { get } from "svelte/store"
+import { v4 } from "uuid"
 
 /**
  * Project metadata, basically everything besides files, layout, and config
@@ -49,62 +46,6 @@ export type ProjectSelectInfo = {
  */
 export type ProjectSaveStatus = 'remote' | 'local' | 'local-changes'
 
-// Main project stores 
-export const wProjectId = writable<string | null>(null)
-export const wFiles = makeFiles()
-export const wLayout = makeLayout()
-export const wConfig = makeConfig()
-export const wProjectMeta = writable<ProjectMeta>({
-    title: "New Project",
-    description: "This is a new project",
-    authorId: null,
-    published: false,
-} as ProjectMeta)
-
-/**
- * @returns Non-reactive get for project in store memory
- */
-export function getProject(): Project {
-    return {
-        files: get(wFiles),
-        layout: get(wLayout),
-        config: get(wConfig),
-    }
-}
-
-/**
- *  Reactive var which indicates if user can modify current project
- *  If not, use will need to fork before modifying.
- */
-export const dCanModifyProject = derived(
-    [wProjectMeta, wUser],
-    ([metadata, user]) => (user?.id ?? null) === metadata.authorId
-)
-
-/**
- * Reactive var for subscribing local storage save 
- */
-export const dProject = derived(
-    [wFiles, wConfig, wLayout, wProjectId, wProjectMeta],
-    ([files, config, layout, id, meta]): ProjectResponse | null => {
-        if (!id) return null
-        return {
-            id,
-            title: meta.title,
-            description: meta.description,
-            authorId: meta.authorId,
-            files,
-            config,
-            layout,
-            published: meta.published,
-            createdAt: meta.createdAt,
-            updatedAt: meta.updatedAt,
-            forkedFromId: meta.forkedFromId,
-
-        }
-    }
-)
-
 /**
  * Writes to local storage only after the alloted amount of time after 
  * last edit has occured
@@ -122,6 +63,15 @@ dProject.subscribe(p => {
     if (p != null)
         writeToLocalStorage(p)
 })
+
+
+export function getProject(): Project {
+    return {
+        files: get(wFiles),
+        layout: get(wLayout),
+        config: get(wConfig)
+    }
+}
 
 /**
  * Creates default project and stores within project stores

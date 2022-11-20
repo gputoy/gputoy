@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Dev from '$lib/dev/Dev.svelte'
 	import ProjectSelection from '$lib/dev/ProjectSelection.svelte'
-	import { wProjectId } from '$stores/project'
+	import { wProjectId } from '$stores'
 	import { toast } from '@zerodevx/svelte-toast'
 	import { onMount } from 'svelte'
 

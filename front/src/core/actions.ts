@@ -1,8 +1,8 @@
-import { clearProject, wLayout } from "$stores/project"
-import { wDebugPanel } from "$stores/ui"
+import type { Action, FilteredAction, Panel, ShiftPaneArgs } from "$common"
+import { clearProject } from "$core/project"
+import { wDebugPanel, wLayout } from "$stores"
 import { toast } from "@zerodevx/svelte-toast"
 import { isEqual } from "lodash"
-import type { Action, FilteredAction, Panel, ShiftPaneArgs } from "src/generated/types"
 
 const actionHistory: Action[] = []
 

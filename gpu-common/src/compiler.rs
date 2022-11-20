@@ -58,8 +58,7 @@ impl DependencyInfo {
             dep_info
                 .imports
                 .iter()
-                .map(|import| self.find_export(&import.text))
-                .filter_map(|import| import)
+                .filter_map(|import| self.find_export(&import.text))
                 .collect()
         } else {
             vec![]
@@ -70,8 +69,7 @@ impl DependencyInfo {
         self.deps
             .iter()
             .find(|(_, dep)| dep.exports.contains_key(ident.as_ref()))
-            .map(|(_, dep)| dep.exports.get(ident.as_ref()).map(From::from))
-            .flatten()
+            .and_then(|(_, dep)| dep.exports.get(ident.as_ref()).map(From::from))
     }
 }
 

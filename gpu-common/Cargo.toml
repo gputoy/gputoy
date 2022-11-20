@@ -21,4 +21,4 @@ regex = "1.7.0"
 
 [dependencies.naga]
 version = "0.10.0"
-features = ["serde", "serialize", "deserialize"]
+features = ["serde", "serialize", "deserialize", "wgsl-in"]

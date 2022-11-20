@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { toggleTheme } from '$core/util'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { theme, toggle } from '$stores/theme'
-	import IconButton from './IconButton.svelte'
+	import { wTheme } from '$stores'
 </script>
 
-<IconButton on:click={toggle}>
-	{#if $theme == 'dark'}
+<IconButton on:click={toggleTheme}>
+	{#if $wTheme == 'dark'}
 		<Icon name="sun" stroked thick />
 	{:else}
 		<Icon name="moon" stroked thick />

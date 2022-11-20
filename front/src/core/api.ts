@@ -2,8 +2,8 @@
 // All endpoints are contained in one file to make syncing with 
 // gpu-back simpler.
 
-import vars from '$lib/consts/vars'
-import type * as types from 'src/generated/types'
+import type * as types from '$common'
+import { API_PATH } from '$core/consts'
 
 export type ResponseError = {
     message: string,
@@ -23,7 +23,7 @@ export type Response<T> = Promise<T | ResponseError>
  */
 export async function signUp(args: types.NewUser): Response<types.NewUserResponse> {
 
-    const response = await fetch(vars.API_PATH + 'signup', {
+    const response = await fetch(API_PATH + 'signup', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -42,7 +42,7 @@ export async function signUp(args: types.NewUser): Response<types.NewUserRespons
  * @returns undefined | error
  */
 export async function login(usernameOrEmail: string, password: string): Response<undefined> {
-    const loginRes = await fetch(vars.API_PATH + 'login', {
+    const loginRes = await fetch(API_PATH + 'login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -65,7 +65,7 @@ export async function login(usernameOrEmail: string, password: string): Response
  * @returns undefined | error 
  */
 export async function logout(): Response<undefined> {
-    const logoutRes = await fetch(vars.API_PATH + 'logout', {
+    const logoutRes = await fetch(API_PATH + 'logout', {
         method: 'POST',
         credentials: 'include'
     })
@@ -81,7 +81,7 @@ export async function logout(): Response<undefined> {
  * @returns UserInfoResponse | error 
  */
 export async function getSession(): Response<types.UserInfoResponse> {
-    const userRes = await fetch(vars.API_PATH + 'me', {
+    const userRes = await fetch(API_PATH + 'me', {
         method: 'GET',
         credentials: 'include'
     })
@@ -101,7 +101,7 @@ export async function getSession(): Response<types.UserInfoResponse> {
  * @returns UserInfoResponse | error 
  */
 export async function updateUser(args: types.UpdateUserInfoArgs): Response<types.UserInfoResponse> {
-    const updateUserRes = await fetch(vars.API_PATH + 'me', {
+    const updateUserRes = await fetch(API_PATH + 'me', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -131,7 +131,7 @@ export async function updateUser(args: types.UpdateUserInfoArgs): Response<types
  * @returns ProjectResponse | error 
  */
 export async function getProject(projectid: string): Response<types.ProjectResponse> {
-    const projectRes = await fetch(vars.API_PATH + 'project/' + projectid, {
+    const projectRes = await fetch(API_PATH + 'project/' + projectid, {
         method: 'GET',
         credentials: 'include'
     })
@@ -152,7 +152,7 @@ export async function getProject(projectid: string): Response<types.ProjectRespo
  * @returns ProjectResponse[] | error
  */
 export async function getUserProjects(userid: string): Response<types.ProjectResponse[]> {
-    const userProjectsRes = await fetch(vars.API_PATH + 'project/user/' + userid, {
+    const userProjectsRes = await fetch(API_PATH + 'project/user/' + userid, {
         method: 'GET',
         credentials: 'include'
     })
@@ -173,7 +173,7 @@ export async function getUserProjects(userid: string): Response<types.ProjectRes
  * @returns ProjectResponse | error 
  */
 export async function updateProject(args: types.ProjectUpsert): Response<types.ProjectResponse> {
-    const projectRes = await fetch(vars.API_PATH + 'project', {
+    const projectRes = await fetch(API_PATH + 'project', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

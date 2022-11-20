@@ -1,11 +1,8 @@
-
-import { DEFAULT_DIR_NODE_STATE, DEFAULT_LAYOUT } from "$lib/consts/project"
-import type { GeneralConfigKey } from "$lib/consts/userConfig"
-import { wUserGeneralConfig } from "$stores/userConfig"
-import type { Layout, Panel } from "src/generated/types"
+import type { Layout, Panel } from "$common"
+import { DEFAULT_DIR_NODE_STATE, type GeneralConfigKey } from "$core/consts"
+import { wUserGeneralPrefs } from "$stores"
 import type { IPaneSizingEvent } from "svelte-splitpanes"
-import { get } from "svelte/store"
-import { makeEnhanced } from "../enhanced"
+import { get, type Writable } from "svelte/store"
 
 export type LayoutExtras = {
     setPanelSize: (panel: Panel, event: IPaneSizingEvent) => void
@@ -16,7 +13,7 @@ export type LayoutExtras = {
     toggleDirOpen: (absoluteDir: string, set?: boolean) => void
     toggleAccordian: (accordian: string, set?: boolean) => void
 }
-export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layout) {
+export function initLayoutMethods(layout: Writable<Layout>) {
 
     function setPanelSize(panel: Panel, event: IPaneSizingEvent) {
         layout.update(l => {
@@ -62,7 +59,7 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
         layout.update(l => {
             let tooSmallToBeOpen = l[panel].size < 12
             let expand = tooSmallToBeOpen || ((set !== undefined) ? set : !l[panel].show)
-            if (tooSmallToBeOpen) l[panel].size = get(wUserGeneralConfig)[(panel + 'Size') as GeneralConfigKey]
+            if (tooSmallToBeOpen) l[panel].size = get(wUserGeneralPrefs)[(panel + 'Size') as GeneralConfigKey]
             l[panel].show = expand
             return l
         })
@@ -87,4 +84,4 @@ export default makeEnhanced<Layout, LayoutExtras>(DEFAULT_LAYOUT, function (layo
     }
 
     return { setPanelSize, moveWorkspaceIdx, closeWorkspaceFile, openDocument, togglePanel, toggleDirOpen, toggleAccordian }
-}) 
+}

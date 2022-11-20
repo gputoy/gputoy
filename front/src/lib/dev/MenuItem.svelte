@@ -1,10 +1,9 @@
 <script lang="ts">
+	import { actionPermitted, pushAction } from '$core/actions'
+	import { MENUKEYS, MENU_MAP, type MenuEntry, type MenuKey } from '$core/consts'
+	import { findActionBind } from '$core/input'
 	import Key from '$lib/components/Key.svelte'
-	import { actionPermitted, pushAction } from '$lib/core/actions'
-	import { findActionBind } from '$lib/core/input'
-	import { wMenuOpen } from '$stores/ui'
-	import { wUserKeybinds } from '$stores/userConfig'
-	import { MENUKEYS, MENU_MAP, type MenuEntry, type MenuKey } from './menu'
+	import { wMenuOpen, wUserKeybinds } from '$stores'
 
 	export let key: MenuKey
 	// When closed, skip the next call to open

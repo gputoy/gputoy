@@ -1,9 +1,8 @@
 <script lang="ts">
+	import { EDITOR_CONFIG_KEYS, GENERAL_CONFIG_KEYS } from '$core/consts'
 	import ConfigItem from '$lib/components/ConfigItem.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { EDITOR_CONFIG_KEYS, GENERAL_CONFIG_KEYS } from '$lib/consts/userConfig'
-	import { wUserConfigOpen } from '$stores/ui'
-	import { wUserEditorConfig, wUserGeneralConfig } from '$stores/userConfig'
+	import { wUserEditorPrefs, wUserGeneralPrefs, wUserPrefsOpen } from '$stores'
 	import { fly } from 'svelte/transition'
 
 	const lowerGeneralKeys: String[] = GENERAL_CONFIG_KEYS.map((s) => s.toLowerCase())
@@ -14,7 +13,7 @@
 	$: searchLower = configSearch.toLowerCase()
 </script>
 
-{#if $wUserConfigOpen}
+{#if $wUserPrefsOpen}
 	<div class="modal" transition:fly={{ x: 500, duration: 300 }}>
 		<div class="body">
 			<div class="category-list">
@@ -28,12 +27,12 @@
 				<Icon name="search" stroked size="1em" style="position:absolute;translate: 3px 3px;" />
 				{#each GENERAL_CONFIG_KEYS as k, i}
 					{#if lowerGeneralKeys[i].includes(searchLower)}
-						<ConfigItem key={k} scope="general" value={$wUserGeneralConfig[k]} />
+						<ConfigItem key={k} scope="general" value={$wUserGeneralPrefs[k]} />
 					{/if}
 				{/each}
 				{#each EDITOR_CONFIG_KEYS as k, i}
 					{#if lowerEditorKeys[i].includes(searchLower)}
-						<ConfigItem key={k} scope="editor" value={$wUserEditorConfig[k]} />
+						<ConfigItem key={k} scope="editor" value={$wUserEditorPrefs[k]} />
 					{/if}
 				{/each}
 			</div>

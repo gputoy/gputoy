@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SupportedExtension } from 'src/generated/types'
+	import type { SupportedExtension } from '$common'
 
 	export let size = 32
 	export let extension: SupportedExtension

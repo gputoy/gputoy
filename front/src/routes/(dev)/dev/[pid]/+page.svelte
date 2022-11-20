@@ -1,7 +1,7 @@
 <script lang="ts">
+	import type { ProjectResponse } from '$common'
 	import Dev from '$lib/dev/Dev.svelte'
-	import { clearProject, setProject } from '$stores/project'
-	import type { ProjectResponse } from 'src/generated/types'
+	import { clearProject, setProject } from '$stores'
 	import { onMount } from 'svelte'
 	export let data: ProjectResponse
 	onMount(() => {

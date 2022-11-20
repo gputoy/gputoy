@@ -1,6 +1,6 @@
 import { browser } from '$app/environment'
+import type { Files, Project } from '$common'
 import { toast } from '@zerodevx/svelte-toast'
-import type { Files, Project } from 'src/generated/types'
 
 import { Context, default as init_client } from '$wasm/client/gpu_wasm_client'
 import { Compiler, default as init_compiler } from '$wasm/compiler/gpu_wasm_compiler'

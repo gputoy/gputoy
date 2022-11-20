@@ -1,18 +1,17 @@
 <script lang="ts">
+	import { MENUKEYS } from '$core/consts'
+	import { loadProject, saveProject } from '$core/project'
+	import { toggleUserModal, toggleUserPrefs } from '$core/util'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import UiThemeButton from '$lib/components/buttons/UiThemeButton.svelte'
 	import Debug from '$lib/components/Debug.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import Key from '$lib/components/Key.svelte'
 	import Logo from '$lib/components/Logo.svelte'
-	import { MENUKEYS } from '$lib/dev/menu/menu'
-	import MenuItem from '$lib/dev/menu/MenuItem.svelte'
-	import UserConfig from '$lib/user/UserConfig.svelte'
+	import MenuItem from '$lib/dev/MenuItem.svelte'
 	import UserModal from '$lib/user/UserModal.svelte'
-	import { wUser } from '$stores/auth'
-	import { wLastInputAction } from '$stores/input'
-	import { loadProject, saveProject, wProjectMeta } from '$stores/project'
-	import { toggleUserConfig, toggleUserModal } from '$stores/ui'
+	import UserPrefs from '$lib/user/UserPrefs.svelte'
+	import { wLastInputAction, wProjectMeta, wUser } from '$stores'
 	import { SvelteToast, type SvelteToastOptions } from '@zerodevx/svelte-toast'
 	import { onMount } from 'svelte'
 	const options: SvelteToastOptions = {}
@@ -73,7 +72,7 @@
 						<Icon name="user" stroked thick />
 					</IconButton>
 				{/if}
-				<IconButton on:click={toggleUserConfig} series="last">
+				<IconButton on:click={toggleUserPrefs} series="last">
 					<Icon name="settings" stroked thick />
 				</IconButton>
 			</div>
@@ -82,7 +81,7 @@
 </header>
 <main>
 	<UserModal />
-	<UserConfig />
+	<UserPrefs />
 	<Debug />
 	<SvelteToast {options} />
 	<slot />

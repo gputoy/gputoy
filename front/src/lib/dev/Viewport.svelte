@@ -1,5 +1,5 @@
 <script lang="ts">
-	import context from '$lib/core/context'
+	import context from '$core/context'
 	let clientHeight: number
 	let clientWidth: number
 	let root: HTMLElement

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
-	import { logout } from '$stores/auth'
+	import { wUser } from '$stores'
 </script>
 
 <div id="root">
 	<div id="head">
 		<h2>Settings</h2>
-		<IconButton text="Sign out" size="md" on:click={logout} />
+		<IconButton text="Sign out" size="md" on:click={wUser.logout} />
 	</div>
 	<div id="tray" />
 </div>

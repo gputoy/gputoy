@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte'
-	import { wLayout } from '$stores/project'
+	import { wLayout } from '$stores'
 
 	export let title: string
 	function handleClick() {

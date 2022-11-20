@@ -23,13 +23,8 @@ pub struct Compiler {
     _internal_files: gpu_common::Files,
 }
 
-impl Default for Compiler {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Compiler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             wgsl_parser: RefCell::new(naga::front::wgsl::Parser::new()),
@@ -100,7 +95,7 @@ impl Compiler {
         }
     }
 
-    fn get_dependency_info(files: &gpu_common::Files) -> DependencyInfo {
+    pub(crate) fn get_dependency_info(files: &gpu_common::Files) -> DependencyInfo {
         let deps: FastHashMap<_, _> = files
             .map
             .iter()
@@ -119,14 +114,16 @@ impl Compiler {
         DependencyInfo { deps }
     }
 
-    fn get_file_imports(file: &gpu_common::File) -> Vec<gpu_common::Match> {
+    pub(crate) fn get_file_imports(file: &gpu_common::File) -> Vec<gpu_common::Match> {
         RE_CAPTURE_IMPORT
             .captures_iter(&file.data)
             .map(|cap| cap.name("ident").unwrap().into())
             .collect()
     }
 
-    fn get_file_exports(file: &gpu_common::File) -> FastHashMap<String, gpu_common::Match> {
+    pub(crate) fn get_file_exports(
+        file: &gpu_common::File,
+    ) -> FastHashMap<String, gpu_common::Match> {
         RE_CAPTURE_EXPORT
             .captures_iter(&file.data)
             .map(|cap| {
@@ -137,70 +134,4 @@ impl Compiler {
             })
             .collect()
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use gpu_common::Files;
-
-    use super::*;
-    use std::{path::Path, vec};
-
-    fn get_test_files(path: &str) -> Files {
-        let root = std::env::var("CARGO_MANIFEST_DIR").unwrap();
-        let path = Path::new(&root).join("test_data").join(path);
-        crate::utils::files_from_dir(&path).unwrap()
-    }
-
-    #[test]
-    fn test_imports() {
-        let files = get_test_files("test_imports");
-        let shader = &files["/main.wgsl"];
-
-        let imports = Compiler::get_file_imports(&shader);
-        assert_eq!(
-            imports.iter().map(|v| &v.text).collect::<Vec<_>>(),
-            vec!["FragIn", "TestStruct0", "TestStruct1"]
-        );
-    }
-
-    #[test]
-    fn test_exports() {
-        let files = get_test_files("test_imports");
-        let shader = &files["/main.wgsl"];
-
-        let imports = Compiler::get_file_exports(&shader);
-        assert_eq!(
-            imports.keys().collect::<Vec<_>>(),
-            vec![&"MyStruct", &"FragIn"]
-        );
-        assert_eq!(
-            imports.values().map(|v| &v.text).collect::<Vec<_>>(),
-            vec![
-                &r#"struct MyStruct {
-    field: vec3<f32>,
-    color: vec4<f32>,
-    count: i32,
-};"#,
-                &r#"struct FragIn {
-  @builtin(position) position: vec4<f32>,
-  @location(0) uv: vec2<f32>,
-};"#
-            ]
-        );
-    }
-
-    // #[test]
-    // fn test_preprocess() {
-    //     let files = get_test_files("test_imports");
-    //     let shader = &files["/main.wgsl"];
-    //     let expected = &files["/.generated/main_processed.wgsl"];
-
-    //     let actual = Compiler::preprocess_file(shader);
-
-    //     assert_eq!(actual.data, expected.data);
-    //     assert_eq!(actual.dir, expected.dir);
-    //     assert_eq!(actual.file_name, expected.file_name);
-    //     assert_eq!(actual.extension, expected.extension);
-    // }
 }

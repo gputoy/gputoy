@@ -4,8 +4,8 @@
 		type ConfigItemMeta,
 		type ConfigKey,
 		type ConfigScope
-	} from '$lib/consts/userConfig'
-	import { setProperty, validate } from '$stores/userConfig'
+	} from '$core/consts'
+	import { setProperty, validate } from '$core/preferences'
 	export let value: any
 	export let scope: ConfigScope
 	export let key: ConfigKey

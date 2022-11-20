@@ -1,11 +1,10 @@
 <script lang="ts">
-	import '$stores/gpu'
+	import { wUser } from '$stores'
 	import { onMount } from 'svelte'
 	import '../app.css'
-	import { getSession } from '../stores/auth'
 	import '../theme.css'
 
-	onMount(getSession)
+	onMount(wUser.getSession)
 </script>
 
 <slot />

@@ -1,8 +1,6 @@
-import { isActionEqual, pushAction } from "$lib/core/actions"
-import { wLastInputAction } from '$stores/input'
-import { wUserConfigOpen, wUserModalOpen } from "$stores/ui"
-import { wUserKeybinds } from "$stores/userConfig"
-import type { Action, FilteredAction } from "src/generated/types"
+import type { Action, FilteredAction } from "$common"
+import { isActionEqual, pushAction } from "$core/actions"
+import { wLastInputAction, wUserKeybinds, wUserModalOpen, wUserPrefsOpen } from '$stores'
 import { get } from "svelte/store"
 
 /**
@@ -56,7 +54,7 @@ function onKeyDown(ev: KeyboardEvent) {
     if (!(ev.ctrlKey || ev.shiftKey || ev.altKey)) return
 
     if (ev.key === 'Escape') {
-        wUserConfigOpen.set(false)
+        wUserPrefsOpen.set(false)
         wUserModalOpen.set(false)
     }
 

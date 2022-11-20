@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { build, introspect, render as context_render } from '$core/context'
+	import { getProject } from '$core/project'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { build, introspect, render as context_render } from '$lib/core/context'
-	import { getProject, wFiles } from '$stores/project'
+	import { wFiles } from '$stores'
 	import { get } from 'svelte/store'
 
 	let x = context_render

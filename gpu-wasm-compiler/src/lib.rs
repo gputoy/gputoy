@@ -32,6 +32,7 @@ pub struct Compiler(gpu_compiler::Compiler);
 
 #[wasm_bindgen]
 impl Compiler {
+    #[allow(clippy::new_without_default)]
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Self(gpu_compiler::Compiler::new())
