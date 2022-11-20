@@ -1,8 +1,21 @@
 use crate::error::Error;
-use crate::regex;
-use crate::types::{DependencyInfo, FileDependencyInfo, FilePrebuildResult, PrebuildResult};
-use naga::FastHashMap;
+use gpu_common::{
+    DependencyInfo, FastHashMap, FileDependencyInfo, FilePrebuildResult, PrebuildResult,
+};
+use lazy_static::lazy_static;
+use regex::Regex;
 use std::{cell::RefCell, vec};
+
+lazy_static! {
+    static ref RE_CAPTURE_IMPORT: Regex =
+        Regex::new(r#"@import\s+(?P<ident>[a-zA-Z_][a-zA-Z0-9]*)\s*"#).unwrap();
+    static ref RE_CAPTURE_EXPORT: Regex = Regex::new(
+        r#"@export\s+(?P<struct>struct\s+(?P<ident>[a-zA-Z_][a-zA-Z0-9]*)\s*\{[^}]*}\s*;)"#
+    )
+    .unwrap();
+    static ref RE_REPLACE_IMPORT: Regex = Regex::new(r#"@import\s+"#).unwrap();
+    static ref RE_REPLACE_EXPORT: Regex = Regex::new(r#"@export\s+"#).unwrap();
+}
 
 pub struct Compiler {
     pub(crate) wgsl_parser: RefCell<naga::front::wgsl::Parser>,
@@ -73,8 +86,8 @@ impl Compiler {
         file: &gpu_common::File,
         depenency_info: &DependencyInfo,
     ) -> gpu_common::File {
-        let data = regex::RE_REPLACE_IMPORT.replace_all(&file.data, "");
-        let data = regex::RE_REPLACE_EXPORT.replace_all(&data, "");
+        let data = RE_REPLACE_IMPORT.replace_all(&file.data, "");
+        let data = RE_REPLACE_EXPORT.replace_all(&data, "");
         let mut imports = depenency_info.find_imports_for_file(fileid);
         imports.push(data.as_ref());
         let data = imports.join("\n");
@@ -106,15 +119,15 @@ impl Compiler {
         DependencyInfo { deps }
     }
 
-    fn get_file_imports(file: &gpu_common::File) -> Vec<regex::Match> {
-        regex::RE_CAPTURE_IMPORT
+    fn get_file_imports(file: &gpu_common::File) -> Vec<gpu_common::Match> {
+        RE_CAPTURE_IMPORT
             .captures_iter(&file.data)
             .map(|cap| cap.name("ident").unwrap().into())
             .collect()
     }
 
-    fn get_file_exports(file: &gpu_common::File) -> FastHashMap<String, regex::Match> {
-        regex::RE_CAPTURE_EXPORT
+    fn get_file_exports(file: &gpu_common::File) -> FastHashMap<String, gpu_common::Match> {
+        RE_CAPTURE_EXPORT
             .captures_iter(&file.data)
             .map(|cap| {
                 (

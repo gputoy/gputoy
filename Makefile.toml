@@ -37,7 +37,9 @@ description = "Generate wasm client (release)"
 script = """\
   RUSTFLAGS=--cfg=web_sys_unstable_apis \
   wasm-pack build gpu-wasm-client --out-dir ../front/pkg/client  --target web --mode no-install &&\
+  echo "gpu-client size pre-optimize: $(wc -c < front/pkg/client/gpu_wasm_client_bg.wasm)B"
   wasm-opt -Os -o front/pkg/client/gpu_wasm_client_bg.wasm front/pkg/client/gpu_wasm_client_bg.wasm 
+  echo "gpu-client size post-optimize: $(wc -c < front/pkg/client/gpu_wasm_client_bg.wasm)B"
 """
 
 [tasks.wasm-compiler-dev]
@@ -56,7 +58,9 @@ description = "Generate wasm compiler (release)"
 script = """\
   RUSTFLAGS=--cfg=web_sys_unstable_apis \
   wasm-pack build gpu-wasm-compiler --out-dir ../front/pkg/compiler  --target web --mode no-install &&\
+  echo "gpu-compiler size pre-optimize: $(wc -c < front/pkg/compiler/gpu_wasm_compiler_bg.wasm)B"
   wasm-opt -Os -o front/pkg/compiler/gpu_wasm_compiler_bg.wasm front/pkg/compiler/gpu_wasm_compiler_bg.wasm 
+  echo "gpu-compiler size post-optimize: $(wc -c < front/pkg/compiler/gpu_wasm_compiler_bg.wasm)B"
 """
 
 [tasks.wasm]
