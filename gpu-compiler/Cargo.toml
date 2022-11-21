@@ -14,14 +14,7 @@ lazy_static = "1.4.0"
 
 [dependencies.naga]
 version = "0.10.0"
-features = [
-    "glsl-in",
-    "wgsl-in",
-    "wgsl-out",
-    "serde",
-    "serialize",
-    "deserialize",
-]
+features = ["wgsl-in", "serde", "deserialize"]
 
 [dev-dependencies]
 serde_json = "1.0.87"

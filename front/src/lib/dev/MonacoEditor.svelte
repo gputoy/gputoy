@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { File, Layout, UserEditorPrefs } from '$common'
+	import type { File, Layout, SupportedExtension, UserEditorPrefs } from '$common'
 	import dark from '$core/monaco/dark'
 	import light from '$core/monaco/light'
 	import { wFiles, wLayout, wTheme, wUserEditorPrefs } from '$stores'
@@ -7,12 +7,10 @@
 	import { onMount } from 'svelte'
 	import { get } from 'svelte/store'
 
+	import Statusbar from '$core/monaco/statusbar'
 	import * as wgsl from '$core/monaco/wgsl'
 	import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
-	import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
-	import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 	import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
-	import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
 	let divEl: HTMLDivElement
 	let statusEl: HTMLDivElement
@@ -23,6 +21,8 @@
 	let editorInstance: editor.IStandaloneCodeEditor | undefined = undefined
 	let vimMode: any | undefined = undefined
 
+	let cursorPosition: editor.ICursorPositionChangedEvent | null = null
+	let currentExtension: SupportedExtension | null = null
 	let cachedPositions: { [key: string]: Position | undefined } = {}
 
 	// Store subscriptions
@@ -36,15 +36,6 @@
 			getWorker(_, label) {
 				if (label === 'json') {
 					return new jsonWorker()
-				}
-				if (label === 'css' || label === 'scss' || label === 'less') {
-					return new cssWorker()
-				}
-				if (label === 'html' || label === 'handlebars' || label === 'razor') {
-					return new htmlWorker()
-				}
-				if (label === 'typescript' || label === 'javascript') {
-					return new tsWorker()
 				}
 				return new editorWorker()
 			}
@@ -82,6 +73,9 @@
 		Monaco.editor.setTheme(get(wTheme))
 		changeFileFromLayout(get(wLayout))
 		updateEditorConfig(get(wUserEditorPrefs))
+		editorInstance.onDidChangeCursorPosition((ev) => {
+			cursorPosition = ev
+		})
 
 		// On destroy, dispose editor
 		return () => {
@@ -96,31 +90,39 @@
 		const fileid = layout.workspace[layout.fileIndex]
 		if (!fileid) return
 		const file = wFiles.getFile(fileid)
+		currentExtension = file?.extension ?? null
 		if (file) changeEditorFile(fileid, file)
 	}
 
 	// Sets editor file, creating model if not already created
 	function changeEditorFile(fileid: string, file: File) {
 		const uri = Monaco.Uri.file(fileid)
-		const prev = editorInstance?.getModel()?.uri.path
-		if (prev === uri.path) return
+		const current = editorInstance?.getModel()?.uri.path
+
+		// do nothing if new file is same as current file
+		if (current === uri.path) return
 		let model = Monaco?.editor.getModel(uri)
-		if (!model) {
-			model = Monaco?.editor.createModel(file.data, file.extension, uri)
-		}
+		if (!model) model = Monaco?.editor.createModel(file.data, file.extension, uri)
+
+		// override on change to target new file
 		model.onDidChangeContent((ev) => {
 			const content = editorInstance?.getModel()?.getValue()
 			if (!content) return
 			wFiles.writeFile(fileid, content)
 		})
-		if (prev) cachedPositions[prev] = editorInstance?.getPosition() ?? undefined
+
+		// store cached cursor position for this model
+		if (current) cachedPositions[current] = editorInstance?.getPosition() ?? undefined
 		const newPos = cachedPositions[fileid]
+
+		// set new model, set cursor positon from cache if available
 		editorInstance?.setModel(model)
 		if (newPos) editorInstance?.setPosition(newPos, 'Editor.changeEditorFile')
 	}
 
 	// Updates editor config based on user editor config
 	function updateEditorConfig(config: UserEditorPrefs) {
+		// monaco options
 		const options: editor.IEditorOptions & editor.IGlobalEditorOptions = {
 			fontSize: config.fontSize!,
 			fontFamily: config.fontFamily!,
@@ -132,7 +134,7 @@
 		editorInstance?.updateOptions(options)
 
 		if (!vimMode && config.vimMode && editorInstance) {
-			vimMode = MonacoVim?.initVimMode(editorInstance, statusEl)
+			vimMode = MonacoVim?.initVimMode(editorInstance, statusEl, Statusbar)
 		} else if (vimMode && !config.vimMode) {
 			vimMode.dispose()
 			vimMode = undefined
@@ -145,7 +147,17 @@
 
 <div id="container">
 	<div id="editor-root" bind:this={divEl} />
-	<div id="status-root" bind:this={statusEl} />
+	<div id="status-root" class:hide={editorInstance === undefined}>
+		<div id="vim-status-root" bind:this={statusEl} />
+		<div id="status-right">
+			{#if cursorPosition}
+				<span>Ln {cursorPosition.position.lineNumber}, Col {cursorPosition.position.column}</span>
+			{/if}
+			{#if currentExtension}
+				<spam>{currentExtension}</spam>
+			{/if}
+		</div>
+	</div>
 </div>
 
 <style>
@@ -158,20 +170,35 @@
 	}
 	#editor-root {
 		flex: 1 1 auto;
-		height: calc(100% - 34px);
+		height: calc(100% - 24px);
 		width: 100%;
 	}
 	#status-root {
 		flex: 0 0 auto;
-		height: 32px;
+		height: 24px;
 		width: 100%;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		font-size: var(--xs);
+		font-size: var(--xxs);
 		padding-inline: 6px;
 		background-color: var(--background-alt);
 		border-top: var(--border2);
 		box-sizing: border-box;
+		color: var(--text-accent-color);
+		user-select: none;
+	}
+	#vim-status-root {
+		flex: 0 0 auto;
+		height: 24px;
+		align-items: center;
+		gap: 8px;
+	}
+	#status-right {
+		display: flex;
+		gap: 8px;
+	}
+	.hide {
+		display: none;
 	}
 </style>

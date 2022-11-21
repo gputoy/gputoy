@@ -59,7 +59,7 @@ script = """\
   RUSTFLAGS=--cfg=web_sys_unstable_apis \
   wasm-pack build gpu-wasm-compiler --out-dir ../front/pkg/compiler  --target web --mode no-install &&\
   echo "gpu-compiler size pre-optimize: $(wc -c < front/pkg/compiler/gpu_wasm_compiler_bg.wasm)B"
-  wasm-opt -Os -o front/pkg/compiler/gpu_wasm_compiler_bg.wasm front/pkg/compiler/gpu_wasm_compiler_bg.wasm 
+  wasm-opt -Oz -o front/pkg/compiler/gpu_wasm_compiler_bg.wasm front/pkg/compiler/gpu_wasm_compiler_bg.wasm 
   echo "gpu-compiler size post-optimize: $(wc -c < front/pkg/compiler/gpu_wasm_compiler_bg.wasm)B"
 """
 

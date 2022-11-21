@@ -8,6 +8,14 @@ import { Compiler, default as init_compiler } from '$wasm/compiler/gpu_wasm_comp
 var context: Context | undefined = undefined
 var compiler: Compiler | undefined = undefined
 
+export function getContextHealth() {
+  return context !== undefined
+}
+
+export function getCompilerHealth() {
+  return compiler !== undefined
+}
+
 export async function init() {
   if (!browser || !("gpu" in navigator)) return
   await init_client()

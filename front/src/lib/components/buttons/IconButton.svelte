@@ -38,6 +38,7 @@
 		border: var(--border2);
 		color: var(--text-accent-color);
 		box-shadow: var(--box-shadow);
+		user-select: none;
 	}
 	button:disabled {
 		color: var(--border-secondary);
