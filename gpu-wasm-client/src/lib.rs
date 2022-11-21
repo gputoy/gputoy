@@ -60,10 +60,15 @@ impl Context {
     }
 
     #[wasm_bindgen]
-    pub async fn build(&mut self, project: JsValue) -> Result<(), Error> {
+    pub async fn build(&mut self, project: JsValue, prebuild_result: JsValue) -> Result<(), Error> {
         let project = serde_wasm_bindgen::from_value(project).map_err(Error::SerdeWasmBindgen)?;
+        let prebuild_result =
+            serde_wasm_bindgen::from_value(prebuild_result).map_err(Error::SerdeWasmBindgen)?;
         log::info!("Recieved project: {:?}", project);
-        self.0.build(&project).await.map_err(Error::ContextBuild)
+        self.0
+            .build(&project, prebuild_result)
+            .await
+            .map_err(Error::ContextBuild)
     }
 
     #[wasm_bindgen]

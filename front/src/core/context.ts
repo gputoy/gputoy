@@ -1,9 +1,11 @@
 import { browser } from '$app/environment'
-import type { Files, Project } from '$common'
+import type { Files, PrebuildResult, Project } from '$common'
 import { toast } from '@zerodevx/svelte-toast'
 
+import { wPrebuildDirty, wPrebuildResult } from '$stores'
 import { Context, default as init_client } from '$wasm/client/gpu_wasm_client'
-import { Compiler, default as init_compiler } from '$wasm/compiler/gpu_wasm_compiler'
+import { Compiler, default as init_compiler } from '$wasm/compiler/gpu_wasm_compiler.js'
+import { get } from 'svelte/store'
 
 var context: Context | undefined = undefined
 var compiler: Compiler | undefined = undefined
@@ -27,8 +29,10 @@ export async function init() {
 }
 
 export async function build(project: Project) {
+  if (get(wPrebuildDirty)) prebuild(project.files)
+  const prebuildResult = get(wPrebuildResult)
   try {
-    await context?.build(project)
+    await context?.build(project, prebuildResult)
   } catch (e) {
     console.error("js:context:build:error", e)
     return
@@ -45,13 +49,15 @@ export async function render() {
   console.log("js:context:render")
 }
 
-export async function introspect(files: Files) {
-  if (!context) {
-    toast.push("Cannot introspect, context not ready")
+export async function prebuild(files: Files) {
+  if (!compiler) {
+    toast.push("Cannot introspect, compiler not ready")
     return
   }
-  let compileResult = compiler?.prebuild(files)
-  console.log("Compile result: ", compileResult)
+  let prebuildResult: PrebuildResult = compiler.prebuild(files)
+  console.log('prebuild res', prebuildResult)
+  wPrebuildResult.set(prebuildResult)
+  wPrebuildDirty.set(false)
 }
 
 export async function reset() {

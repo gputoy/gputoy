@@ -5,6 +5,8 @@
 		dUserPrefs,
 		wDebugPanel,
 		wMenuOpen,
+		wPrebuildDirty,
+		wPrebuildResult,
 		wUser,
 		wUserModalOpen,
 		wUserPrefsOpen
@@ -20,6 +22,10 @@
 			userModalOpen: $wUserModalOpen,
 			UserPrefsOpen: $wUserPrefsOpen,
 			menuOpen: $wMenuOpen
+		},
+		prebuild: {
+			dirty: $wPrebuildDirty,
+			result: $wPrebuildResult
 		}
 	}
 </script>

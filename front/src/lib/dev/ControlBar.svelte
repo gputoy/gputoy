@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { build, introspect, render as context_render } from '$core/context'
+	import { build, prebuild, render as context_render } from '$core/context'
 	import { getProject } from '$core/project'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
@@ -13,7 +13,7 @@
 		build(getProject())
 	}
 	function handleIntrospect() {
-		introspect(get(wFiles))
+		prebuild(get(wFiles))
 	}
 </script>
 

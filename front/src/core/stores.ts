@@ -1,4 +1,4 @@
-import type { Action, Config, Files, Layout, ProjectResponse, UserEditorPrefs, UserGeneralPrefs, UserInfoResponse, UserPrefs } from "$common"
+import type { Action, Config, Files, Layout, PrebuildResult, ProjectResponse, UserEditorPrefs, UserGeneralPrefs, UserInfoResponse, UserPrefs } from "$common"
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT, DEFAULT_USER_EDITOR_PREFS, DEFAULT_USER_GENERAL_PREFS, DEFAULT_USER_KEYBINDS, type MenuKey } from "$core/consts"
 import type { ProjectMeta } from "$core/project"
 import { derived, writable, type Writable } from "svelte/store"
@@ -32,6 +32,12 @@ function makeEnhanced<Type, Extras>(
     }
 
 }
+
+/**
+ *                  Core system stores
+ */
+export const wPrebuildResult = writable<PrebuildResult | null>(null)
+export const wPrebuildDirty = writable(true)
 
 /**
  *                  Project stores parts, merges in derived dProject

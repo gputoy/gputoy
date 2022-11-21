@@ -139,6 +139,7 @@
 			vimMode.dispose()
 			vimMode = undefined
 		}
+		console.log('clearing font cache', Monaco)
 		Monaco?.editor.remeasureFonts()
 	}
 
@@ -197,6 +198,7 @@
 	#status-right {
 		display: flex;
 		gap: 8px;
+		min-width: max-content;
 	}
 	.hide {
 		display: none;

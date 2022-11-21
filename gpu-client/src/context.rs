@@ -1,3 +1,4 @@
+use gpu_common::PrebuildResult;
 use thiserror::Error;
 
 use winit::event_loop::EventLoop;
@@ -115,20 +116,32 @@ impl Context {
         })
     }
 
-    pub async fn build(&mut self, project: &gpu_common::Project) -> Result<(), Error> {
-        let run_file = project
-            .files
-            .map
+    pub async fn build(
+        &mut self,
+        project: &gpu_common::Project,
+        prebuild_result: PrebuildResult,
+    ) -> Result<(), Error> {
+        let fs = &prebuild_result
+            .file_builds
             .get("/shaders/main.wgsl")
-            .ok_or(Error::ProjectBuildFailed)?;
+            .ok_or(Error::ProjectBuildFailed)?
+            .processed_shader;
+        let vs = &prebuild_result
+            .file_builds
+            .get("/shaders/types.wgsl")
+            .ok_or(Error::ProjectBuildFailed)?
+            .processed_shader;
         let vertex = self
             .device
-            .create_shader_module(wgpu::include_wgsl!("vertex.wgsl"));
+            .create_shader_module(wgpu::ShaderModuleDescriptor {
+                label: None,
+                source: wgpu::ShaderSource::Wgsl(vs.into()),
+            });
         let shader_desc = self
             .device
             .create_shader_module(wgpu::ShaderModuleDescriptor {
                 label: None,
-                source: wgpu::ShaderSource::Wgsl(run_file.into()),
+                source: wgpu::ShaderSource::Wgsl(fs.into()),
             });
         let render_pipeline_layout =
             self.device
@@ -184,5 +197,9 @@ impl Context {
         };
         runner.render_frame(self);
         Ok(())
+    }
+
+    pub fn has_runner(&self) -> bool {
+        self.runner.is_some()
     }
 }

@@ -90,7 +90,7 @@ impl Compiler {
             file_name: format!("{}_processed", file.file_name),
             data,
             extension: file.extension,
-            dir: String::from(".generated"),
+            dir: file.dir.clone(),
             fetch: None,
         }
     }
