@@ -1,10 +1,17 @@
+#[cfg(feature = "schema")]
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 /// Identical to regex::Match, except the text is owned
 /// and it can be serialized.
 /// TODO: get refs to work within the compiler instead of owned strings.
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Match {
     pub text: String,
     pub start: usize,
@@ -40,14 +47,23 @@ impl From<&regex::Match<'_>> for Match {
 
 pub type FastHashMap<K, V> = rustc_hash::FxHashMap<K, V>;
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(
+    any(feature = "serialize", feature = "deserialize"),
+    serde(rename_all = "camelCase")
+)]
 pub struct PrebuildResult {
     pub dependency_info: DependencyInfo,
     pub file_builds: FastHashMap<String, FilePrebuildResult>,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct DependencyInfo {
     pub deps: FastHashMap<String, FileDependencyInfo>,
 }
@@ -73,70 +89,31 @@ impl DependencyInfo {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(
+    any(feature = "serialize", feature = "deserialize"),
+    serde(rename_all = "camelCase")
+)]
 pub struct FilePrebuildResult {
     pub processed_shader: crate::File,
-    #[schemars(with = "ModuleProxy")]
-    pub raw_module: Option<naga::Module>,
-    pub errors: Option<Vec<CompileError>>,
+    pub raw_module: Option<crate::naga::Module>,
+    pub errors: Option<Vec<crate::naga::CompileError>>,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct FileDependencyInfo {
     pub imports: Vec<Match>,
+    // rename to not collide with ts export keyword
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(rename = "exxports")
+    )]
     pub exports: FastHashMap<String, Match>,
-    pub errors: Option<Vec<CompileError>>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct CompileError {
-    pub message: String,
-    pub span: Option<SourceLocation>,
-}
-
-impl From<(&naga::front::wgsl::ParseError, &str)> for CompileError {
-    fn from((err, src): (&naga::front::wgsl::ParseError, &str)) -> Self {
-        Self {
-            message: err.emit_to_string(src),
-            span: err.location(src).map(From::from),
-        }
-    }
-}
-
-#[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct SourceLocation {
-    /// 1-based line number.
-    pub line_number: u32,
-    /// 1-based column of the start of this span
-    pub line_position: u32,
-    /// 0-based Offset in code units (in bytes) of the start of the span.
-    pub offset: u32,
-    /// Length in code units (in bytes) of the span.
-    pub length: u32,
-}
-
-impl From<naga::SourceLocation> for SourceLocation {
-    fn from(loc: naga::SourceLocation) -> Self {
-        Self {
-            line_number: loc.line_number,
-            line_position: loc.line_position,
-            offset: loc.offset,
-            length: loc.length,
-        }
-    }
-}
-
-/// naga::Module doesn't implement JsonSchema, so this struct will
-/// act as an approximate schema for Module.
-#[allow(dead_code)]
-#[derive(JsonSchema)]
-#[schemars(rename_all = "camelCase")]
-struct ModuleProxy {
-    constants: Vec<()>,
-    entry_points: Vec<()>,
-    functions: Vec<()>,
-    global_variables: Vec<()>,
-    types: Vec<()>,
+    pub errors: Option<Vec<crate::naga::CompileError>>,
 }

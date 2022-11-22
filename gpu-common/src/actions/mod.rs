@@ -1,10 +1,20 @@
+#[cfg(feature = "schema")]
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 
 use crate::Panel;
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase", tag = "ty", content = "c")]
+#[derive(Debug)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(
+    any(feature = "serialize", feature = "deserialize"),
+    serde(rename_all = "camelCase", tag = "ty", content = "c")
+)]
 pub enum Action {
     /// Toggles pane open and closed
     TogglePanel(Panel),
@@ -32,7 +42,6 @@ pub enum Action {
     PreviousDocument,
     /// Opens document at specified id
     OpenDocument(String),
-
     /// Creates new project
     CreateNewProject,
     /// Creates new file
@@ -53,8 +62,11 @@ pub enum Action {
     CloseProject,
 }
 
-#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Debug)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct ShiftPaneArgs {
-    pane: Panel,
-    shift: i32,
+    pub pane: Panel,
+    pub shift: i32,
 }

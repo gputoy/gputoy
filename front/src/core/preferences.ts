@@ -1,6 +1,6 @@
 import { browser } from "$app/environment"
 import type { UserPrefs } from "$common"
-import { DEFAULT_USER_EDITOR_PREFS, DEFAULT_USER_GENERAL_PREFS, DEFAULT_USER_KEYBINDS, type ConfigKey, type ConfigScope, type GeneralConfigKey } from "$core/consts"
+import { DEFAULT_USER_EDITOR_PREFS, DEFAULT_USER_GENERAL_PREFS, DEFAULT_USER_KEYBINDS, USER_CONFIG_META, type ConfigKey, type ConfigScope, type GeneralConfigKey } from "$core/consts"
 import { wUserEditorPrefs, wUserGeneralPrefs, wUserKeybinds, wUserTheme } from "$stores"
 import debounce from "lodash/debounce"
 

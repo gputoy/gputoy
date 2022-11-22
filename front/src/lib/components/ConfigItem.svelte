@@ -18,8 +18,8 @@
 		if (validate(scope, key, value)) setProperty(scope, key, value)
 	}
 	function onToggleProp(ev: Event) {
-		const value = (ev.target as HTMLInputElement)?.value
-		setProperty(scope, key, value == 'on' ? true : false)
+		const value = (ev.target as HTMLInputElement)?.checked
+		setProperty(scope, key, value)
 	}
 	function onSelectProp(ev: Event) {
 		const value = (ev.target as HTMLSelectElement)?.value

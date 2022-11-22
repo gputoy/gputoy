@@ -1,8 +1,10 @@
 mod actions;
 mod compiler;
 mod config;
+mod context;
 mod file;
 mod layout;
+mod naga;
 mod preferences;
 mod project;
 pub mod realm;

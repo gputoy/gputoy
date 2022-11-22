@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { Panel } from '$common'
-	import { stop } from '$core/context'
+	// import { stop } from '$core/context'
 	import { initKeys } from '$core/input'
 	import ControlBar from '$lib/dev/ControlBar.svelte'
 	import EditorPane from '$lib/dev/panes/EditorPane.svelte'
 	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
 	import Viewport from '$lib/dev/Viewport.svelte'
 	import { wLayout } from '$stores'
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import { Pane, Splitpanes, type IPaneSizingEvent } from 'svelte-splitpanes'
 
 	let clientHeight: number
@@ -27,7 +27,7 @@
 		: controlBarMinSize
 
 	onMount(initKeys)
-	onDestroy(stop)
+	// onDestroy(stop)
 </script>
 
 <div class="dev-root" bind:clientHeight bind:clientWidth>

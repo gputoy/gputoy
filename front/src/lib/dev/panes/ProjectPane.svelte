@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getCompilerHealth, getContextHealth } from '$core/context'
 	import type { FileTreeNode } from '$core/files'
 	import Accordian from '$lib/components/Accordian.svelte'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
@@ -41,7 +40,7 @@
 			{/if}
 		</svelte:fragment>
 	</Accordian>
-	<Accordian title="System">
+	<!-- <Accordian title="System">
 		<svelte:fragment slot="content">
 			<div>
 				<label>Client: {getContextHealth()}</label>
@@ -50,7 +49,7 @@
 				<label>Compiler: {getCompilerHealth()}</label>
 			</div>
 		</svelte:fragment>
-	</Accordian>
+	</Accordian> -->
 </div>
 
 <style>

@@ -15,7 +15,7 @@ import { initTheme, type Theme } from "$core/util"
 type EnhancedWritable<Type, Extras> = Writable<Type> & Extras
 
 /**
- * Constructor for enhanced store. This creates a writable store and
+ * Constructor for custom store. This creates a writable and
  * passes it to the extras constructor to create the extra methods on store. 
  * @param initial Initial value of store 
  * @param extras Constructor for extra methods within store
@@ -38,6 +38,8 @@ function makeEnhanced<Type, Extras>(
  */
 export const wPrebuildResult = writable<PrebuildResult | null>(null)
 export const wPrebuildDirty = writable(true)
+export const wBuildResult = writable<{} | null>(null)
+export const wBuildDirty = writable(true)
 
 /**
  *                  Project stores parts, merges in derived dProject
@@ -54,7 +56,7 @@ export const wProjectMeta = writable<ProjectMeta>({
 } as ProjectMeta)
 
 /**
- *                  User store and auth
+ *                  User and auth stores
  */
 export const wUser = makeEnhanced<UserInfoResponse | null, UserExtras>(null, initUserMethods)()
 

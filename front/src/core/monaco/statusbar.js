@@ -78,8 +78,9 @@ export default class VimStatusBar {
   toggleVisibility(toggle) {
     if (toggle) {
       this.node.style.display = "flex"
+      this.node.style.visibility = "visible"
     } else {
-      this.node.style.display = "none"
+      this.node.style.visibility = "hidden"
     }
 
     if (this.input) {

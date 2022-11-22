@@ -1391,7 +1391,6 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "gpu-common",
- "gpu-compiler",
  "js-sys",
  "log",
  "serde",
@@ -1422,6 +1421,7 @@ dependencies = [
  "uuid",
  "validator",
  "validator_derive",
+ "wgpu",
 ]
 
 [[package]]
@@ -1471,7 +1471,6 @@ dependencies = [
  "console_log",
  "gpu-client",
  "gpu-common",
- "gpu-compiler",
  "js-sys",
  "lazy_static",
  "log",
@@ -2680,7 +2679,6 @@ dependencies = [
  "schemars_derive",
  "serde",
  "serde_json",
- "uuid",
 ]
 
 [[package]]
@@ -2779,9 +2777,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.87"
+version = "1.0.89"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ce777b7b150d76b9cf60d28b55f5847135a003f7d7350c6be7a773508ce7d45"
+checksum = "020ff22c755c2ed3f8cf162dbb41a7268d934702f3ed3631656ea597e08fc3db"
 dependencies = [
  "itoa",
  "ryu",

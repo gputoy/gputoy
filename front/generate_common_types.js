@@ -19,6 +19,7 @@ async function main() {
       additionalProperties: false,
       format: true,
       declareExternallyReferenced: true,
+      enableConstEnums: true,
     })
 
     let eachType = compiled.split('export')
@@ -27,9 +28,9 @@ async function main() {
         continue
       }
       if (type.startsWith("/"))
-        compiledTypes.add(type)
+        compiledTypes.add(type.trim())
       else
-        compiledTypes.add('export ' + type)
+        compiledTypes.add('export ' + type.trim())
     }
   }
 

@@ -5,8 +5,9 @@ edition = "2021"
 
 [dependencies]
 # local dependencies
-gpu-compiler = { path = "../gpu-compiler" }
-gpu-common = { path = "../gpu-common" }
+gpu-common = { path = "../gpu-common", features = ["wgpu", "serialize"] }
+
+# remote dependencies
 serde = { version = "1.0.144", features = ["derive"] }
 serde_json = "1.0.85"
 winit = { version = "0.27.2" }

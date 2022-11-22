@@ -1,76 +1,57 @@
-import { browser } from '$app/environment'
-import type { Files, PrebuildResult, Project } from '$common'
-import { toast } from '@zerodevx/svelte-toast'
+import { wFiles, wPrebuildDirty, wPrebuildResult } from '$stores'
+import { Context as WasmContext, default as init_client } from '$wasm/client/gpu_wasm_client'
+import { Compiler as WasmCompiler, default as init_compiler } from '$wasm/compiler/gpu_wasm_compiler'
+import { get, writable, type Readable, type Subscriber, type Unsubscriber, type Writable } from 'svelte/store'
 
-import { wPrebuildDirty, wPrebuildResult } from '$stores'
-import { Context, default as init_client } from '$wasm/client/gpu_wasm_client'
-import { Compiler, default as init_compiler } from '$wasm/compiler/gpu_wasm_compiler.js'
-import { get } from 'svelte/store'
+init_client().catch(e => console.error(e))
+init_compiler().catch(e => console.error(e))
 
-var context: Context | undefined = undefined
-var compiler: Compiler | undefined = undefined
+export type ContextState = {}
 
-export function getContextHealth() {
-  return context !== undefined
+/**
+ * Thin wrapper around gpu_wasm_client::Context
+ */
+class ClientContext implements Readable<ContextState> {
+    private _store: Writable<ContextState>
+    private _context: WasmContext
+    private _compiler: WasmCompiler
+    constructor() {
+        this._context = new WasmContext()
+        this._compiler = new WasmCompiler()
+        this._store = writable({})
+    }
+    subscribe(run: Subscriber<ContextState>, invalidate: any): Unsubscriber {
+        return this._store.subscribe(run, invalidate)
+    }
+    async build() {
+        if (get(wPrebuildDirty)) this.prebuild()
+        const prebuildResult = get(wPrebuildResult)
+        try {
+            await this._context.build(prebuildResult)
+        } catch (e) {
+            console.error("js:context:build:error", e)
+            return
+        }
+    }
+    async prebuild() {
+        const files = get(wFiles)
+        let prebuildResult
+        try {
+            prebuildResult = this._compiler.prebuild(files)
+        } catch (e) {
+            console.error("js:context:prebuild:error", e)
+            return
+        }
+        wPrebuildDirty.set(false)
+        wPrebuildResult.set(prebuildResult)
+    }
+    async render() {
+        await this._context.render()
+    }
+    reset() {
+        this._context.free()
+        this._context = new WasmContext()
+    }
 }
 
-export function getCompilerHealth() {
-  return compiler !== undefined
-}
-
-export async function init() {
-  if (!browser || !("gpu" in navigator)) return
-  await init_client()
-  await init_compiler()
-
-  context = await new Context()
-  compiler = new Compiler()
-  console.log("js:context:init", context)
-}
-
-export async function build(project: Project) {
-  if (get(wPrebuildDirty)) prebuild(project.files)
-  const prebuildResult = get(wPrebuildResult)
-  try {
-    await context?.build(project, prebuildResult)
-  } catch (e) {
-    console.error("js:context:build:error", e)
-    return
-  }
-  console.log("js:context:build")
-}
-
-export async function render() {
-  if (!context) {
-    toast.push("No context to render!")
-    return
-  }
-  context?.render()
-  console.log("js:context:render")
-}
-
-export async function prebuild(files: Files) {
-  if (!compiler) {
-    toast.push("Cannot introspect, compiler not ready")
-    return
-  }
-  let prebuildResult: PrebuildResult = compiler.prebuild(files)
-  console.log('prebuild res', prebuildResult)
-  wPrebuildResult.set(prebuildResult)
-  wPrebuildDirty.set(false)
-}
-
-export async function reset() {
-  if (!browser || !("gpu" in navigator)) return
-  console.log("js:context:reset")
-  context?.free()
-  await init()
-}
-
-export async function stop() {
-  if (!browser || !("gpu" in navigator)) return
-  console.log("js:context:stop")
-  context?.free()
-}
-
-export default context
+export default ClientContext

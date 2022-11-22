@@ -9,6 +9,7 @@
 
 	import Statusbar from '$core/monaco/statusbar'
 	import * as wgsl from '$core/monaco/wgsl'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 	import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 
@@ -61,10 +62,11 @@
 				highlightActiveBracketPair: true,
 				bracketPairs: true,
 				indentation: true,
-				highlightActiveIndentation: true
+				highlightActiveIndentation: true,
+				bracketPairsHorizontal: true
 			},
 			padding: {
-				bottom: 10,
+				bottom: 20,
 				top: 20
 			}
 		})
@@ -133,13 +135,16 @@
 		}
 		editorInstance?.updateOptions(options)
 
+		console.log(vimMode, config.vimMode)
 		if (!vimMode && config.vimMode && editorInstance) {
 			vimMode = MonacoVim?.initVimMode(editorInstance, statusEl, Statusbar)
 		} else if (vimMode && !config.vimMode) {
 			vimMode.dispose()
 			vimMode = undefined
 		}
-		console.log('clearing font cache', Monaco)
+		setTimeout(() => Monaco?.editor.remeasureFonts(), 10)
+	}
+	function clearFontCache() {
 		Monaco?.editor.remeasureFonts()
 	}
 
@@ -151,9 +156,11 @@
 	<div id="status-root" class:hide={editorInstance === undefined}>
 		<div id="vim-status-root" bind:this={statusEl} />
 		<div id="status-right">
-			{#if cursorPosition}
-				<span>Ln {cursorPosition.position.lineNumber}, Col {cursorPosition.position.column}</span>
-			{/if}
+			<IconButton size="xs" on:click={clearFontCache}>Clear</IconButton>
+			<span
+				>Ln {cursorPosition?.position.lineNumber ?? '?'}, Col {cursorPosition?.position.column ??
+					'?'}</span
+			>
 			{#if currentExtension}
 				<spam>{currentExtension}</spam>
 			{/if}
@@ -196,6 +203,7 @@
 		gap: 8px;
 	}
 	#status-right {
+		align-items: center;
 		display: flex;
 		gap: 8px;
 		min-width: max-content;

@@ -1,5 +1,9 @@
+#[cfg(feature = "schema")]
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use std::{borrow::Cow, collections::HashMap, ops::Index};
 use strum_macros::{AsRefStr, EnumString};
 
@@ -18,7 +22,10 @@ use strum_macros::{AsRefStr, EnumString};
 ///     }
 /// }
 /// ```
-#[derive(Debug, Serialize, Deserialize, JsonSchema, Default, Clone)]
+#[derive(Debug, Default, Clone)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct Files {
     pub map: HashMap<String, File>,
 }
@@ -35,20 +42,29 @@ impl<'i> Index<&'i str> for Files {
 
 /// Encapsulates all data needed to emulate a file in
 /// gputoy virtual directory structure.
-#[derive(Debug, Serialize, Deserialize, JsonSchema, Clone)]
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct File {
     /// Contents of file in plain text
     pub data: String,
     /// File path starting at / (project root)
     pub dir: String,
     /// Name of file
-    #[serde(rename = "fileName")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(rename = "fileName")
+    )]
     pub file_name: String,
     /// File extension
     pub extension: SupportedExtension,
     /// Fetch url. If exists, then contents will be fetched
     /// from remote URL on project load
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(skip_serializing_if = "Option::is_none")
+    )]
     pub fetch: Option<String>,
 }
 
@@ -66,10 +82,14 @@ impl File {
     }
 }
 
-#[derive(
-    AsRefStr, EnumString, Debug, Clone, Copy, Serialize, Deserialize, JsonSchema, Eq, PartialEq,
+#[derive(AsRefStr, EnumString, Debug, Clone, Copy, Eq, PartialEq)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(
+    any(feature = "serialize", feature = "deserialize"),
+    serde(rename_all = "camelCase")
 )]
-#[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 pub enum SupportedExtension {
     Wgsl,
@@ -92,15 +112,5 @@ impl SupportedExtension {
     /// Returns true if file type can be used as a gpu buffer
     pub fn is_buffer(&self) -> bool {
         matches!(self, Self::Csv | Self::Png | Self::Jpeg | Self::Mp3)
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::SupportedExtension;
-
-    #[test]
-    fn test_extensions() {
-        assert_eq!(false, SupportedExtension::Csv.is_shader());
     }
 }

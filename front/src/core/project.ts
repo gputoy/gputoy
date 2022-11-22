@@ -2,7 +2,7 @@ import { browser } from "$app/environment"
 import type { Project, ProjectResponse, ProjectUpsert } from "$common"
 import * as api from '$core/api'
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from "$core/consts"
-import context, { init } from "$core/context"
+// import context, { init } from "$core/context"
 import { dProject, wConfig, wFiles, wLayout, wProjectId, wProjectMeta, wUser } from "$stores"
 import { toast } from "@zerodevx/svelte-toast"
 import debounce from "lodash/debounce"
@@ -96,7 +96,6 @@ export async function initNewProject() {
     // this will be used until the user decides to upload to remote,
     // then the local storage entry should be removed
     wProjectId.set('local:' + v4())
-    await init()
 }
 
 /**
@@ -221,8 +220,8 @@ export function setProject(project: ProjectResponse, resetContext: boolean = fal
 
 
     if (resetContext) {
-        context?.free()
-        init()
+        // context?.free()
+        // init()
     }
 }
 export function clearProject() {
@@ -232,6 +231,6 @@ export function clearProject() {
     // when projectId is null
     wProjectId.set(null)
     localStorage.removeItem('last-project')
-    context?.free()
+    // context?.free()
 }
 

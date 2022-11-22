@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { build, prebuild, render as context_render } from '$core/context'
-	import { getProject } from '$core/project'
+	// import { build, prebuild, render as context_render } from '$core/context'
+	// import { getProject } from '$core/project'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { wFiles } from '$stores'
-	import { get } from 'svelte/store'
+	// import { wFiles } from '$stores'
+	// import { get } from 'svelte/store'
 
-	let x = context_render
 	let playing = false
 
 	function handleBuild() {
-		build(getProject())
+		// build(getProject())
 	}
 	function handleIntrospect() {
-		prebuild(get(wFiles))
+		// prebuild(get(wFiles))
 	}
+	function handleRender() {}
 </script>
 
 <div id="controlbar-container">
@@ -47,7 +47,7 @@
 		<IconButton on:click={handleBuild} series="middle" text="Build">
 			<Icon name="tool" stroked thick />
 		</IconButton>
-		<IconButton on:click={context_render} series="last" text="Render">
+		<IconButton on:click={handleRender} series="last" text="Render">
 			<Icon name="monitor" stroked thick />
 		</IconButton>
 	</div>

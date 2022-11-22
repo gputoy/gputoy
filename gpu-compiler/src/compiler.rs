@@ -62,7 +62,7 @@ impl Compiler {
         let processed_shader = Self::preprocess_file(fileid, file, depenency_info);
         let (raw_module, errors) = match self.wgsl_parser.borrow_mut().parse(&processed_shader.data)
         {
-            Ok(module) => (Some(module), None),
+            Ok(module) => (Some(module.into()), None),
             Err(err) => (
                 None,
                 Some(vec![(&err, processed_shader.data.as_ref()).into()]),

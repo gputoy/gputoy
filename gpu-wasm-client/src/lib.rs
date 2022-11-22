@@ -21,8 +21,6 @@ pub enum Error {
     ContextIntrospect(gpu_client::context::Error),
     #[error("Context render failed: {0}")]
     ContextRender(gpu_client::context::Error),
-    #[error("Compiler error: {0}")]
-    Compiler(gpu_compiler::Error),
     #[error("Could not serialize from JsonValue: {0}")]
     SerdeWasmBindgen(serde_wasm_bindgen::Error),
     #[error("Could not initialize logger")]
@@ -60,13 +58,11 @@ impl Context {
     }
 
     #[wasm_bindgen]
-    pub async fn build(&mut self, project: JsValue, prebuild_result: JsValue) -> Result<(), Error> {
-        let project = serde_wasm_bindgen::from_value(project).map_err(Error::SerdeWasmBindgen)?;
+    pub async fn build(&mut self, prebuild_result: JsValue) -> Result<(), Error> {
         let prebuild_result =
             serde_wasm_bindgen::from_value(prebuild_result).map_err(Error::SerdeWasmBindgen)?;
-        log::info!("Recieved project: {:?}", project);
         self.0
-            .build(&project, prebuild_result)
+            .build(prebuild_result)
             .await
             .map_err(Error::ContextBuild)
     }

@@ -5,9 +5,7 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-
-
-export  type Action =
+export type Action =
   | {
       c: Panel;
       ty: "togglePanel";
@@ -79,87 +77,260 @@ export  type Action =
       ty: "closeProject";
     };
 
+export type Panel = "editorPanel" | "projectPanel" | "resourcePanel";
 
-export  type Panel = "editorPanel" | "projectPanel" | "resourcePanel";
-
-
-
-export  interface ShiftPaneArgs {
+export interface ShiftPaneArgs {
   pane: Panel;
   shift: number;
 }
 
+export type PerformanceLevel = "Default" | "PowerSaver";
 
-export  type PerformanceLevel = "Default" | "PowerSaver";
-
-
-
-export  interface Config {
+export interface Config {
   limitFps?: number;
   perfLevel?: PerformanceLevel | null;
 }
 
-
-export  interface Credentials {
+export interface Credentials {
   password: string;
   usernameOrEmail: string;
 }
 
-
-export  interface LoginResponse {
+export interface LoginResponse {
   userId: string;
 }
 
-
-export  interface NewUser {
+export interface NewUser {
   email: string;
   password: string;
   username: string;
 }
 
-
-export  interface NewUserResponse {
+export interface NewUserResponse {
   id: string;
 }
 
+export type SupportedExtension = "wgsl" | "glsl" | "txt" | "md" | "json" | "csv" | "png" | "jpeg" | "mp3";
 
-export  type SupportedExtension = "wgsl" | "glsl" | "txt" | "md" | "json" | "csv" | "png" | "jpeg" | "mp3";
+export type Binding =
+  | {
+      Builtin: Builtin;
+    }
+  | {
+      Location: {
+        interpolation?: Interpolation | null;
+        location: number;
+        sampling?: Sampling | null;
+      };
+    };
 
+export type Builtin =
+  | (
+      | "ViewIndex"
+      | "BaseInstance"
+      | "BaseVertex"
+      | "ClipDistance"
+      | "CullDistance"
+      | "InstanceIndex"
+      | "PointSize"
+      | "VertexIndex"
+      | "FragDepth"
+      | "FrontFacing"
+      | "PrimitiveIndex"
+      | "SampleIndex"
+      | "SampleMask"
+      | "GlobalInvocationId"
+      | "LocalInvocationId"
+      | "LocalInvocationIndex"
+      | "WorkGroupId"
+      | "WorkGroupSize"
+      | "NumWorkGroups"
+    )
+  | {
+      Position: {
+        invariant: boolean;
+      };
+    };
 
+export type Interpolation = "Perspective" | "Linear" | "Flat";
 
-export  interface PrebuildResult {
+export type Sampling = "Center" | "Centroid" | "Sample";
+
+export type ShaderStage = "Vertex" | "Fragment" | "Compute";
+
+export type TypeInner =
+  | {
+      Scalar: {
+        kind: ScalarKind;
+        width: number;
+      };
+    }
+  | {
+      Vector: {
+        kind: ScalarKind;
+        size: VectorSize;
+        width: number;
+      };
+    }
+  | {
+      Matrix: {
+        colums: VectorSize;
+        rows: VectorSize;
+        width: number;
+      };
+    }
+  | {
+      Atomic: {
+        kind: ScalarKind;
+        width: number;
+      };
+    }
+  | {
+      Pointer: {
+        base: number;
+        space: AddressSpace;
+      };
+    }
+  | {
+      ValuePointer: {
+        kind: ScalarKind;
+        size?: VectorSize | null;
+        space: AddressSpace;
+        width: number;
+      };
+    }
+  | {
+      Array: {
+        base: number;
+        size: ArraySize;
+        stride: number;
+      };
+    }
+  | {
+      Struct: {
+        members: StructMember[];
+        span: number;
+      };
+    }
+  | {
+      Image: {
+        arrayed: boolean;
+        class: ImageClass;
+        dim: ImageDimension;
+      };
+    }
+  | {
+      Sampler: {
+        comparison: boolean;
+      };
+    }
+  | {
+      BindingArray: {
+        base: number;
+        size: ArraySize;
+      };
+    };
+
+export type ScalarKind = "Sint" | "Uint" | "Float" | "Bool";
+
+export type VectorSize = "Bi" | "Tri" | "Quad";
+
+export type AddressSpace =
+  | ("Function" | "Private" | "WorkGroup" | "Uniform" | "Handle" | "PushConstant")
+  | {
+      Storage: {
+        access: number;
+      };
+    };
+
+export type ArraySize =
+  | "Dynamic"
+  | {
+      Constant: number;
+    };
+
+export type ImageClass =
+  | {
+      Sampled: {
+        kind: ScalarKind;
+        multi: boolean;
+      };
+    }
+  | {
+      Depth: {
+        multi: boolean;
+      };
+    }
+  | {
+      Storage: {
+        access: number;
+        format: StorageFormat;
+      };
+    };
+
+export type StorageFormat =
+  | "R8Unorm"
+  | "R8Snorm"
+  | "R8Uint"
+  | "R8Sint"
+  | "R16Uint"
+  | "R16Sint"
+  | "R16Float"
+  | "Rg8Unorm"
+  | "Rg8Snorm"
+  | "Rg8Uint"
+  | "Rg8Sint"
+  | "R32Uint"
+  | "R32Sint"
+  | "R32Float"
+  | "Rg16Uint"
+  | "Rg16Sint"
+  | "Rg16Float"
+  | "Rgba8Unorm"
+  | "Rgba8Snorm"
+  | "Rgba8Uint"
+  | "Rgba8Sint"
+  | "Rgb10a2Unorm"
+  | "Rg11b10Float"
+  | "Rg32Uint"
+  | "Rg32Sint"
+  | "Rg32Float"
+  | "Rgba16Uint"
+  | "Rgba16Sint"
+  | "Rgba16Float"
+  | "Rgba32Uint"
+  | "Rgba32Sint"
+  | "Rgba32Float";
+
+export type ImageDimension = "D1" | "D2" | "D3" | "Cube";
+
+export interface PrebuildResult {
   dependencyInfo: DependencyInfo;
   fileBuilds: {
     [k: string]: FilePrebuildResult;
   };
 }
 
-
-export  interface DependencyInfo {
+export interface DependencyInfo {
   deps: {
     [k: string]: FileDependencyInfo;
   };
 }
 
-
-export  interface FileDependencyInfo {
+export interface FileDependencyInfo {
   errors?: CompileError[] | null;
-  
-
-export s: {
+  exxports: {
     [k: string]: Match;
   };
   imports: Match[];
 }
 
-
-export  interface CompileError {
+export interface CompileError {
   message: string;
   span?: SourceLocation | null;
 }
 
-
-export  interface SourceLocation {
+export interface SourceLocation {
   /**
    * Length in code units (in bytes) of the span.
    */
@@ -181,25 +352,22 @@ export  interface SourceLocation {
  * Identical to regex::Match, except the text is owned and it can be serialized. TODO: get refs to work within the compiler instead of owned strings.
  */
 
-
-export  interface Match {
+export interface Match {
   end: number;
   start: number;
   text: string;
 }
 
-
-export  interface FilePrebuildResult {
+export interface FilePrebuildResult {
   errors?: CompileError[] | null;
   processedShader: File;
-  rawModule: ModuleProxy;
+  rawModule?: Module | null;
 }
 /**
  * Encapsulates all data needed to emulate a file in gputoy virtual directory structure.
  */
 
-
-export  interface File {
+export interface File {
   /**
    * Contents of file in plain text
    */
@@ -221,31 +389,60 @@ export  interface File {
    */
   fileName: string;
 }
-/**
- * naga::Module doesn't implement JsonSchema, so this struct will act as an approximate schema for Module.
- */
 
-
-export  interface ModuleProxy {
-  constants: null[];
-  entryPoints: null[];
-  functions: null[];
-  globalVariables: null[];
-  types: null[];
+export interface Module {
+  entry_points: EntryPoint[];
+  functions: Function[];
+  types: Type[];
 }
 
+export interface EntryPoint {
+  function: Function;
+  name: string;
+  stage: ShaderStage;
+  /**
+   * @minItems 3
+   * @maxItems 3
+   */
+  workgroup_size: [number, number, number];
+}
 
-export  type PerformanceLevel = "Default" | "PowerSaver";
+export interface Function {
+  arguments: FunctionArgument[];
+  name?: string | null;
+  result?: FunctionResult | null;
+}
 
+export interface FunctionArgument {
+  binding?: Binding | null;
+  name?: string | null;
+  ty: number;
+}
 
-export  interface Project {
+export interface FunctionResult {
+  binding?: Binding | null;
+  ty: number;
+}
+
+export interface Type {
+  inner: TypeInner;
+  name?: string | null;
+}
+
+export interface StructMember {
+  binding?: Binding | null;
+  name?: string | null;
+  offset: number;
+  ty: number;
+}
+
+export interface Project {
   config?: Config | null;
   files: Files;
   layout?: Layout | null;
 }
 
-
-export  interface Config {
+export interface Config {
   limitFps?: number;
   perfLevel?: PerformanceLevel | null;
 }
@@ -255,8 +452,7 @@ export  interface Config {
  * example: ```ts map: { "shaders/main.wgsl": { "data": "...", "dir": "shaders/", "fileName": "main", "extension": "wgsl", } } ```
  */
 
-
-export  interface Files {
+export interface Files {
   map: {
     [k: string]: File;
   };
@@ -265,32 +461,7 @@ export  interface Files {
  * Encapsulates all data needed to emulate a file in gputoy virtual directory structure.
  */
 
-
-export  interface File {
-  /**
-   * Contents of file in plain text
-   */
-  data: string;
-  /**
-   * File path starting at / (project root)
-   */
-  dir: string;
-  /**
-   * File extension
-   */
-  extension: SupportedExtension;
-  /**
-   * Fetch url. If exists, then contents will be fetched from remote URL on project load
-   */
-  fetch?: string | null;
-  /**
-   * Name of file
-   */
-  fileName: string;
-}
-
-
-export  interface Layout {
+export interface Layout {
   /**
    * State of project panel accordians
    */
@@ -329,20 +500,17 @@ export  interface Layout {
   workspace: string[];
 }
 
-
-export  interface PanelState {
+export interface PanelState {
   show: boolean;
   size: number;
 }
 
-
-export  interface DirNodeState {
+export interface DirNodeState {
   isRenaming: boolean;
   open: boolean;
 }
 
-
-export  interface ProjectResponse {
+export interface ProjectResponse {
   authorId?: string | null;
   config?: Config | null;
   createdAt: string;
@@ -356,8 +524,7 @@ export  interface ProjectResponse {
   updatedAt: string;
 }
 
-
-export  interface ProjectUpsert {
+export interface ProjectUpsert {
   config?: Config | null;
   description?: string | null;
   files: Files;
@@ -367,19 +534,16 @@ export  interface ProjectUpsert {
   title: string;
 }
 
+export type LineNumberPrefs = "on" | "interval" | "relative" | "off";
 
-export  type LineNumberPrefs = "on" | "interval" | "relative" | "off";
-
-
-export  interface UpdateUserInfoArgs {
+export interface UpdateUserInfoArgs {
   bio?: string | null;
   config?: UserPrefs | null;
   fullName?: string | null;
   image?: string | null;
 }
 
-
-export  interface UserPrefs {
+export interface UserPrefs {
   editor: UserEditorPrefs;
   general: UserGeneralPrefs;
   keybinds: {
@@ -390,8 +554,7 @@ export  interface UserPrefs {
   };
 }
 
-
-export  interface UserEditorPrefs {
+export interface UserEditorPrefs {
   fontFamily?: string | null;
   fontSize?: number | null;
   lineNumbers: LineNumberPrefs;
@@ -399,21 +562,18 @@ export  interface UserEditorPrefs {
   vimMode: boolean;
 }
 
-
-export  interface UserGeneralPrefs {
+export interface UserGeneralPrefs {
   editorPanelSize: number;
   projectPanelSize: number;
   resourcePanelSize: number;
 }
 
-
-export  interface FilteredAction {
+export interface FilteredAction {
   action: Action;
   condition?: string | null;
 }
 
-
-export  interface UserInfoResponse {
+export interface UserInfoResponse {
   active: boolean;
   bio?: string | null;
   config?: UserPrefs | null;

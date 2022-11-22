@@ -18,8 +18,6 @@ pub enum Error {
     ProjectBuildFailed,
     #[error("No runner")]
     NoRunner,
-    #[error(transparent)]
-    CompileError(gpu_compiler::Error),
 }
 
 #[allow(dead_code)]
@@ -48,33 +46,10 @@ impl Context {
         let backend = wgpu::Backends::BROWSER_WEBGPU;
         let instance = wgpu::Instance::new(backend);
 
-        #[cfg(target_arch = "wasm32")]
-        {
-            use winit::platform::web::WindowExtWebSys;
-            let query_string = web_sys::window().unwrap().location().search().unwrap();
-            log::info!("query_String: {query_string}");
-            // On wasm, append the canvas to the document body
-            web_sys::window()
-                .and_then(|win| win.document())
-                .and_then(|doc| doc.get_element_by_id("canvas-root"))
-                .and_then(|root| {
-                    let element = web_sys::Element::from(window.canvas());
-                    let _ = element.set_id("canvas");
-                    let _ = element.set_attribute("width", "");
-                    let _ = element.set_attribute("height", "");
-                    root.append_child(&element).ok()
-                })
-                .expect("couldn't append canvas to document body");
-        }
-
         log::info!("Initializing the surface...");
-        #[cfg(not(target_arch = "wasm32"))]
-        let surface = unsafe { instance.create_surface(&window) };
-        #[cfg(target_arch = "wasm32")]
         let surface = unsafe { instance.create_surface(&window) };
 
         let size = window.inner_size();
-
         let adapter = wgpu::util::initialize_adapter_from_env_or_default(&instance, backend, None)
             .await
             .ok_or(Error::NoAdapter)?;
@@ -116,11 +91,7 @@ impl Context {
         })
     }
 
-    pub async fn build(
-        &mut self,
-        project: &gpu_common::Project,
-        prebuild_result: PrebuildResult,
-    ) -> Result<(), Error> {
+    pub async fn build(&mut self, prebuild_result: PrebuildResult) -> Result<(), Error> {
         let fs = &prebuild_result
             .file_builds
             .get("/shaders/main.wgsl")
@@ -131,6 +102,7 @@ impl Context {
             .get("/shaders/types.wgsl")
             .ok_or(Error::ProjectBuildFailed)?
             .processed_shader;
+
         let vertex = self
             .device
             .create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -143,6 +115,7 @@ impl Context {
                 label: None,
                 source: wgpu::ShaderSource::Wgsl(fs.into()),
             });
+
         let render_pipeline_layout =
             self.device
                 .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {

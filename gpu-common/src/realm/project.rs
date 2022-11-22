@@ -1,11 +1,18 @@
 use chrono::NaiveDateTime;
+#[cfg(feature = "schema")]
 use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+#[cfg(feature = "deserialize")]
+use serde::Deserialize;
+#[cfg(feature = "serialize")]
+use serde::Serialize;
 use validator_derive::Validate;
 
 use crate::{Config, Files, Layout};
 
-#[derive(Debug, Deserialize, Validate, JsonSchema)]
+#[derive(Debug, Validate)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct ProjectUpsert {
     pub id: Option<String>,
     #[validate(length(min = 3, max = 50))]
@@ -17,16 +24,28 @@ pub struct ProjectUpsert {
     pub published: bool,
 }
 
-#[derive(Debug, Serialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serialize", derive(Serialize))]
+#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(
+    any(feature = "serialize", feature = "deserialize"),
+    serde(rename_all = "camelCase")
+)]
 pub struct ProjectResponse {
     pub id: String,
     pub title: String,
     pub description: Option<String>,
     pub files: Files,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(skip_serializing_if = "Option::is_none")
+    )]
     pub layout: Option<Layout>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(
+        any(feature = "serialize", feature = "deserialize"),
+        serde(skip_serializing_if = "Option::is_none")
+    )]
     pub config: Option<Config>,
     pub published: bool,
     pub created_at: NaiveDateTime,
