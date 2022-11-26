@@ -5,7 +5,6 @@ use wasm_bindgen::{prelude::*, JsValue};
 pub fn __init() -> Result<(), JsValue> {
     console_log::init().map_err(|_| Error::LoggerInit)?;
     console_error_panic_hook::set_once();
-    log::info!("__init");
     Ok(())
 }
 

@@ -1,55 +1,49 @@
-// #![cfg(target_arch = "wasm32")]
+use std::cell::RefCell;
 
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsValue};
 
+/// Actual struct that can go across wasm boundary.
+/// Notice the static lifetime on the inner context.
+#[wasm_bindgen]
+pub struct Context(gpu_client::context::Context<'static>);
+
+// This feels INCREDBILY hacky, but it works for now.
+// Basically, since gpu_client::Context requires a lifetime, and since wasm cannot have any lifetime params
+// on structs, the global context is first initialized statically, then taken out of the static cell
+// upon calling self::Context::new()
+thread_local! {
+    static CONTEXT_GLOBAL: RefCell<Option<gpu_client::context::Context<'static>>> = RefCell::new(None)
+}
+
+/// First part of the hack, initialize loggers and 'statically' initialize inner context
 #[wasm_bindgen(start)]
-pub fn __init() -> Result<(), JsValue> {
+pub async fn start() -> Result<(), JsValue> {
     console_log::init().map_err(|_| Error::LoggerInit)?;
     console_error_panic_hook::set_once();
-    log::info!("__init");
+    let context = gpu_client::context::Context::new()
+        .await
+        .map_err(Error::ContextInit)?;
+    CONTEXT_GLOBAL.with(|r| r.replace(Some(context)));
     Ok(())
 }
 
-#[derive(Error, Debug)]
-pub enum Error {
-    #[error("Context init failed: {0}")]
-    ContextInit(gpu_client::context::Error),
-    #[error("Context build failed: {0}")]
-    ContextBuild(gpu_client::context::Error),
-    #[error("Context introspection failed: {0}")]
-    ContextIntrospect(gpu_client::context::Error),
-    #[error("Context render failed: {0}")]
-    ContextRender(gpu_client::context::Error),
-    #[error("Could not serialize from JsonValue: {0}")]
-    SerdeWasmBindgen(serde_wasm_bindgen::Error),
-    #[error("Could not initialize logger")]
-    LoggerInit,
-}
-
-impl From<Error> for JsValue {
-    fn from(err: Error) -> Self {
-        JsValue::from_str(&err.to_string())
-    }
-}
-
-#[wasm_bindgen]
-#[derive(Debug)]
-pub struct Context(gpu_client::context::Context);
-
 #[wasm_bindgen]
 impl Context {
+    /// Second part of the hack, take from statically initialized memory,
+    /// or return error if it is not present.
+    /// If it is not present, it should have thrown an error before during start().
     #[wasm_bindgen(constructor)]
-    pub async fn new() -> Result<Context, Error> {
-        let inner = gpu_client::context::Context::new()
-            .await
-            .map_err(Error::ContextInit)?;
-        Ok(Context(inner))
+    pub fn new() -> Result<Context, Error> {
+        let ctx = CONTEXT_GLOBAL
+            .with(|s| s.take())
+            .ok_or(Error::ContextFailed)?;
+        Ok(Context(ctx))
     }
 
     #[wasm_bindgen(js_name = debug)]
     pub fn debug_to_console(&self) {
-        log::info!("{:#?}", &self);
+        log::info!("{:#?}", &self.0);
     }
 
     #[wasm_bindgen]
@@ -73,13 +67,26 @@ impl Context {
     }
 }
 
-#[wasm_bindgen]
-pub enum FrameResult {
-    Placeholder,
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("Context init failed: {0}")]
+    ContextInit(gpu_client::context::Error),
+    #[error("Context build failed: {0}")]
+    ContextBuild(gpu_client::context::Error),
+    #[error("Context introspection failed: {0}")]
+    ContextIntrospect(gpu_client::context::Error),
+    #[error("Context render failed: {0}")]
+    ContextRender(gpu_client::context::Error),
+    #[error("Could not serialize from JsonValue: {0}")]
+    SerdeWasmBindgen(serde_wasm_bindgen::Error),
+    #[error("Could not initialize logger")]
+    LoggerInit,
+    #[error("Context failed init in previous step.")]
+    ContextFailed,
 }
 
-impl From<FrameResult> for JsValue {
-    fn from(_: FrameResult) -> Self {
-        JsValue::from_str("Placeholder")
+impl From<Error> for JsValue {
+    fn from(err: Error) -> Self {
+        JsValue::from_str(&err.to_string())
     }
 }

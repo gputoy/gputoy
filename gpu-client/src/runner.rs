@@ -4,6 +4,7 @@ pub struct Runner {
 }
 
 impl Runner {
+    #[cfg(not(test))]
     pub fn render_frame(&self, context: &crate::context::Context) {
         let output = context.surface.get_current_texture().unwrap();
         let view = output.texture.create_view(&Default::default());

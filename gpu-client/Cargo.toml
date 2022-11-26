@@ -3,6 +3,9 @@ name = "gpu-client"
 version = "0.1.0"
 edition = "2021"
 
+[dev-dependencies]
+tokio-test = "0.4.2"
+
 [dependencies]
 # local dependencies
 gpu-common = { path = "../gpu-common", features = ["wgpu", "serialize"] }
@@ -23,6 +26,7 @@ wee_alloc = { version = "0.4.5", optional = true }
 log = "0.4.17"
 thiserror = "1.0.4"
 uuid = { version = "1.1.2", features = ["serde"] }
+slotmap = "1.0.6"
 
 web-sys = { version = "0.3.58", features = [
   "Document",

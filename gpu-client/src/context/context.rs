@@ -1,55 +1,57 @@
-use gpu_common::PrebuildResult;
-use thiserror::Error;
+use super::Error;
 
-use winit::event_loop::EventLoop;
-use winit::window::WindowBuilder;
+use crate::resource;
+use winit::{event_loop::EventLoop, window::WindowBuilder};
 
-#[derive(Error, Debug)]
-pub enum Error {
-    #[error("Placeholder error!")]
-    Placeholder,
-    #[error("Could not create window: {0}")]
-    WindowCreation(winit::error::OsError),
-    #[error("Failed to obtain adapter")]
-    NoAdapter,
-    #[error(transparent)]
-    DeviceCreationFailed(#[from] wgpu::RequestDeviceError),
-    #[error("Project build failed")]
-    ProjectBuildFailed,
-    #[error("No runner")]
-    NoRunner,
-}
-
-#[allow(dead_code)]
 #[derive(Debug)]
-pub struct Context {
-    pub window: winit::window::Window,
-    pub event_loop: EventLoop<()>,
-    pub instance: wgpu::Instance,
-    pub size: winit::dpi::PhysicalSize<u32>,
-    pub surface: wgpu::Surface,
-    pub adapter: wgpu::Adapter,
-    pub device: wgpu::Device,
-    pub queue: wgpu::Queue,
-    pub runner: Option<crate::runner::Runner>,
+pub struct Context<'a> {
+    pub(crate) window: winit::window::Window,
+    pub(crate) instance: wgpu::Instance,
+    pub(crate) size: winit::dpi::PhysicalSize<u32>,
+    pub(crate) surface: wgpu::Surface,
+    pub(crate) adapter: wgpu::Adapter,
+    pub(crate) device: wgpu::Device,
+    pub(crate) queue: wgpu::Queue,
+    pub(crate) runner: Option<crate::runner::Runner>,
+    pub(crate) resources: resource::ResourceCache<'a>,
 }
 
-impl Context {
-    pub async fn new() -> Result<Context, Error> {
-        log::info!("Calling new context from rust");
-
+impl<'a> Context<'a> {
+    pub async fn new() -> Result<Context<'a>, Error> {
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
             .build(&event_loop)
             .map_err(Error::WindowCreation)?;
 
+        #[cfg(target_arch = "wasm32")]
         let backend = wgpu::Backends::BROWSER_WEBGPU;
+        #[cfg(not(target_arch = "wasm32"))]
+        let backend = wgpu::Backends::PRIMARY;
         let instance = wgpu::Instance::new(backend);
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            use winit::platform::web::WindowExtWebSys;
+            let query_string = web_sys::window().unwrap().location().search().unwrap();
+            log::info!("query_String: {query_string}");
+            // On wasm, append the canvas to the document body
+            web_sys::window()
+                .and_then(|win| win.document())
+                .and_then(|doc| doc.get_element_by_id("canvas-root"))
+                .and_then(|root| {
+                    let element = web_sys::Element::from(window.canvas());
+                    let _ = element.set_id("canvas");
+                    let _ = element.set_attribute("width", "");
+                    let _ = element.set_attribute("height", "");
+                    root.append_child(&element).ok()
+                })
+                .expect("couldn't append canvas to document body");
+        }
 
         log::info!("Initializing the surface...");
         let surface = unsafe { instance.create_surface(&window) };
-
         let size = window.inner_size();
+
         let adapter = wgpu::util::initialize_adapter_from_env_or_default(&instance, backend, None)
             .await
             .ok_or(Error::NoAdapter)?;
@@ -78,8 +80,9 @@ impl Context {
         };
         surface.configure(&device, &surface_config);
 
+        let resources = resource::ResourceCache::new();
+
         Ok(Context {
-            event_loop,
             window,
             adapter,
             device,
@@ -88,10 +91,14 @@ impl Context {
             size,
             surface,
             runner: None,
+            resources,
         })
     }
 
-    pub async fn build(&mut self, prebuild_result: PrebuildResult) -> Result<(), Error> {
+    pub async fn build(
+        &mut self,
+        prebuild_result: gpu_common::PrebuildResult,
+    ) -> Result<(), Error> {
         let fs = &prebuild_result
             .file_builds
             .get("/shaders/main.wgsl")

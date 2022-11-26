@@ -99,8 +99,8 @@ impl DependencyInfo {
 )]
 pub struct FilePrebuildResult {
     pub processed_shader: crate::File,
-    pub raw_module: Option<crate::naga::Module>,
-    pub errors: Option<Vec<crate::naga::CompileError>>,
+    pub raw_module: Option<crate::sys::Module>,
+    pub errors: Option<Vec<crate::sys::CompileError>>,
 }
 
 #[derive(Debug)]
@@ -115,5 +115,5 @@ pub struct FileDependencyInfo {
         serde(rename = "exxports")
     )]
     pub exports: FastHashMap<String, Match>,
-    pub errors: Option<Vec<crate::naga::CompileError>>,
+    pub errors: Option<Vec<crate::sys::CompileError>>,
 }

@@ -56,6 +56,17 @@
 		outline: none;
 	}
 
+	.xs {
+		font-size: var(--xxs);
+		height: var(--xl);
+		border-radius: 4px;
+	}
+
+	.xs:global(svg) {
+		width: var(--sm);
+		height: var(--sm);
+	}
+
 	.sm {
 		padding: 0 4px;
 		font-size: var(--xs);

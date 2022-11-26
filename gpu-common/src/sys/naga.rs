@@ -23,6 +23,8 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
+use super::common::{ImageDimension, StorageFormat};
+
 type Handle = usize;
 pub type StorageAccess = u32;
 
@@ -262,17 +264,6 @@ pub struct StructMember {
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub enum ImageDimension {
-    D1,
-    D2,
-    D3,
-    Cube,
-}
-
-#[derive(Debug)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub enum ImageClass {
     Sampled {
         kind: ScalarKind,
@@ -345,45 +336,6 @@ pub enum Sampling {
     Center,
     Centroid,
     Sample,
-}
-
-#[derive(Debug)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-pub enum StorageFormat {
-    R8Unorm,
-    R8Snorm,
-    R8Uint,
-    R8Sint,
-    R16Uint,
-    R16Sint,
-    R16Float,
-    Rg8Unorm,
-    Rg8Snorm,
-    Rg8Uint,
-    Rg8Sint,
-    R32Uint,
-    R32Sint,
-    R32Float,
-    Rg16Uint,
-    Rg16Sint,
-    Rg16Float,
-    Rgba8Unorm,
-    Rgba8Snorm,
-    Rgba8Uint,
-    Rgba8Sint,
-    Rgb10a2Unorm,
-    Rg11b10Float,
-    Rg32Uint,
-    Rg32Sint,
-    Rg32Float,
-    Rgba16Uint,
-    Rgba16Sint,
-    Rgba16Float,
-    Rgba32Uint,
-    Rgba32Sint,
-    Rgba32Float,
 }
 
 #[cfg(feature = "naga")]
@@ -643,7 +595,7 @@ mod naga_ext {
         }
     }
 
-    impl From<naga::ImageDimension> for ImageDimension {
+    impl From<naga::ImageDimension> for crate::sys::common::ImageDimension {
         fn from(dim: naga::ImageDimension) -> Self {
             match dim {
                 naga::ImageDimension::D1 => Self::D1,
@@ -717,7 +669,7 @@ mod naga_ext {
         }
     }
 
-    impl From<naga::StorageFormat> for StorageFormat {
+    impl From<naga::StorageFormat> for crate::sys::common::StorageFormat {
         fn from(format: naga::StorageFormat) -> Self {
             match format {
                 naga::StorageFormat::R8Unorm => Self::R8Unorm,

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { MENUKEYS } from '$core/consts'
+	import context from '$core/context'
 	import { loadProject, saveProject } from '$core/project'
 	import { toggleUserModal, toggleUserPrefs } from '$core/util'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
@@ -14,6 +15,7 @@
 	import { wLastInputAction, wProjectMeta, wUser } from '$stores'
 	import { SvelteToast, type SvelteToastOptions } from '@zerodevx/svelte-toast'
 	import { onMount } from 'svelte'
+
 	const options: SvelteToastOptions = {}
 
 	onMount(() => {
@@ -22,6 +24,9 @@
 			loadProject(last)
 		}
 	})
+	/** @ts-ignore*/
+	onMount(() => setTimeout(() => context.init(context), 100))
+	// onDestroy(context.destroy)
 </script>
 
 <header>

@@ -1,20 +1,20 @@
 <script lang="ts">
-	// import { build, prebuild, render as context_render } from '$core/context'
-	// import { getProject } from '$core/project'
+	import context from '$core/context'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	// import { wFiles } from '$stores'
-	// import { get } from 'svelte/store'
 
 	let playing = false
+	$: ready = $context.ready
 
 	function handleBuild() {
-		// build(getProject())
+		context?.build()
 	}
 	function handleIntrospect() {
-		// prebuild(get(wFiles))
+		context?.prebuild()
 	}
-	function handleRender() {}
+	function handleRender() {
+		context?.render()
+	}
 </script>
 
 <div id="controlbar-container">
@@ -41,13 +41,13 @@
 	</div>
 
 	<div class="right button-container">
-		<IconButton on:click={handleIntrospect} series="first" text="Introspect">
+		<IconButton on:click={handleIntrospect} disabled={!ready} series="first" text="Introspect">
 			<Icon name="code" stroked thick />
 		</IconButton>
-		<IconButton on:click={handleBuild} series="middle" text="Build">
+		<IconButton on:click={handleBuild} disabled={!ready} series="middle" text="Build">
 			<Icon name="tool" stroked thick />
 		</IconButton>
-		<IconButton on:click={handleRender} series="last" text="Render">
+		<IconButton on:click={handleRender} disabled={!ready} series="last" text="Render">
 			<Icon name="monitor" stroked thick />
 		</IconButton>
 	</div>

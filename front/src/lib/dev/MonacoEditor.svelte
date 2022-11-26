@@ -10,6 +10,7 @@
 	import Statusbar from '$core/monaco/statusbar'
 	import * as wgsl from '$core/monaco/wgsl'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
+	import Icon from '$lib/components/Icon.svelte'
 	import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 	import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 
@@ -135,7 +136,6 @@
 		}
 		editorInstance?.updateOptions(options)
 
-		console.log(vimMode, config.vimMode)
 		if (!vimMode && config.vimMode && editorInstance) {
 			vimMode = MonacoVim?.initVimMode(editorInstance, statusEl, Statusbar)
 		} else if (vimMode && !config.vimMode) {
@@ -156,11 +156,13 @@
 	<div id="status-root" class:hide={editorInstance === undefined}>
 		<div id="vim-status-root" bind:this={statusEl} />
 		<div id="status-right">
-			<IconButton size="xs" on:click={clearFontCache}>Clear</IconButton>
-			<span
-				>Ln {cursorPosition?.position.lineNumber ?? '?'}, Col {cursorPosition?.position.column ??
-					'?'}</span
-			>
+			<span>
+				Ln {cursorPosition?.position.lineNumber ?? '?'}, Col {cursorPosition?.position.column ??
+					'?'}
+			</span>
+			<IconButton size="xs" on:click={clearFontCache} empty>
+				<Icon name="refresh-ccw" stroked thick />
+			</IconButton>
 			{#if currentExtension}
 				<spam>{currentExtension}</spam>
 			{/if}
