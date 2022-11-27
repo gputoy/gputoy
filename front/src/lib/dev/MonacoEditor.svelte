@@ -1,8 +1,15 @@
 <script lang="ts">
-	import type { File, Layout, SupportedExtension, UserEditorPrefs } from '$common'
+	import type {
+		File,
+		FilePrebuildResult,
+		Layout,
+		PrebuildResult,
+		SupportedExtension,
+		UserEditorPrefs
+	} from '$common'
 	import dark from '$core/monaco/dark'
 	import light from '$core/monaco/light'
-	import { wFiles, wLayout, wTheme, wUserEditorPrefs } from '$stores'
+	import { wFiles, wLayout, wPrebuildResult, wTheme, wUserEditorPrefs } from '$stores'
 	import type { editor, Position } from 'monaco-editor'
 	import { onMount } from 'svelte'
 	import { get } from 'svelte/store'
@@ -31,6 +38,7 @@
 	wTheme.subscribe((newTheme) => Monaco?.editor.setTheme(newTheme))
 	wUserEditorPrefs.subscribe(updateEditorConfig)
 	wLayout.subscribe(changeFileFromLayout)
+	wPrebuildResult.subscribe(updateIntellisense)
 
 	// Initializes the monaco editor instance
 	async function initEditor() {
@@ -121,6 +129,8 @@
 		// set new model, set cursor positon from cache if available
 		editorInstance?.setModel(model)
 		if (newPos) editorInstance?.setPosition(newPos, 'Editor.changeEditorFile')
+
+		updateIntellisense(get(wPrebuildResult))
 	}
 
 	// Updates editor config based on user editor config
@@ -144,6 +154,25 @@
 		}
 		setTimeout(() => Monaco?.editor.remeasureFonts(), 10)
 	}
+	function updateIntellisense(prebuildResult: PrebuildResult | null) {
+		if (!prebuildResult) return
+		let model = editorInstance?.getModel()
+		let fileid = model?.uri.path
+		if (!model || !fileid) return
+		/** @ts-ignore*/
+		let result: FilePrebuildResult = prebuildResult.fileBuilds.get(fileid)
+		if (!result) return
+		let errors: editor.IMarkerData[] =
+			result.errors?.map((error) => ({
+				message: error.message,
+				severity: Monaco.MarkerSeverity.Error,
+				startColumn: error.span?.linePosition ?? 0,
+				endColumn: (error.span?.linePosition ?? 0) + (error.span?.length ?? 0),
+				startLineNumber: error.span?.lineNumber ?? 0,
+				endLineNumber: error.span?.lineNumber ?? 0
+			})) ?? []
+		Monaco.editor.setModelMarkers(model, 'owner', errors)
+	}
 	function clearFontCache() {
 		Monaco?.editor.remeasureFonts()
 	}
@@ -160,6 +189,12 @@
 				Ln {cursorPosition?.position.lineNumber ?? '?'}, Col {cursorPosition?.position.column ??
 					'?'}
 			</span>
+			<div class="analyzer-result">
+				<span> 2 </span>
+				<Icon name="alert-circle" stroked />
+				<span> 0 </span>
+				<Icon name="alert-triangle" stroked />
+			</div>
 			<IconButton size="xs" on:click={clearFontCache} empty>
 				<Icon name="refresh-ccw" stroked thick />
 			</IconButton>
@@ -191,7 +226,7 @@
 		align-items: center;
 		justify-content: space-between;
 		font-size: var(--xxs);
-		padding-inline: 6px;
+		padding-inline: 12px;
 		background-color: var(--background-alt);
 		border-top: var(--border2);
 		box-sizing: border-box;
@@ -207,10 +242,15 @@
 	#status-right {
 		align-items: center;
 		display: flex;
-		gap: 8px;
+		gap: 12px;
 		min-width: max-content;
 	}
 	.hide {
 		display: none;
+	}
+	.analyzer-result {
+		display: flex;
+		align-items: center;
+		gap: 4px;
 	}
 </style>

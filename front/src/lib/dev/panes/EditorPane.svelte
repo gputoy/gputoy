@@ -4,7 +4,7 @@
 	import Icon from '$lib/components/Icon.svelte'
 	import Logo from '$lib/components/Logo.svelte'
 	import Editor from '$lib/dev/MonacoEditor.svelte'
-	import { wFiles, wLayout } from '$stores'
+	import { wFiles, wLayout, wPrebuildResult } from '$stores'
 
 	$: workspace = $wLayout.workspace
 	$: fileindex = $wLayout.fileIndex ?? null
@@ -57,6 +57,9 @@
 					<span>
 						{getCanonicalName(fileid)}
 					</span>
+					{#if wPrebuildResult?.getFileBuild(fileid)?.errors?.length ?? 0 > 0}
+						<code>errors!</code>
+					{/if}
 					<IconButton empty size="xs" on:click={() => handleClose(i)}>
 						<Icon
 							stroked

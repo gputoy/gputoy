@@ -1,3 +1,5 @@
+use crate::resource::ResourceCache;
+
 use super::Error;
 use winit::{
     event_loop::{EventLoop, EventLoopBuilder},
@@ -6,17 +8,17 @@ use winit::{
 
 #[allow(dead_code)]
 #[derive(Debug)]
-pub struct MockContext {
+pub struct MockContext<'a> {
     pub instance: wgpu::Instance,
     pub adapter: wgpu::Adapter,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub runner: Option<crate::runner::Runner>,
+    pub resources: ResourceCache<'a>,
 }
 
-impl MockContext {
-    #[cfg(test)]
-    pub async fn new() -> Result<Self, Error> {
+impl<'a> MockContext<'a> {
+    pub async fn new() -> Result<MockContext<'a>, Error> {
         let backend = wgpu::Backends::PRIMARY;
         let instance = wgpu::Instance::new(backend);
         let adapter = instance
@@ -37,6 +39,7 @@ impl MockContext {
             limits,
         };
         let (device, queue) = adapter.request_device(&desc, None).await?;
+        let resources = ResourceCache::new();
 
         Ok(MockContext {
             adapter,
@@ -44,6 +47,7 @@ impl MockContext {
             queue,
             runner: None,
             instance,
+            resources,
         })
     }
 

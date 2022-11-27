@@ -1,16 +1,12 @@
 use thiserror::Error;
 
+mod context;
 #[cfg(test)]
 mod mock;
 
-#[cfg(not(test))]
-mod context;
-
-#[cfg(test)]
-pub use mock::MockContext as Context;
-
-#[cfg(not(test))]
 pub use context::Context;
+#[cfg(test)]
+pub use mock::MockContext;
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -26,4 +22,6 @@ pub enum Error {
     ProjectBuildFailed,
     #[error("No runner")]
     NoRunner,
+    #[error(transparent)]
+    BundleError(crate::bundle::BundleError),
 }

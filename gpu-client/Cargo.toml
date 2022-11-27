@@ -147,6 +147,7 @@ web-sys = { version = "0.3.58", features = [
   "GpuVertexState",
   "GpuVertexStepMode",
   "HtmlCanvasElement",
+  "ResizeObserver",
   "OffscreenCanvas",
   "ImageBitmap",
   "ImageBitmapRenderingContext",

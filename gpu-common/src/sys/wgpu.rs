@@ -259,6 +259,53 @@ mod wgpu_ext {
             }
         }
     }
+    impl From<wgpu::TextureFormat> for common::TextureFormat {
+        fn from(format: wgpu::TextureFormat) -> Self {
+            match format {
+                wgpu::TextureFormat::R8Unorm => Self::R8Unorm,
+                wgpu::TextureFormat::R8Snorm => Self::R8Snorm,
+                wgpu::TextureFormat::R8Uint => Self::R8Uint,
+                wgpu::TextureFormat::R8Sint => Self::R8Sint,
+                wgpu::TextureFormat::R16Uint => Self::R16Uint,
+                wgpu::TextureFormat::R16Sint => Self::R16Sint,
+                wgpu::TextureFormat::R16Float => Self::R16Float,
+                wgpu::TextureFormat::Rg8Unorm => Self::Rg8Unorm,
+                wgpu::TextureFormat::Rg8Snorm => Self::Rg8Snorm,
+                wgpu::TextureFormat::Rg8Uint => Self::Rg8Uint,
+                wgpu::TextureFormat::Rg8Sint => Self::Rg8Sint,
+                wgpu::TextureFormat::R32Uint => Self::R32Uint,
+                wgpu::TextureFormat::R32Sint => Self::R32Sint,
+                wgpu::TextureFormat::R32Float => Self::R32Float,
+                wgpu::TextureFormat::Rg16Uint => Self::Rg16Uint,
+                wgpu::TextureFormat::Rg16Sint => Self::Rg16Sint,
+                wgpu::TextureFormat::Rg16Float => Self::Rg16Float,
+                wgpu::TextureFormat::Rgba8Unorm => Self::Rgba8Unorm,
+                wgpu::TextureFormat::Rgba8UnormSrgb => Self::Rgba8UnormSrgb,
+                wgpu::TextureFormat::Rgba8Snorm => Self::Rgba8Snorm,
+                wgpu::TextureFormat::Rgba8Uint => Self::Rgba8Uint,
+                wgpu::TextureFormat::Rgba8Sint => Self::Rgba8Sint,
+                wgpu::TextureFormat::Bgra8Unorm => Self::Bgra8Unorm,
+                wgpu::TextureFormat::Bgra8UnormSrgb => Self::Bgra8UnormSrgb,
+                wgpu::TextureFormat::Rgb10a2Unorm => Self::Rgb10a2Unorm,
+                wgpu::TextureFormat::Rg11b10Float => Self::Rg11b10Float,
+                wgpu::TextureFormat::Rg32Uint => Self::Rg32Uint,
+                wgpu::TextureFormat::Rg32Sint => Self::Rg32Sint,
+                wgpu::TextureFormat::Rg32Float => Self::Rg32Float,
+                wgpu::TextureFormat::Rgba16Uint => Self::Rgba16Uint,
+                wgpu::TextureFormat::Rgba16Sint => Self::Rgba16Sint,
+                wgpu::TextureFormat::Rgba16Float => Self::Rgba16Float,
+                wgpu::TextureFormat::Rgba32Uint => Self::Rgba32Uint,
+                wgpu::TextureFormat::Rgba32Sint => Self::Rgba32Sint,
+                wgpu::TextureFormat::Rgba32Float => Self::Rgba32Float,
+                wgpu::TextureFormat::Depth32Float => Self::Depth32Float,
+                wgpu::TextureFormat::Depth32FloatStencil8 => Self::Depth32FloatStencil8,
+                wgpu::TextureFormat::Depth24Plus => Self::Depth24Plus,
+                wgpu::TextureFormat::Depth24PlusStencil8 => Self::Depth24PlusStencil8,
+                wgpu::TextureFormat::Depth24UnormStencil8 => Self::Depth24UnormStencil8,
+                _ => todo!(),
+            }
+        }
+    }
 
     impl From<common::TextureFormat> for wgpu::TextureSampleType {
         fn from(format: common::TextureFormat) -> Self {

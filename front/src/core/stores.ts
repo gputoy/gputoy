@@ -1,16 +1,35 @@
-import type { Action, Config, Files, Layout, PrebuildResult, ProjectResponse, UserEditorPrefs, UserGeneralPrefs, UserInfoResponse, UserPrefs } from "$common"
+import type { Action, CompileError, Config, FileDependencyInfo, FilePrebuildResult, Files, Layout, PrebuildResult, ProjectResponse, UserEditorPrefs, UserGeneralPrefs, UserInfoResponse, UserPrefs } from "$common"
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT, DEFAULT_USER_EDITOR_PREFS, DEFAULT_USER_GENERAL_PREFS, DEFAULT_USER_KEYBINDS, type MenuKey } from "$core/consts"
-import type { ProjectMeta } from "$core/project"
-import { derived, writable, type Writable } from "svelte/store"
-
+// import { initPrebuildResultMethods, type PrebuildResultExtras } from "$core/context"
 import { initFilesMethods, type FilesExtras } from "$core/files"
 import type { Keybinds } from "$core/input"
 import { initLayoutMethods, type LayoutExtras } from "$core/layout"
 import { writeToLocalStorage } from "$core/preferences"
+import type { ProjectMeta } from "$core/project"
 import { initUserMethods, type UserExtras } from "$core/user"
 import { initTheme, type Theme } from "$core/util"
+import { derived, get, writable, type Writable } from "svelte/store"
 
 
+export type PrebuildResultExtras = {
+    getFileBuild: (fileid: string) => FilePrebuildResult | null
+    getFileDeps: (fileid: string) => FileDependencyInfo | null
+}
+export function initPrebuildResultMethods(prebuildResults: Writable<PrebuildResult | null>): PrebuildResultExtras {
+    function getFileBuild(fileid: string): FilePrebuildResult | null {
+        /** @ts-ignore */
+        return get(prebuildResults)?.fileBuilds.get(fileid) ?? null
+    }
+    function getFileDeps(fileid: string): FileDependencyInfo | null {
+        /** @ts-ignore */
+        return get(prebuildResults)?.dependencyInfo.deps.get(fileid) ?? null
+    }
+    function errors(): CompileError[] | null {
+        /** @ts-ignore */
+        return get(prebuildResults)?.fileBuilds.map((fileid, val) => console.log(fileid, val))
+    }
+    return { getFileBuild, getFileDeps }
+}
 
 type EnhancedWritable<Type, Extras> = Writable<Type> & Extras
 
@@ -25,7 +44,6 @@ function makeEnhanced<Type, Extras>(
     initial: Type,
     extras: (w: Writable<Type>) => Extras
 ): () => EnhancedWritable<Type, Extras> {
-
     return function () {
         const _writable = writable<Type>(initial)
         return { ..._writable, ...extras(_writable) }
@@ -36,7 +54,7 @@ function makeEnhanced<Type, Extras>(
 /**
  *                  Core system stores
  */
-export const wPrebuildResult = writable<PrebuildResult | null>(null)
+export const wPrebuildResult = makeEnhanced<PrebuildResult | null, PrebuildResultExtras>(null, initPrebuildResultMethods)()
 export const wPrebuildDirty = writable(true)
 export const wBuildResult = writable<{} | null>(null)
 export const wBuildDirty = writable(true)

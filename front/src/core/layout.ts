@@ -13,7 +13,7 @@ export type LayoutExtras = {
     toggleDirOpen: (absoluteDir: string, set?: boolean) => void
     toggleAccordian: (accordian: string, set?: boolean) => void
 }
-export function initLayoutMethods(layout: Writable<Layout>) {
+export function initLayoutMethods(layout: Writable<Layout>): LayoutExtras {
 
     function setPanelSize(panel: Panel, event: IPaneSizingEvent) {
         layout.update(l => {

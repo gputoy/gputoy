@@ -1,23 +1,31 @@
+use crate::bundle;
+
 #[derive(Debug)]
 pub struct Runner {
     pub render_pipeline: wgpu::RenderPipeline,
 }
 
 impl Runner {
-    #[cfg(not(test))]
     pub fn render_frame(&self, context: &crate::context::Context) {
-        let output = context.surface.get_current_texture().unwrap();
-        let view = output.texture.create_view(&Default::default());
+        let mut textures = Vec::new();
+        for viewport in context.bundles.iter::<bundle::Viewport>() {
+            let texture = viewport
+                .surface()
+                .get_current_texture()
+                .expect("Texture from viewport");
+            textures.push(texture);
+        }
         let mut encoder = context
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor {
                 ..Default::default()
             });
         {
+            let view = &textures[0].texture.create_view(&Default::default());
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render pass"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
+                    view: view,
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
@@ -35,6 +43,6 @@ impl Runner {
             render_pass.draw(0..6, 0..1);
         }
         context.queue.submit(std::iter::once(encoder.finish()));
-        output.present();
+        textures.remove(0).present();
     }
 }

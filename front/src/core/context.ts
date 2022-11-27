@@ -59,6 +59,7 @@ class ClientContext implements Readable<ContextState> {
             console.error("js:context:prebuild:error", e)
             return
         }
+
         wPrebuildDirty.set(false)
         wPrebuildResult.set(prebuildResult)
     }
@@ -81,4 +82,4 @@ class ClientContext implements Readable<ContextState> {
 }
 
 var context: ClientContext = new ClientContext()
-export default context 
+export default context

@@ -18,7 +18,7 @@ mod tests {
         }
     }
 
-    fn make_context() -> Context {
+    fn make_context<'a>() -> Context<'a> {
         tokio_test::block_on(async {
             crate::context::Context::new()
                 .await

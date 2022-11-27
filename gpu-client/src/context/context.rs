@@ -1,56 +1,25 @@
 use super::Error;
 
-use crate::resource;
-use winit::{event_loop::EventLoop, window::WindowBuilder};
+use crate::{bundle, bundle::Bundle, resource};
 
 #[derive(Debug)]
 pub struct Context<'a> {
-    pub(crate) window: winit::window::Window,
     pub(crate) instance: wgpu::Instance,
-    pub(crate) size: winit::dpi::PhysicalSize<u32>,
-    pub(crate) surface: wgpu::Surface,
     pub(crate) adapter: wgpu::Adapter,
     pub(crate) device: wgpu::Device,
     pub(crate) queue: wgpu::Queue,
     pub(crate) runner: Option<crate::runner::Runner>,
     pub(crate) resources: resource::ResourceCache<'a>,
+    pub(crate) bundles: bundle::BundleCache,
 }
 
 impl<'a> Context<'a> {
     pub async fn new() -> Result<Context<'a>, Error> {
-        let event_loop = EventLoop::new();
-        let window = WindowBuilder::new()
-            .build(&event_loop)
-            .map_err(Error::WindowCreation)?;
-
         #[cfg(target_arch = "wasm32")]
         let backend = wgpu::Backends::BROWSER_WEBGPU;
         #[cfg(not(target_arch = "wasm32"))]
         let backend = wgpu::Backends::PRIMARY;
         let instance = wgpu::Instance::new(backend);
-
-        #[cfg(target_arch = "wasm32")]
-        {
-            use winit::platform::web::WindowExtWebSys;
-            let query_string = web_sys::window().unwrap().location().search().unwrap();
-            log::info!("query_String: {query_string}");
-            // On wasm, append the canvas to the document body
-            web_sys::window()
-                .and_then(|win| win.document())
-                .and_then(|doc| doc.get_element_by_id("canvas-root"))
-                .and_then(|root| {
-                    let element = web_sys::Element::from(window.canvas());
-                    let _ = element.set_id("canvas");
-                    let _ = element.set_attribute("width", "");
-                    let _ = element.set_attribute("height", "");
-                    root.append_child(&element).ok()
-                })
-                .expect("couldn't append canvas to document body");
-        }
-
-        log::info!("Initializing the surface...");
-        let surface = unsafe { instance.create_surface(&window) };
-        let size = window.inner_size();
 
         let adapter = wgpu::util::initialize_adapter_from_env_or_default(&instance, backend, None)
             .await
@@ -71,27 +40,18 @@ impl<'a> Context<'a> {
             limits,
         };
         let (device, queue) = adapter.request_device(&desc, None).await?;
-        let surface_config = wgpu::SurfaceConfiguration {
-            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-            format: surface.get_supported_formats(&adapter)[0],
-            width: size.width,
-            height: size.height,
-            present_mode: wgpu::PresentMode::Fifo,
-        };
-        surface.configure(&device, &surface_config);
 
         let resources = resource::ResourceCache::new();
+        let bundles = bundle::BundleCache::new();
 
         Ok(Context {
-            window,
             adapter,
             device,
             queue,
             instance,
-            size,
-            surface,
             runner: None,
             resources,
+            bundles,
         })
     }
 
@@ -109,6 +69,14 @@ impl<'a> Context<'a> {
             .get("/shaders/types.wgsl")
             .ok_or(Error::ProjectBuildFailed)?
             .processed_shader;
+
+        let viewport = bundle::Viewport::new(
+            &self,
+            &gpu_common::ViewportBundleArgs {
+                target: "canvas-root".to_owned(),
+            },
+        )
+        .expect("Viewport bundle to work");
 
         let vertex = self
             .device
@@ -144,7 +112,7 @@ impl<'a> Context<'a> {
                     module: &shader_desc,
                     entry_point: "fs_main",
                     targets: &[Some(wgpu::ColorTargetState {
-                        format: self.surface.get_supported_formats(&self.adapter)[0],
+                        format: viewport.surface().get_supported_formats(&self.adapter)[0],
                         blend: Some(wgpu::BlendState::REPLACE),
                         write_mask: wgpu::ColorWrites::ALL,
                     })],
@@ -167,11 +135,12 @@ impl<'a> Context<'a> {
                 },
             });
 
+        self.bundles.insert(viewport);
         self.runner = Some(crate::runner::Runner { render_pipeline });
         Ok(())
     }
 
-    pub async fn render(&self) -> Result<(), Error> {
+    pub async fn render(&mut self) -> Result<(), Error> {
         let Some(runner) = &self.runner else {
             return Err(Error::NoRunner);
         };

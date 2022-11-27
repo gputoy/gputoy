@@ -62,7 +62,7 @@ impl Context {
     }
 
     #[wasm_bindgen]
-    pub async fn render(&self) -> Result<(), Error> {
+    pub async fn render(&mut self) -> Result<(), Error> {
         self.0.render().await.map_err(Error::ContextRender)
     }
 }

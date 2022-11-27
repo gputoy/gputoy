@@ -1,3 +1,5 @@
+use gpu_common::TextureArgs;
+
 use crate::context::Context;
 
 use super::{Resource, SubResource, TextureHandle};

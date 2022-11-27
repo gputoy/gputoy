@@ -121,6 +121,7 @@
 		border: none;
 		background-color: transparent;
 		box-shadow: none;
+		padding: 0px;
 	}
 	.empty:hover {
 		background-color: transparent !important;
