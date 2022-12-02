@@ -34,7 +34,7 @@ impl Compiler {
     }
     pub fn prebuild(&mut self, files: &gpu_common::Files) -> Result<PrebuildResult, Error> {
         let dependency_info = Self::get_dependency_info(files);
-        let prebuild: FastHashMap<String, _> = files
+        let prebuild: FastHashMap<_, _> = files
             .map
             .iter()
             .filter(|(_, file)| file.extension.is_shader())
@@ -55,7 +55,7 @@ impl Compiler {
 
     pub fn prebuild_file(
         &self,
-        fileid: &String,
+        fileid: &gpu_common::FilePath,
         file: &gpu_common::File,
         depenency_info: &DependencyInfo,
     ) -> FilePrebuildResult {
@@ -77,7 +77,7 @@ impl Compiler {
     }
 
     fn preprocess_file(
-        fileid: &String,
+        fileid: &gpu_common::FilePath,
         file: &gpu_common::File,
         depenency_info: &DependencyInfo,
     ) -> gpu_common::File {

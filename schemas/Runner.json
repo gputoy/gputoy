@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Runner",
+  "description": "A runner is used to orchestrate shader execution and resource management.\n\nA project can have multiple runners, but will default to /run.json.",
+  "type": "object",
+  "required": [
+    "bundles",
+    "pipelines"
+  ],
+  "properties": {
+    "bundles": {
+      "title": "Runner bundles",
+      "description": "Bundles are a collection of Resources surrounding some form of input/ouput that are maintained around a runner's lifecycle (run start, run end, frame start, frame end).\n\nFor example, the Viewport bundle has a 'surface' texture resource which can be written to in fragment shader, a 'mouse' uniform buffer corresponding to mouse position over said viewport, and a 'resolution' uniform buffer that contains the current resolution of the viewport.\n\nIn the pipelines, these resources can be used just like a resource defined by the user. Only instead of 'res::{some_resource_name}', the identifier will be '{some_bundle_name}::{some_resource_within_bundle}'.\n\nFor instance, if you wanted to use the surface of a Viewport bundle named 'view' within a pipeline, you would identiy it like 'view::surface'.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/BundleArgs"
+      }
+    },
+    "pipelines": {
+      "title": "Runner pipelines",
+      "description": "A pipeline represents an execution of shader.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PipelineArgs"
+      }
+    }
+  },
+  "definitions": {
+    "Binds": {
+      "title": "Pipeline binds",
+      "description": "Describes a map between syned shader variables and resource path.\n\nDuring build, the resource at named sync variable will be bound via bind groups.\n\nResources can be from either project resources or from a bundle. For example, \"resource::particles\" will look for defined resource named \"particles\", and \"view::surface\" will look for the \"surface\" resource from defined bundle called \"view\".",
+      "type": "object"
+    },
+    "BundleArgs": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "target",
+            "type"
+          ],
+          "properties": {
+            "target": {
+              "description": "Target canvas id",
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "Viewport"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "Compute": {
+      "type": "object",
+      "required": [
+        "shader"
+      ],
+      "properties": {
+        "binds": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Binds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "shader": {
+          "title": "Compute shader",
+          "description": "A path to \"wgsl\" or \"glsl\" shader file that contains a compute entry point.",
+          "type": "string"
+        }
+      }
+    },
+    "FullscreenQuad": {
+      "type": "object",
+      "required": [
+        "fragment",
+        "targets"
+      ],
+      "properties": {
+        "binds": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Binds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fragment": {
+          "title": "Fragment shader",
+          "description": "A path to \"wgsl\" or \"glsl\" shader file that contains a fragment entry point.",
+          "type": "string"
+        },
+        "targets": {
+          "title": "Fragment shader targets",
+          "description": "Ordered list of texture resources the fragment shader will draw to. Ordering will correspond to location attributes in shader output.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "PipelineArgs": {
+      "oneOf": [
+        {
+          "title": "Vertex/Fragment pipeline",
+          "description": "Plain rasterizer pipeline with configurable vertex inputs and texture output targets.\n\nNote: While this can be used for fullscreen quad, the easier method would to be to use the built in FullscreenQuad pipeline, which handles the vertex shader automatically.",
+          "type": "object",
+          "required": [
+            "VertexFragement"
+          ],
+          "properties": {
+            "VertexFragement": {
+              "$ref": "#/definitions/VertexFragment"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "title": "Fullscreen quad pipeline",
+          "description": "Fragment shader over rasterized fullscreen quad.\n\nSimilar in function to a 'shadertoy' shader.",
+          "type": "object",
+          "required": [
+            "FullscreenQuad"
+          ],
+          "properties": {
+            "FullscreenQuad": {
+              "$ref": "#/definitions/FullscreenQuad"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "title": "Compute pipeline",
+          "description": "Compute pipeline to be ran over the range of some resource.",
+          "type": "object",
+          "required": [
+            "Compute"
+          ],
+          "properties": {
+            "Compute": {
+              "$ref": "#/definitions/Compute"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "VertexFragment": {
+      "type": "object",
+      "required": [
+        "fragment",
+        "targets",
+        "vertex"
+      ],
+      "properties": {
+        "binds": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Binds"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fragment": {
+          "title": "Fragment shader",
+          "description": "A path to \"wgsl\" or \"glsl\" shader file that contains a fragment entry point.\n\nNote: this may be the same as vertex shader as long as that file has both vertex and fragment entry points.",
+          "type": "string"
+        },
+        "targets": {
+          "title": "Fragment shader targets",
+          "description": "Ordered list of texture resources the fragment shader will draw to. Ordering will correspond to location attributes in shader output.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "vertex": {
+          "title": "Vertex shader",
+          "description": "A path to \"wgsl\" or \"glsl\" shader file that contains a vertex entry point.\n\nNote: this may be the same as fragment shader as long as that file has both vertex and fragment entry points.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

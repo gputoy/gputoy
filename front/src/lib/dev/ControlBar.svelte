@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { pushAction } from '$core/actions'
 	import context from '$core/context'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
@@ -19,8 +20,8 @@
 
 <div id="controlbar-container">
 	<div class="left button-container">
-		<IconButton smallIcons>
-			<Icon name="square" />
+		<IconButton smallIcons on:click={() => pushAction({ ty: 'toggleConsole' })}>
+			<Icon name="command" stroked thick />
 		</IconButton>
 	</div>
 	<div class="middle button-container">

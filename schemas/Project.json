@@ -50,6 +50,12 @@
               "type": "null"
             }
           ]
+        },
+        "runner": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       }
     },
@@ -108,7 +114,7 @@
       }
     },
     "Files": {
-      "description": "Gputoy virtual directory. Each file in the map has its path from root as key, including file name and extension\n\nexample: ```ts map: { \"shaders/main.wgsl\": { \"data\": \"...\", \"dir\": \"shaders/\", \"fileName\": \"main\", \"extension\": \"wgsl\", } } ```",
+      "description": "Gputoy virtual directory. Each file in the map has its path from root as key, including file name and extension\n\nexample: ```ts map: { \"/shaders/main.wgsl\": { \"data\": \"...\", \"dir\": \"shaders/\", \"fileName\": \"main\", \"extension\": \"wgsl\", } } ```",
       "type": "object",
       "required": [
         "map"

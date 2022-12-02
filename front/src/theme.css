@@ -37,6 +37,12 @@ body {
   --nodeColor: var(--text-color);
   --leafDefaultBackground: var(--glass-high);
 
+  --console-trace: white;
+  --console-debug: grey;
+  --console-info: blue;
+  --console-warn: orange;
+  --console-error: red;
+
 }
 
 body.dark {

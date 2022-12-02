@@ -47,7 +47,7 @@ impl From<&regex::Match<'_>> for Match {
 
 pub type FastHashMap<K, V> = rustc_hash::FxHashMap<K, V>;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
@@ -57,20 +57,20 @@ pub type FastHashMap<K, V> = rustc_hash::FxHashMap<K, V>;
 )]
 pub struct PrebuildResult {
     pub dependency_info: DependencyInfo,
-    pub file_builds: FastHashMap<String, FilePrebuildResult>,
+    pub file_builds: FastHashMap<crate::file::FilePath, FilePrebuildResult>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 #[cfg_attr(feature = "deserialize", derive(Deserialize))]
 pub struct DependencyInfo {
-    pub deps: FastHashMap<String, FileDependencyInfo>,
+    pub deps: FastHashMap<crate::file::FilePath, FileDependencyInfo>,
 }
 
 impl DependencyInfo {
-    pub fn find_imports_for_file<S: AsRef<str>>(&self, fileid: S) -> Vec<&str> {
-        if let Some(dep_info) = self.deps.get(fileid.as_ref()) {
+    pub fn find_imports_for_file(&self, fileid: &crate::file::FilePath) -> Vec<&str> {
+        if let Some(dep_info) = self.deps.get(fileid) {
             dep_info
                 .imports
                 .iter()

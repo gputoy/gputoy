@@ -5,6 +5,8 @@ use serde::Deserialize;
 #[cfg(feature = "serialize")]
 use serde::Serialize;
 
+use crate::FilePath;
+
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
@@ -18,6 +20,7 @@ pub struct Config {
     pub perf_level: Option<PerformanceLevel>,
     #[cfg_attr(any(feature = "serialize", feature = "deserialize"), serde(default))]
     pub limit_fps: u32,
+    pub runner: Option<FilePath>,
 }
 
 #[derive(Debug, Default)]

@@ -75,6 +75,10 @@ export type Action =
     }
   | {
       ty: "closeProject";
+    }
+  | {
+      c: string;
+      ty: "setRunner";
     };
 
 export type Panel = "editorPanel" | "projectPanel" | "resourcePanel";
@@ -89,6 +93,7 @@ export type PerformanceLevel = "Default" | "PowerSaver";
 export interface Config {
   limitFps?: number;
   perfLevel?: PerformanceLevel | null;
+  runner?: string | null;
 }
 
 export interface Credentials {
@@ -302,7 +307,7 @@ export type StorageFormat =
   | "Rgba32Sint"
   | "Rgba32Float";
 
-export type ImageDimension = "D1" | "D2" | "D3" | "Cube";
+export type ImageDimension = "1d" | "2d" | "3d" | "cube";
 
 export interface PrebuildResult {
   dependencyInfo: DependencyInfo;
@@ -445,11 +450,12 @@ export interface Project {
 export interface Config {
   limitFps?: number;
   perfLevel?: PerformanceLevel | null;
+  runner?: string | null;
 }
 /**
  * Gputoy virtual directory. Each file in the map has its path from root as key, including file name and extension
  *
- * example: ```ts map: { "shaders/main.wgsl": { "data": "...", "dir": "shaders/", "fileName": "main", "extension": "wgsl", } } ```
+ * example: ```ts map: { "/shaders/main.wgsl": { "data": "...", "dir": "shaders/", "fileName": "main", "extension": "wgsl", } } ```
  */
 
 export interface Files {
@@ -532,6 +538,131 @@ export interface ProjectUpsert {
   layout?: Layout | null;
   published: boolean;
   title: string;
+}
+
+export type BundleArgs = {
+  /**
+   * Target canvas id
+   */
+  target: string;
+  type: "Viewport";
+};
+
+export type PipelineArgs = VertexFragmentPipeline | FullscreenQuadPipeline | ComputePipeline;
+/**
+ * A path to "wgsl" or "glsl" shader file that contains a fragment entry point.
+ *
+ * Note: this may be the same as vertex shader as long as that file has both vertex and fragment entry points.
+ */
+
+export type FragmentShader = string;
+/**
+ * Ordered list of texture resources the fragment shader will draw to. Ordering will correspond to location attributes in shader output.
+ */
+
+export type FragmentShaderTargets = string[];
+/**
+ * A path to "wgsl" or "glsl" shader file that contains a vertex entry point.
+ *
+ * Note: this may be the same as fragment shader as long as that file has both vertex and fragment entry points.
+ */
+
+export type VertexShader = string;
+/**
+ * A path to "wgsl" or "glsl" shader file that contains a fragment entry point.
+ */
+
+export type FragmentShader1 = string;
+/**
+ * Ordered list of texture resources the fragment shader will draw to. Ordering will correspond to location attributes in shader output.
+ */
+
+export type FragmentShaderTargets1 = string[];
+/**
+ * A path to "wgsl" or "glsl" shader file that contains a compute entry point.
+ */
+
+export type ComputeShader = string;
+/**
+ * A pipeline represents an execution of shader.
+ */
+
+export type RunnerPipelines = PipelineArgs[];
+
+/**
+ * A runner is used to orchestrate shader execution and resource management.
+ *
+ * A project can have multiple runners, but will default to /run.json.
+ */
+
+export interface Runner {
+  bundles: RunnerBundles;
+  pipelines: RunnerPipelines;
+}
+/**
+ * Bundles are a collection of Resources surrounding some form of input/ouput that are maintained around a runner's lifecycle (run start, run end, frame start, frame end).
+ *
+ * For example, the Viewport bundle has a 'surface' texture resource which can be written to in fragment shader, a 'mouse' uniform buffer corresponding to mouse position over said viewport, and a 'resolution' uniform buffer that contains the current resolution of the viewport.
+ *
+ * In the pipelines, these resources can be used just like a resource defined by the user. Only instead of 'res::{some_resource_name}', the identifier will be '{some_bundle_name}::{some_resource_within_bundle}'.
+ *
+ * For instance, if you wanted to use the surface of a Viewport bundle named 'view' within a pipeline, you would identiy it like 'view::surface'.
+ */
+
+export interface RunnerBundles {
+  [k: string]: BundleArgs;
+}
+/**
+ * Plain rasterizer pipeline with configurable vertex inputs and texture output targets.
+ *
+ * Note: While this can be used for fullscreen quad, the easier method would to be to use the built in FullscreenQuad pipeline, which handles the vertex shader automatically.
+ */
+
+export interface VertexFragmentPipeline {
+  VertexFragement: VertexFragment;
+}
+
+export interface VertexFragment {
+  binds?: PipelineBinds | null;
+  fragment: FragmentShader;
+  targets: FragmentShaderTargets;
+  vertex: VertexShader;
+}
+/**
+ * Describes a map between syned shader variables and resource path.
+ *
+ * During build, the resource at named sync variable will be bound via bind groups.
+ *
+ * Resources can be from either project resources or from a bundle. For example, "resource::particles" will look for defined resource named "particles", and "view::surface" will look for the "surface" resource from defined bundle called "view".
+ */
+
+export interface PipelineBinds {}
+/**
+ * Fragment shader over rasterized fullscreen quad.
+ *
+ * Similar in function to a 'shadertoy' shader.
+ */
+
+export interface FullscreenQuadPipeline {
+  FullscreenQuad: FullscreenQuad;
+}
+
+export interface FullscreenQuad {
+  binds?: PipelineBinds | null;
+  fragment: FragmentShader1;
+  targets: FragmentShaderTargets1;
+}
+/**
+ * Compute pipeline to be ran over the range of some resource.
+ */
+
+export interface ComputePipeline {
+  Compute: Compute;
+}
+
+export interface Compute {
+  binds?: PipelineBinds | null;
+  shader: ComputeShader;
 }
 
 export type LineNumberPrefs = "on" | "interval" | "relative" | "off";

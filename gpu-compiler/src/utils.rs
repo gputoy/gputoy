@@ -20,15 +20,19 @@ pub fn files_from_dir<P: AsRef<Path>>(path: P) -> Option<Files> {
         if metadata.is_dir() {
             continue;
         }
-        let fileid = format!(
-            "/{}",
-            entry.path().strip_prefix(&path).unwrap().to_str().unwrap()
-        );
+        let fileid = gpu_common::FilePath::try_from(
+            format!(
+                "/{}",
+                entry.path().strip_prefix(&path).unwrap().to_str().unwrap()
+            )
+            .as_str(),
+        )
+        .unwrap();
         let mut file = std::fs::File::open(entry.path()).unwrap();
         let mut data = String::new();
         let _ = file.read_to_string(&mut data);
 
-        let dir: Vec<&str> = fileid.split("/").collect();
+        let dir: Vec<&str> = fileid.as_ref().split("/").collect();
         let dir = dir
             .len()
             .checked_sub(2)

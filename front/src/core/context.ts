@@ -1,4 +1,4 @@
-import { wFiles, wPrebuildDirty, wPrebuildResult } from '$stores'
+import { wConfig, wFiles, wPrebuildDirty, wPrebuildResult } from '$stores'
 import { Context as WasmContext, default as init_client } from '$wasm/client/gpu_wasm_client'
 import { Compiler as WasmCompiler, default as init_compiler } from '$wasm/compiler/gpu_wasm_compiler'
 import { get, writable, type Readable, type Subscriber, type Unsubscriber, type Writable } from 'svelte/store'
@@ -28,7 +28,7 @@ class ClientContext implements Readable<ContextState> {
             this._context = new WasmContext()
             this._compiler = new WasmCompiler()
         } catch (e) {
-            console.error("error in context:init", e)
+            console.error("error in context:init: ", e)
             return
         }
         this._store.set({ ready: true })
@@ -39,8 +39,14 @@ class ClientContext implements Readable<ContextState> {
         }
         if (get(wPrebuildDirty)) this.prebuild()
         const prebuildResult = get(wPrebuildResult)
+        const runnerFile = wFiles.getFile(get(wConfig).runner ?? "")
+        if (!runnerFile) {
+            console.error("No runner file set, aborting.")
+            return
+        }
+        const runner = JSON.parse(runnerFile.data)
         try {
-            await this._context!.build(prebuildResult)
+            await this._context!.build(runner, prebuildResult)
 
         } catch (e) {
             console.error("js:context:build:error", e)

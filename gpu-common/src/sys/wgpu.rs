@@ -11,6 +11,7 @@ pub use wgpu_ext::*;
 use super::common::{ImageDimension, TextureFormat};
 
 bitflags::bitflags! {
+    #[cfg_attr(feature = "schema", derive(JsonSchema))]
     pub struct BufferUsages: u32 {
         const MAP_READ= 1 << 0;
         const MAP_WRITE= 1 << 1;
@@ -23,6 +24,7 @@ bitflags::bitflags! {
         const INDIRECT = 1 << 8;
     }
 
+    #[cfg_attr(feature = "schema", derive(JsonSchema))]
     pub struct TextureUsages: u32 {
         const COPY_SRC = 1 << 0;
         const COPY_DST = 1 << 1;

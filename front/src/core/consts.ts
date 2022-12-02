@@ -41,7 +41,9 @@ export const DEFAULT_LAYOUT: Layout = {
     }
 
 } as const
-export const DEFAULT_CONFIG: Config = {} as const
+export const DEFAULT_CONFIG: Config = {
+    runner: "/run.json"
+} as const
 export const DEFAULT_FILES: Files = {
     map: {
         "/shaders/main.wgsl": {
@@ -155,6 +157,11 @@ export const DEFAULT_USER_KEYBINDS: Keybinds = {
         },
         condition: 'userLoggedIn'
     },
+    'A-t': {
+        action: {
+            ty: 'toggleConsole'
+        }
+    }
 
 
 } as const

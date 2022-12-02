@@ -1,16 +1,17 @@
 import type { Action, CompileError, Config, FileDependencyInfo, FilePrebuildResult, Files, Layout, PrebuildResult, ProjectResponse, UserEditorPrefs, UserGeneralPrefs, UserInfoResponse, UserPrefs } from "$common"
+import { initConsoleMethods, type ConsoleExtras, type Log } from "$core/console"
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT, DEFAULT_USER_EDITOR_PREFS, DEFAULT_USER_GENERAL_PREFS, DEFAULT_USER_KEYBINDS, type MenuKey } from "$core/consts"
-// import { initPrebuildResultMethods, type PrebuildResultExtras } from "$core/context"
 import { initFilesMethods, type FilesExtras } from "$core/files"
 import type { Keybinds } from "$core/input"
 import { initLayoutMethods, type LayoutExtras } from "$core/layout"
 import { writeToLocalStorage } from "$core/preferences"
-import type { ProjectMeta } from "$core/project"
+import { writeToProjectLocalStorage, type ProjectMeta } from "$core/project"
 import { initUserMethods, type UserExtras } from "$core/user"
 import { initTheme, type Theme } from "$core/util"
 import { derived, get, writable, type Writable } from "svelte/store"
 
 
+// TODO: move this to seperate file
 export type PrebuildResultExtras = {
     getFileBuild: (fileid: string) => FilePrebuildResult | null
     getFileDeps: (fileid: string) => FileDependencyInfo | null
@@ -31,6 +32,10 @@ export function initPrebuildResultMethods(prebuildResults: Writable<PrebuildResu
     return { getFileBuild, getFileDeps }
 }
 
+/**
+ * Custom store. Allows store methods to be defined in seperate file from
+ * the store itself. It should come from some other file within /src/core.
+ */
 type EnhancedWritable<Type, Extras> = Writable<Type> & Extras
 
 /**
@@ -72,6 +77,15 @@ export const wProjectMeta = writable<ProjectMeta>({
     authorId: null,
     published: false,
 } as ProjectMeta)
+
+/**
+ *                  Console
+ */
+export const wConsole = makeEnhanced<Log[], ConsoleExtras>([], initConsoleMethods)()
+export const wConsoleOpen = writable(false)
+export const wConsoleHistory = writable<string[]>([])
+export const wConsoleHistoryIndex = writable(0)
+export const wConsoleCompletionIndex = writable(0)
 
 /**
  *                  User and auth stores
@@ -151,3 +165,7 @@ export const dProject = derived(
         }
     }
 )
+dProject.subscribe(p => {
+    if (p != null)
+        writeToProjectLocalStorage(p)
+})

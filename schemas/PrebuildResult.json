@@ -508,10 +508,10 @@
     "ImageDimension": {
       "type": "string",
       "enum": [
-        "D1",
-        "D2",
-        "D3",
-        "Cube"
+        "1d",
+        "2d",
+        "3d",
+        "cube"
       ]
     },
     "Interpolation": {

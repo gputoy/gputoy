@@ -16,7 +16,7 @@ impl super::Resource for BufferResource {
     const LABEL: &'static str = "buffer";
     const SHADER_DECL: &'static str = "";
 
-    fn new(ctx: &crate::context::Context, args: &Self::Args) -> Self {
+    fn new(ctx: &crate::Context, args: &Self::Args) -> Self {
         let buffer = ctx.device.create_buffer(&args.into());
         Self {
             buffer,
