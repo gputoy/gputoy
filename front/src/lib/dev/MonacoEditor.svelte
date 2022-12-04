@@ -14,6 +14,7 @@
 	import { onMount } from 'svelte'
 	import { get } from 'svelte/store'
 
+	import setJSONSchema from '$core/monaco/json'
 	import Statusbar from '$core/monaco/statusbar'
 	import * as wgsl from '$core/monaco/wgsl'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
@@ -55,6 +56,7 @@
 		MonacoVim = await import('monaco-vim')
 		Monaco.editor.defineTheme('dark', dark)
 		Monaco.editor.defineTheme('light', light)
+		setJSONSchema(Monaco)
 
 		Monaco.languages.register(wgsl.extensionPoint)
 		Monaco.languages.onLanguage(wgsl.id, () => {

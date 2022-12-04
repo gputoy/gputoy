@@ -1,12 +1,15 @@
 pub mod bundle;
-pub mod context;
+mod context;
+pub mod pipeline;
 pub mod resource;
-pub mod runner;
+
+pub use context::*;
 
 #[cfg(test)]
 mod tests {
-    use super::context::Context;
+
     use super::resource::{self, Resource};
+    use super::Context;
 
     fn make_buffer_args() -> gpu_common::BufferArgs {
         gpu_common::BufferArgs {
@@ -18,18 +21,14 @@ mod tests {
         }
     }
 
-    fn make_context<'a>() -> Context<'a> {
-        tokio_test::block_on(async {
-            crate::context::Context::new()
-                .await
-                .expect("context new to suceed")
-        })
+    fn make_context<'a>() -> Context {
+        tokio_test::block_on(async { crate::Context::new().await.expect("context new to suceed") })
     }
 
     #[test]
     fn test_resource_cache() {
-        let mut cache = resource::ResourceCache::new();
         let ctx = make_context();
+        let mut cache = resource::ResourceCache::new();
         let args = make_buffer_args();
         let buffer = resource::Buffer::new(&ctx, &args);
         let buffer_handle = cache.insert(buffer);

@@ -1,6 +1,7 @@
 mod actions;
 mod compiler;
 mod config;
+mod error;
 mod file;
 mod layout;
 mod preferences;
@@ -11,6 +12,7 @@ pub mod sys;
 pub use actions::*;
 pub use compiler::*;
 pub use config::*;
+pub use error::*;
 pub use file::*;
 pub use layout::*;
 pub use preferences::*;

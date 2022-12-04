@@ -1,8 +1,8 @@
 import type { Action, FilteredAction, Panel, ShiftPaneArgs } from "$common"
 import { clearProject } from "$core/project"
-import { wDebugPanel, wLayout } from "$stores"
+import { wConfig, wConsole, wConsoleOpen, wDebugPanel, wFiles, wLayout } from "$stores"
 import { toast } from "@zerodevx/svelte-toast"
-import { isEqual } from "lodash"
+import isEqual from "lodash/isEqual"
 
 const actionHistory: Action[] = []
 
@@ -64,6 +64,7 @@ export function pushAction(action: Action) {
         case 'toggleDebugPanel': toggleDebugPanel(); break
         case 'closeFile': closeCurrentFile(); break
         case 'closeProject': closeProject(); break
+        case 'setRunner': setRunner(action.c); break
 
         /** @ts-ignore */
         // There may be a case in the future where a new variant is added
@@ -104,6 +105,7 @@ function resetProject() {
 }
 
 function toggleConsole() {
+    wConsoleOpen.update(o => !o)
 }
 
 function togglePanel(panel: Panel) {
@@ -122,4 +124,14 @@ function focusPane(c: string) {
 
 function closeProject() {
     clearProject()
+}
+
+function setRunner(fileid: string) {
+    if (wFiles.getFile(fileid))
+        wConfig.update(config => {
+            config.runner = fileid
+            return config
+        })
+    else
+        wConsole.error("Runner not found: " + fileid)
 }

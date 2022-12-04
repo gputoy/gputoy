@@ -1,5 +1,6 @@
 <script lang="ts">
 	import context from '$core/context'
+	import Console from '$lib/dev/Console.svelte'
 	let clientHeight: number
 	let clientWidth: number
 	let root: HTMLElement
@@ -18,6 +19,7 @@
 
 <div class="canvas-container" bind:clientWidth bind:clientHeight>
 	<div id="canvas-root" bind:this={root} />
+	<Console />
 </div>
 
 <style>
@@ -30,6 +32,7 @@
 		background-color: var(--background-nav);
 		width: 100%;
 		height: 100%;
+		display: relative;
 	}
 
 	#canvas-root {

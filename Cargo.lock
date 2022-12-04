@@ -1445,6 +1445,7 @@ dependencies = [
  "bitflags",
  "bitflags_serde_shim",
  "chrono",
+ "lazy_static",
  "naga 0.10.0",
  "regex",
  "rustc-hash",

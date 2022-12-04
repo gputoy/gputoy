@@ -23,5 +23,7 @@ pub enum Error {
     #[error("No runner")]
     NoRunner,
     #[error(transparent)]
-    BundleError(crate::bundle::BundleError),
+    Bundle(crate::bundle::BundleError),
+    #[error(transparent)]
+    Pipeline(crate::pipeline::PipelineError),
 }

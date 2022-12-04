@@ -1,17 +1,74 @@
 use gpu_common::TextureArgs;
 
-use crate::context::Context;
+use crate::Context;
 
 use super::{Resource, SubResource, TextureHandle};
 
 #[derive(Debug)]
+enum TextureInner {
+    /// Standard wgpu texture.
+    ///
+    /// This variant can only be generated from user arguments or bundles.
+    Texture(wgpu::Texture),
+
+    /// Contains result of `get_current_texture` for [`wgpu::Surface`]
+    ///
+    /// By storing the surface texture this way, the surface can be decoupled from the surface texture
+    /// and surface textures can be queried exactly like any other texture.
+    Surface(wgpu::SurfaceTexture),
+}
+
+#[derive(Debug)]
 pub struct TextureResource {
-    texture: wgpu::Texture,
-    args: gpu_common::TextureArgs,
+    texture: TextureInner,
+    pub(crate) args: gpu_common::TextureArgs,
 }
 
 pub struct TextureView {}
 impl SubResource for TextureView {}
+
+impl TextureResource {
+    pub fn from_raw(texture: wgpu::Texture, args: gpu_common::TextureArgs) -> Self {
+        Self {
+            texture: TextureInner::Texture(texture),
+            args,
+        }
+    }
+    pub(crate) fn from_surface(
+        surface: &wgpu::Surface,
+        args: gpu_common::TextureArgs,
+    ) -> Result<Self, wgpu::SurfaceError> {
+        let surface_texture = surface.get_current_texture()?;
+        Ok(Self {
+            texture: TextureInner::Surface(surface_texture),
+            args,
+        })
+    }
+    pub fn create_view(&self) -> wgpu::TextureView {
+        match &self.texture {
+            TextureInner::Texture(texture) => texture.create_view(&self.args().into()),
+            TextureInner::Surface(surface_texture) => {
+                surface_texture.texture.create_view(&self.args().into())
+            }
+        }
+    }
+
+    pub fn format(&self) -> gpu_common::TextureFormat {
+        self.args.format
+    }
+
+    /// Replace inner texture with current texture from surface.
+    ///
+    /// Should only be used by [`crate::bundle::Viewport`].
+    pub(crate) fn replace_from_surface(
+        &mut self,
+        surface: &wgpu::Surface,
+    ) -> Result<(), wgpu::SurfaceError> {
+        let surface_texture = surface.get_current_texture()?;
+        self.texture = TextureInner::Surface(surface_texture);
+        Ok(())
+    }
+}
 
 impl Resource for TextureResource {
     type Args = gpu_common::TextureArgs;
@@ -22,21 +79,19 @@ impl Resource for TextureResource {
     const SHADER_DECL: &'static str = "";
 
     fn new(ctx: &Context, args: &Self::Args) -> Self {
-        let texture = ctx.device.create_texture(&args.into());
+        let texture = TextureInner::Texture(ctx.device.create_texture(&args.into()));
         Self {
             texture,
             args: args.clone(),
         }
     }
-    fn destroy(self) {
-        self.texture.destroy();
-    }
+
+    fn destroy(self) {}
+
     fn bind_group_entry(&self, binding: u32) -> wgpu::BindGroupEntry {
-        wgpu::BindGroupEntry {
-            binding,
-            resource: wgpu::BindingResource::TextureView(todo!()),
-        }
+        todo!()
     }
+
     fn bind_group_layout_entry(
         &self,
         binding: u32,
@@ -53,13 +108,8 @@ impl Resource for TextureResource {
             },
         }
     }
+
     fn args(&self) -> &Self::Args {
         &self.args
-    }
-}
-
-impl TextureResource {
-    pub fn create_view(&self) -> wgpu::TextureView {
-        self.texture.create_view(&self.args().into())
     }
 }

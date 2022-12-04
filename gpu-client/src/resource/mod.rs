@@ -1,3 +1,5 @@
+use std::{cell::RefCell, rc::Rc};
+
 use crate::context::Context;
 use gpu_common::FastHashMap;
 use slotmap::{new_key_type, HopSlotMap, Key, SecondaryMap};
@@ -11,6 +13,14 @@ pub use texture::TextureResource as Texture;
 
 new_key_type! { pub struct TextureHandle; }
 new_key_type! { pub struct BufferHandle; }
+
+/// Resource store. Safe to share in multiple parts of the context.
+pub type Resources = Rc<RefCell<ResourceCache>>;
+
+pub enum AnyResource {
+    Buffer(Buffer),
+    Texture(Texture),
+}
 
 pub trait SubResource {}
 
@@ -40,60 +50,78 @@ pub trait Resource {
 ///
 /// During project build/rebuilds,
 #[derive(Debug)]
-pub struct ResourceCache<'a> {
-    inner: ResourceCacheInner<'a>,
+pub struct ResourceCache {
+    inner: ResourceCacheInner,
 }
 
-impl<'a> ResourceCache<'a> {
+impl ResourceCache {
     pub fn new() -> Self {
         Self {
             inner: ResourceCacheInner::new(),
         }
     }
 
+    ///
+    ///
+    ///
+    /// ```
+    /// use gpu_client::context::Context;
+    ///
+    /// let context = crate::context::Context::new();
+    /// let cache =
+    /// ```
     pub fn insert<R>(&mut self, resource: R) -> R::Handle
     where
         R: Resource,
-        ResourceCacheInner<'a>: ResourceStore<'a, R>,
+        ResourceCacheInner: ResourceStore<R>,
     {
         self.inner.store_mut().insert(resource)
     }
 
-    pub fn insert_from_args<R>(&'a mut self, ctx: &Context, args: &'a R::Args) -> R::Handle
+    pub fn insert_from_args<R>(&mut self, ctx: &Context, args: &R::Args) -> R::Handle
     where
-        R: Resource + 'a,
-        ResourceCacheInner<'a>: ResourceStore<'a, R>,
+        R: Resource,
+        ResourceCacheInner: ResourceStore<R>,
     {
         let resource = R::new(ctx, args);
         self.insert_with_ident(resource, gpu_common::ResourceArguments::ident(args))
     }
 
     ///
-    pub fn insert_with_ident<R>(&'a mut self, resource: R, ident: &'a str) -> R::Handle
+    pub fn insert_with_ident<R>(&mut self, resource: R, ident: &str) -> R::Handle
     where
-        R: Resource + 'a,
-        ResourceCacheInner<'a>: ResourceStore<'a, R>,
+        R: Resource,
+        ResourceCacheInner: ResourceStore<R>,
     {
         let handle = self.inner.store_mut().insert(resource);
-        self.inner.names_mut().insert(ident, handle);
+        self.inner.names_mut().insert(ident.to_owned(), handle);
         handle
     }
 
-    /// Get resource of type R by handle.
-    pub fn get<R>(&'a self, handle: R::Handle) -> Option<&'a R>
+    /// Get reference to resource of type R by handle.
+    pub fn get<R>(&self, handle: R::Handle) -> Option<&R>
     where
         R: Resource,
-        ResourceCacheInner<'a>: ResourceStore<'a, R>,
+        ResourceCacheInner: ResourceStore<R>,
     {
         self.inner.store().get(handle)
     }
 
-    /// Find resource of type R by string identifier, returning the proper handle alongside resource for
-    /// faster future access.
-    pub fn get_by_ident<R>(&'a self, ident: &str) -> Option<(R::Handle, &'a R)>
+    /// Get mutable reference to resource of type R by handle.
+    pub fn get_mut<R>(&mut self, handle: R::Handle) -> Option<&mut R>
     where
         R: Resource,
-        ResourceCacheInner<'a>: ResourceStore<'a, R>,
+        ResourceCacheInner: ResourceStore<R>,
+    {
+        self.inner.store_mut().get_mut(handle)
+    }
+
+    /// Find resource of type R by string identifier, returning the proper handle alongside resource for
+    /// faster future access.
+    pub fn get_by_ident<R>(&self, ident: &str) -> Option<(R::Handle, &R)>
+    where
+        R: Resource,
+        ResourceCacheInner: ResourceStore<R>,
     {
         self.inner
             .names()
@@ -103,10 +131,10 @@ impl<'a> ResourceCache<'a> {
     }
 
     /// Get immutable iterator over a particular resource type R.
-    pub fn iter<R>(&'a self) -> impl Iterator<Item = &'a R>
+    pub fn iter<'a, R>(&'a self) -> impl Iterator<Item = &R>
     where
         R: Resource + 'a,
-        ResourceCacheInner<'a>: ResourceStore<'a, R>,
+        ResourceCacheInner: ResourceStore<R>,
     {
         self.inner.store().values()
     }
@@ -115,16 +143,16 @@ impl<'a> ResourceCache<'a> {
     ///
     /// TODO: Do some testing to determine if it is better to destroy all
     /// cleared resources is preferrable to letting wgpu internal handle it lazily.
-    pub fn clear<R>(&'a mut self)
+    pub fn clear<R>(&mut self)
     where
-        R: Resource + 'a,
-        ResourceCacheInner<'a>: ResourceStore<'a, R>,
+        R: Resource,
+        ResourceCacheInner: ResourceStore<R>,
     {
         self.inner.names_mut().clear();
         self.inner.store_mut().clear();
     }
 
-    pub fn clear_all(&'a mut self) {
+    pub fn clear_all(&mut self) {
         self.inner.clear()
     }
 
@@ -135,7 +163,7 @@ impl<'a> ResourceCache<'a> {
     pub fn remove<R>(&mut self, handle: R::Handle) -> Option<R>
     where
         R: Resource,
-        ResourceCacheInner<'a>: ResourceStore<'a, R>,
+        ResourceCacheInner: ResourceStore<R>,
     {
         let removed = self.inner.store_mut().remove(handle)?;
         let ident = self
@@ -143,24 +171,26 @@ impl<'a> ResourceCache<'a> {
             .names()
             .iter()
             .find(|(_, &other_handle)| other_handle == handle)
-            .map(|(&ident, _)| ident.to_owned())?;
-        let _ = self.inner.names_mut().remove(ident.as_str());
+            .map(|(ident, _)| ident.to_owned())?;
+        let _ = self.inner.names_mut().remove(&ident);
         Some(removed)
     }
 }
 
-// Private inner cache containing direct resource stores.
+/// Private inner cache containing direct resource stores.
+///
+/// These can be fetched generically using the ResourceStore<R> trait.
 #[derive(Debug)]
-pub struct ResourceCacheInner<'a> {
+pub struct ResourceCacheInner {
     textures: HopSlotMap<TextureHandle, Texture>,
     texture_views: SecondaryMap<TextureHandle, Vec<wgpu::TextureView>>,
-    texture_idents: FastHashMap<&'a str, TextureHandle>,
+    texture_idents: FastHashMap<String, TextureHandle>,
     buffers: HopSlotMap<BufferHandle, Buffer>,
-    buffer_idents: FastHashMap<&'a str, BufferHandle>,
+    buffer_idents: FastHashMap<String, BufferHandle>,
 }
 
 // Inner methods not generic over Resource.
-impl<'a> ResourceCacheInner<'a> {
+impl ResourceCacheInner {
     fn new() -> Self {
         Self {
             textures: HopSlotMap::with_key(),
@@ -185,15 +215,15 @@ impl<'a> ResourceCacheInner<'a> {
 ///
 /// This allows the public api of ResourceCache to be generic across Resource
 /// while keeping direct access to these stores private.
-pub trait ResourceStore<'a, R: Resource> {
+pub trait ResourceStore<R: Resource> {
     /// For read operations on Resource instance(s).
     fn store(&self) -> &HopSlotMap<R::Handle, R>;
     /// For mutating operations on Resource instance(s).
     fn store_mut(&mut self) -> &mut HopSlotMap<R::Handle, R>;
     /// For read operations on Resource identifier(s).
-    fn names(&self) -> &FastHashMap<&'a str, R::Handle>;
+    fn names(&self) -> &FastHashMap<String, R::Handle>;
     /// For mutating operations on Resource identifier(s).
-    fn names_mut(&mut self) -> &mut FastHashMap<&'a str, R::Handle>;
+    fn names_mut(&mut self) -> &mut FastHashMap<String, R::Handle>;
 }
 
 // Resource store implementations for ResourceCacheInner
@@ -201,7 +231,7 @@ pub trait ResourceStore<'a, R: Resource> {
 
 // Resource store for buffer.
 // Accesses buffers, buffer_idents from ResourceCacheInner
-impl<'a> ResourceStore<'a, Buffer> for ResourceCacheInner<'a> {
+impl ResourceStore<Buffer> for ResourceCacheInner {
     #[inline(always)]
     fn store(&self) -> &HopSlotMap<<Buffer as Resource>::Handle, Buffer> {
         &self.buffers
@@ -213,19 +243,19 @@ impl<'a> ResourceStore<'a, Buffer> for ResourceCacheInner<'a> {
     }
 
     #[inline(always)]
-    fn names(&self) -> &FastHashMap<&'a str, <Buffer as Resource>::Handle> {
+    fn names(&self) -> &FastHashMap<String, <Buffer as Resource>::Handle> {
         &self.buffer_idents
     }
 
     #[inline(always)]
-    fn names_mut(&mut self) -> &mut FastHashMap<&'a str, <Buffer as Resource>::Handle> {
+    fn names_mut(&mut self) -> &mut FastHashMap<String, <Buffer as Resource>::Handle> {
         &mut self.buffer_idents
     }
 }
 
 // Resource store for buffer.
 // Accesses textures, texture_idents, texture_views from ResourceCacheInner
-impl<'a> ResourceStore<'a, Texture> for ResourceCacheInner<'a> {
+impl ResourceStore<Texture> for ResourceCacheInner {
     #[inline(always)]
     fn store(&self) -> &HopSlotMap<<Texture as Resource>::Handle, Texture> {
         &self.textures
@@ -237,12 +267,12 @@ impl<'a> ResourceStore<'a, Texture> for ResourceCacheInner<'a> {
     }
 
     #[inline(always)]
-    fn names(&self) -> &FastHashMap<&'a str, <Texture as Resource>::Handle> {
+    fn names(&self) -> &FastHashMap<String, <Texture as Resource>::Handle> {
         &self.texture_idents
     }
 
     #[inline(always)]
-    fn names_mut(&mut self) -> &mut FastHashMap<&'a str, <Texture as Resource>::Handle> {
+    fn names_mut(&mut self) -> &mut FastHashMap<String, <Texture as Resource>::Handle> {
         &mut self.texture_idents
     }
 }

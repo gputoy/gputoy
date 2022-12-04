@@ -3,7 +3,7 @@ import type { Project, ProjectResponse, ProjectUpsert } from "$common"
 import * as api from '$core/api'
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from "$core/consts"
 // import context, { init } from "$core/context"
-import { dProject, wConfig, wFiles, wLayout, wProjectId, wProjectMeta, wUser } from "$stores"
+import { wConfig, wFiles, wLayout, wProjectId, wProjectMeta, wUser } from "$stores"
 import { toast } from "@zerodevx/svelte-toast"
 import debounce from "lodash/debounce"
 import generate from "project-name-generator"
@@ -51,7 +51,7 @@ export type ProjectSaveStatus = 'remote' | 'local' | 'local-changes'
  * last edit has occured
  * TODO: add project save timing to user config
  */
-const writeToLocalStorage = debounce(_writeToLocalStorage, 500)
+export const writeToProjectLocalStorage = debounce(_writeToLocalStorage, 500)
 function _writeToLocalStorage(project: ProjectResponse) {
     // TODO: doing dates like this will probably cause a problem
     if (browser) {
@@ -59,10 +59,6 @@ function _writeToLocalStorage(project: ProjectResponse) {
         localStorage.setItem(project.id, JSON.stringify(project))
     }
 }
-dProject.subscribe(p => {
-    if (p != null)
-        writeToLocalStorage(p)
-})
 
 
 export function getProject(): Project {
@@ -226,7 +222,7 @@ export function setProject(project: ProjectResponse, resetContext: boolean = fal
 }
 export function clearProject() {
     // flush any pending saves to local storage
-    writeToLocalStorage.flush()
+    writeToProjectLocalStorage.flush()
     // nothing else needs to be cleared as frontend will not display editor
     // when projectId is null
     wProjectId.set(null)

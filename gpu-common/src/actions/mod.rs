@@ -60,6 +60,8 @@ pub enum Action {
     CloseFile,
     /// Close project
     CloseProject,
+    /// Sets runner json file
+    SetRunner(String),
 }
 
 #[derive(Debug)]

@@ -25,6 +25,7 @@ serde = { version = "1.0.144", optional = true }
 serde_json = { version = "1.0.88", optional = true }
 bitflags = "1.3.2"
 bitflags_serde_shim = "0.2.2"
+lazy_static = "1.4.0"
 
 [dependencies.schemars]
 version = "0.8.11"

@@ -17,6 +17,7 @@ const config: UserConfig = {
 		},
 		host: true,
 		port: 3000,
+
 	},
 	resolve: {
 		alias: {
@@ -26,7 +27,7 @@ const config: UserConfig = {
 			"$core": path.resolve(__dirname, "./src/core"),
 			"$common": path.resolve(__dirname, "./src/core/common")
 		}
-	}
+	},
 }
 
 export default config

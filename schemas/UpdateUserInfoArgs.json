@@ -380,6 +380,25 @@
               ]
             }
           }
+        },
+        {
+          "description": "Sets runner json file",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "type": "string"
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "setRunner"
+              ]
+            }
+          }
         }
       ]
     },

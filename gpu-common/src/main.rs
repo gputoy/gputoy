@@ -41,7 +41,8 @@ fn main() -> std::io::Result<()> {
         UserInfoResponse,
         UpdateUserInfoArgs,
         Action,
-        PrebuildResult
+        PrebuildResult,
+        Runner
     );
 
     println!("Wrote schemas to {}", dir.to_string_lossy());

@@ -16,11 +16,11 @@
 		<ul id="link-container">
 			<div class="logo-container">
 				<Logo />
-				<NavItem title="GPUToy" current={$page.routeId === ''} style="font-weight: bold" />
+				<NavItem title="GPUToy" current={$page.route.id === ''} style="font-weight: bold" />
 			</div>
-			<NavItem title="Browse" route="/browse" current={$page.routeId === 'browse'} />
-			<NavItem title="Dev" route="/dev" current={$page.routeId === 'dev'} />
-			<NavItem title="Docs" current={$page.routeId === 'docs'} />
+			<NavItem title="Browse" route="/browse" current={$page.route.id === 'browse'} />
+			<NavItem title="Dev" route="/dev" current={$page.route.id === 'dev'} />
+			<NavItem title="Docs" current={$page.route.id === 'docs'} />
 		</ul>
 
 		<div class="navend">

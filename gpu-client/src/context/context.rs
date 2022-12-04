@@ -1,20 +1,30 @@
+use std::{cell::RefCell, rc::Rc};
+
+use gpu_common::BundleArgs;
+
 use super::Error;
 
-use crate::{bundle, bundle::Bundle, resource};
+use crate::{
+    bundle::{self, Bundle},
+    pipeline::{AnyPipeline, Pipeline},
+    resource,
+};
 
 #[derive(Debug)]
-pub struct Context<'a> {
+pub struct Context {
+    pub(crate) event_loop: winit::event_loop::EventLoop<()>,
     pub(crate) instance: wgpu::Instance,
     pub(crate) adapter: wgpu::Adapter,
     pub(crate) device: wgpu::Device,
     pub(crate) queue: wgpu::Queue,
-    pub(crate) runner: Option<crate::runner::Runner>,
-    pub(crate) resources: resource::ResourceCache<'a>,
+    pub(crate) files: gpu_common::PrebuildResult,
+    pub(crate) resources: resource::Resources,
     pub(crate) bundles: bundle::BundleCache,
+    pub(crate) pipelines: Option<Vec<AnyPipeline>>,
 }
 
-impl<'a> Context<'a> {
-    pub async fn new() -> Result<Context<'a>, Error> {
+impl Context {
+    pub async fn new() -> Result<Context, Error> {
         #[cfg(target_arch = "wasm32")]
         let backend = wgpu::Backends::BROWSER_WEBGPU;
         #[cfg(not(target_arch = "wasm32"))]
@@ -40,115 +50,76 @@ impl<'a> Context<'a> {
             limits,
         };
         let (device, queue) = adapter.request_device(&desc, None).await?;
+        let resources = Rc::new(RefCell::new(resource::ResourceCache::new()));
+        let bundles = bundle::BundleCache::new(resources.clone());
 
-        let resources = resource::ResourceCache::new();
-        let bundles = bundle::BundleCache::new();
-
-        Ok(Context {
+        let context = Context {
+            event_loop: winit::event_loop::EventLoop::new(),
             adapter,
             device,
             queue,
             instance,
-            runner: None,
             resources,
             bundles,
-        })
+            files: Default::default(),
+            pipelines: None,
+        };
+
+        Ok(context)
     }
 
     pub async fn build(
         &mut self,
+        runner: gpu_common::Runner,
         prebuild_result: gpu_common::PrebuildResult,
     ) -> Result<(), Error> {
-        let fs = &prebuild_result
-            .file_builds
-            .get("/shaders/main.wgsl")
-            .ok_or(Error::ProjectBuildFailed)?
-            .processed_shader;
-        let vs = &prebuild_result
-            .file_builds
-            .get("/shaders/types.wgsl")
-            .ok_or(Error::ProjectBuildFailed)?
-            .processed_shader;
+        // Processed shaders for other parts to access.
+        self.files = prebuild_result;
 
-        let viewport = bundle::Viewport::new(
-            &self,
-            &gpu_common::ViewportBundleArgs {
-                target: "canvas-root".to_owned(),
-            },
-        )
-        .expect("Viewport bundle to work");
+        // TODO: Initilize resources
 
-        let vertex = self
-            .device
-            .create_shader_module(wgpu::ShaderModuleDescriptor {
-                label: None,
-                source: wgpu::ShaderSource::Wgsl(vs.into()),
-            });
-        let shader_desc = self
-            .device
-            .create_shader_module(wgpu::ShaderModuleDescriptor {
-                label: None,
-                source: wgpu::ShaderSource::Wgsl(fs.into()),
-            });
+        // Initialize bundles and store in bundle cache.
+        for (ident, arg) in runner.bundles.iter() {
+            match arg {
+                BundleArgs::Viewport(arg) => self.bundles.insert::<bundle::Viewport>(
+                    bundle::Viewport::new(self, ident.to_owned(), &arg)
+                        .map_err(bundle::BundleError::Viewport)
+                        .map_err(Error::Bundle)?,
+                ),
+            }
+        }
 
-        let render_pipeline_layout =
-            self.device
-                .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                    label: Some("Pipeline layout"),
-                    bind_group_layouts: &[],
-                    push_constant_ranges: &[],
-                });
-        let render_pipeline = self
-            .device
-            .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-                label: Some("Render pipeline"),
-                layout: Some(&render_pipeline_layout),
-                vertex: wgpu::VertexState {
-                    module: &vertex,
-                    entry_point: "main",
-                    buffers: &[],
-                },
-                fragment: Some(wgpu::FragmentState {
-                    module: &shader_desc,
-                    entry_point: "fs_main",
-                    targets: &[Some(wgpu::ColorTargetState {
-                        format: viewport.surface().get_supported_formats(&self.adapter)[0],
-                        blend: Some(wgpu::BlendState::REPLACE),
-                        write_mask: wgpu::ColorWrites::ALL,
-                    })],
-                }),
-                multisample: wgpu::MultisampleState {
-                    count: 1,
-                    mask: !0,
-                    alpha_to_coverage_enabled: false,
-                },
-                multiview: None,
-                depth_stencil: None,
-                primitive: wgpu::PrimitiveState {
-                    topology: wgpu::PrimitiveTopology::TriangleList,
-                    strip_index_format: None,
-                    front_face: wgpu::FrontFace::Cw,
-                    cull_mode: None,
-                    unclipped_depth: false,
-                    polygon_mode: wgpu::PolygonMode::Fill,
-                    conservative: false,
-                },
-            });
+        // Build pipelines
+        let mut pipelines = Vec::new();
+        for pipeline_arg in runner.pipelines.into_iter() {
+            let pipeline = AnyPipeline::from_args(
+                &self.files,
+                &self.device,
+                self.resources.clone(),
+                &pipeline_arg,
+            )
+            .map_err(Error::Pipeline)?;
+            pipelines.push(pipeline);
+        }
 
-        self.bundles.insert(viewport);
-        self.runner = Some(crate::runner::Runner { render_pipeline });
+        self.pipelines = Some(pipelines);
         Ok(())
     }
 
     pub async fn render(&mut self) -> Result<(), Error> {
-        let Some(runner) = &self.runner else {
+        let Some(pipelines) = &mut self.pipelines else {
             return Err(Error::NoRunner);
         };
-        runner.render_frame(self);
+        // Allow bundles to write/modify resources.
+        self.bundles.on_frame_start().map_err(Error::Bundle)?;
+        let mut encoder = self.device.create_command_encoder(&Default::default());
+        // Dispatch all pipelines
+        pipelines
+            .iter_mut()
+            .for_each(|pipeline| pipeline.dispatch(&mut encoder));
+        self.queue.submit(std::iter::once(encoder.finish()));
+        // Allow bundles to read from resources.
+        self.bundles.on_frame_end().map_err(Error::Bundle)?;
         Ok(())
-    }
-
-    pub fn has_runner(&self) -> bool {
-        self.runner.is_some()
     }
 }
