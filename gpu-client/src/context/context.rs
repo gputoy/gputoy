@@ -12,6 +12,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct Context {
+    pub(crate) event_loop: winit::event_loop::EventLoop<()>,
     pub(crate) instance: wgpu::Instance,
     pub(crate) adapter: wgpu::Adapter,
     pub(crate) device: wgpu::Device,
@@ -53,6 +54,7 @@ impl Context {
         let bundles = bundle::BundleCache::new(resources.clone());
 
         let context = Context {
+            event_loop: winit::event_loop::EventLoop::new(),
             adapter,
             device,
             queue,
@@ -109,7 +111,7 @@ impl Context {
             return Err(Error::NoRunner);
         };
         // Allow bundles to write/modify resources.
-        self.bundles.on_frame_start();
+        self.bundles.on_frame_start().map_err(Error::Bundle)?;
         let mut encoder = self.device.create_command_encoder(&Default::default());
         // Dispatch all pipelines
         pipelines
@@ -117,7 +119,7 @@ impl Context {
             .for_each(|pipeline| pipeline.dispatch(&mut encoder));
         self.queue.submit(std::iter::once(encoder.finish()));
         // Allow bundles to read from resources.
-        self.bundles.on_frame_end();
+        self.bundles.on_frame_end().map_err(Error::Bundle)?;
         Ok(())
     }
 }

@@ -39,9 +39,8 @@ impl Bundle for ViewportBundle {
     type Error = ViewportError;
 
     fn new(ctx: &crate::Context, ident: String, args: &Self::Args) -> Result<Self, Self::Error> {
-        let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
-            .build(&event_loop)
+            .build(&ctx.event_loop)
             .map_err(Self::Error::WindowCreation)?;
         #[cfg(target_arch = "wasm32")]
         {

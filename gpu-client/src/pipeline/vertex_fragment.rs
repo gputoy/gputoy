@@ -35,6 +35,7 @@ impl Pipeline for VertexFragment {
             .ok_or(PipelineError::FileNotFound(args.fragment.clone()))?
             .processed_shader;
 
+        device.push_error_scope(wgpu::ErrorFilter::Validation);
         // Create wgpu shader modules from processed source.
         let vs = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: None,
@@ -43,6 +44,11 @@ impl Pipeline for VertexFragment {
         let fs = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: None,
             source: wgpu::ShaderSource::Wgsl(fs.into()),
+        });
+        let error = device.pop_error_scope();
+        wasm_bindgen_futures::spawn_local(async {
+            let error = error.await;
+            log::error!("Log from pop error scope: {error:?}");
         });
 
         // Fetch target textures from resource cache, while

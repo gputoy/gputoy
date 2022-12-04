@@ -2,7 +2,7 @@
 	"name": "front",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --force",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "playwright test",
