@@ -1,5 +1,3 @@
-use gpu_common::TextureArgs;
-
 use crate::Context;
 
 use super::{Resource, SubResource, TextureHandle};
@@ -89,6 +87,8 @@ impl Resource for TextureResource {
     fn destroy(self) {}
 
     fn bind_group_entry(&self, binding: u32) -> wgpu::BindGroupEntry {
+        // shut clippy up
+        let _ = binding;
         todo!()
     }
 

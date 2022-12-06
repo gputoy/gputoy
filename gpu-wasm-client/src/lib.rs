@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsValue};
 
@@ -8,41 +6,24 @@ use wasm_bindgen::{prelude::*, JsValue};
 #[wasm_bindgen]
 pub struct Context(gpu_client::Context);
 
-// This feels INCREDBILY hacky, but it works for now.
-// Basically, since gpu_client::Context requires a lifetime, and since wasm cannot have any lifetime params
-// on structs, the global context is first initialized statically, then taken out of the static cell
-// upon calling self::Context::new()
-//
-// TODO: Change back to full javacript custody now that the lifetime on context is gone.
-//       I'm a little apprehensive since the context api is changing so rapidly, there
-//       may be another lifetime parameter on it sometime in the near future.
-thread_local! {
-    static CONTEXT_GLOBAL: RefCell<Option<gpu_client::Context>> = RefCell::new(None)
-}
-
 /// First part of the hack, initialize loggers and 'statically' initialize inner context
 #[wasm_bindgen(start)]
 pub async fn start() -> Result<(), JsValue> {
     console_log::init().map_err(|_| Error::LoggerInit)?;
     console_error_panic_hook::set_once();
-    let context = gpu_client::Context::new()
-        .await
-        .map_err(Error::ContextInit)?;
-    CONTEXT_GLOBAL.with(|r| r.replace(Some(context)));
+
     Ok(())
 }
 
 #[wasm_bindgen]
 impl Context {
-    /// Second part of the hack, take from statically initialized memory,
-    /// or return error if it is not present.
-    /// If it is not present, it should have thrown an error before during start().
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Result<Context, Error> {
-        let ctx = CONTEXT_GLOBAL
-            .with(|s| s.take())
-            .ok_or(Error::ContextFailed)?;
-        Ok(Context(ctx))
+    pub async fn new() -> Result<Context, Error> {
+        Ok(Context(
+            gpu_client::Context::new()
+                .await
+                .map_err(Error::ContextBuild)?,
+        ))
     }
 
     #[wasm_bindgen(js_name = debug)]

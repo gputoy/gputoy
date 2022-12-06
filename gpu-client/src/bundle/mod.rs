@@ -28,15 +28,23 @@ pub trait Bundle: Sized {
     fn prefix_key_with_ident(ident: &str, key: Self::ResourceKeys) -> String {
         format!("{ident}::{}", key.as_ref())
     }
+
+    #[allow(unused_variables)]
     fn on_run_start(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
         Ok(())
     }
+
+    #[allow(unused_variables)]
     fn on_run_end(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
         Ok(())
     }
+
+    #[allow(unused_variables)]
     fn on_frame_start(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
         Ok(())
     }
+
+    #[allow(unused_variables)]
     fn on_frame_end(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
         Ok(())
     }

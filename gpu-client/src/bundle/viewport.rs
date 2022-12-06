@@ -1,7 +1,7 @@
 use gpu_common::{ViewportBundleArgs, ViewportBundleResources};
 use thiserror::Error;
 
-use winit::{event_loop::EventLoop, window::WindowBuilder};
+use winit::window::WindowBuilder;
 
 use crate::resource;
 
@@ -9,12 +9,12 @@ use super::Bundle;
 
 #[derive(Debug)]
 pub struct ViewportBundle {
-    window: winit::window::Window,
+    _window: winit::window::Window,
     surface: wgpu::Surface,
     surface_texture_handle: crate::resource::TextureHandle,
     // mouse_buffer_handle: BufferHandle,
     // resolution_buffer_handle: BufferHandle,
-    args: ViewportBundleArgs,
+    _args: ViewportBundleArgs,
 }
 
 #[derive(Debug, Error)]
@@ -97,9 +97,9 @@ impl Bundle for ViewportBundle {
         let surface_texture_handle = resources.insert_with_ident(surface_texture, &full_ident);
 
         Ok(Self {
-            window,
+            _window: window,
             surface,
-            args: args.clone(),
+            _args: args.clone(),
             surface_texture_handle,
         })
     }
