@@ -4,6 +4,30 @@ import type { Writable } from 'svelte/store'
 import actionSchema from '../../../schemas/Action.json'
 import { pushAction } from './actions'
 
+// Add private logging methods to window so wasm modules can use it
+// without having to import anything from frontend.
+//
+// Methods only meant to be used within gpu-wasm-logger/log_ext.js
+if (typeof window !== "undefined") {
+    Object.assign(window, {
+        __trace_ext: function (log: string) {
+            wConsole.trace(log)
+        },
+        __debug_ext: function (log: string) {
+            wConsole.debug(log)
+        },
+        __info_ext: function (log: string) {
+            wConsole.info(log)
+        },
+        __warn_ext: function (log: string) {
+            wConsole.warn(log)
+        },
+        __error_ext: function (log: string) {
+            wConsole.error(log)
+        }
+    })
+}
+
 const CONSOLE_ACTION_NAMES = actionSchema.oneOf.map((actionDef) => actionDef.properties.ty.enum[0])
 const CONSOLE_COMPLETIONS = actionSchema.oneOf.map((actionDef) => ({
     action: actionDef.properties.ty.enum[0],

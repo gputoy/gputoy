@@ -76,8 +76,6 @@ impl Bundle for ViewportBundle {
 
         // Create texture resource from surface.
         let surface_texture = crate::resource::Texture::from_surface(
-            // Should be ok to unwrap since this can only fail with loss.
-            // And there is no way we lose it since it is just configured.
             &surface,
             gpu_common::TextureArgs {
                 label: format!("viewport_surface_{}", &ident),

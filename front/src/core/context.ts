@@ -25,7 +25,7 @@ class ClientContext implements Readable<ContextState> {
         await init_compiler()
         try {
 
-            this._context = new WasmContext()
+            this._context = await (new WasmContext())
             this._compiler = new WasmCompiler()
         } catch (e) {
             console.error("error in context:init: ", e)
@@ -45,6 +45,7 @@ class ClientContext implements Readable<ContextState> {
             return
         }
         const runner = JSON.parse(runnerFile.data)
+        console.log(this._context)
         try {
             await this._context!.build(runner, prebuildResult)
 

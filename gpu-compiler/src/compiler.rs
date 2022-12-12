@@ -45,7 +45,14 @@ impl Compiler {
                 )
             })
             .collect();
-        log::info!("Prebuild: {prebuild:#?} \n\n {dependency_info:#?}");
+
+        // print errors to console
+        prebuild
+            .iter()
+            .map(|(_, r)| &r.errors)
+            .flatten()
+            .flatten()
+            .for_each(|err| log::error!("{}", err.message));
 
         Ok(PrebuildResult {
             dependency_info,

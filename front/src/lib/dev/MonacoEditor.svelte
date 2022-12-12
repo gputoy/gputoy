@@ -119,6 +119,7 @@
 
 		// override on change to target new file
 		model.onDidChangeContent((ev) => {
+			console.log(ev)
 			const content = editorInstance?.getModel()?.getValue()
 			if (!content) return
 			wFiles.writeFile(fileid, content)

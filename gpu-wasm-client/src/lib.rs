@@ -1,17 +1,12 @@
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsValue};
 
-/// Actual struct that can go across wasm boundary.
-/// Notice the static lifetime on the inner context.
 #[wasm_bindgen]
 pub struct Context(gpu_client::Context);
 
-/// First part of the hack, initialize loggers and 'statically' initialize inner context
 #[wasm_bindgen(start)]
 pub async fn start() -> Result<(), JsValue> {
-    console_log::init().map_err(|_| Error::LoggerInit)?;
-    console_error_panic_hook::set_once();
-
+    gpu_wasm_logger::init().map_err(|_| Error::LoggerInit)?;
     Ok(())
 }
 

@@ -47,8 +47,9 @@ impl Pipeline for VertexFragment {
         });
         let error = device.pop_error_scope();
         wasm_bindgen_futures::spawn_local(async {
-            let error = error.await;
-            log::error!("Log from pop error scope: {error:?}");
+            if let Some(error) = error.await {
+                log::error!("{}", error.to_string());
+            }
         });
 
         // Fetch target textures from resource cache, while

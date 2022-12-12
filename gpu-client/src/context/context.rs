@@ -36,13 +36,13 @@ impl Context {
             .ok_or(Error::NoAdapter)?;
 
         let features = adapter.features();
-        log::debug!("Adapter features: {features:?}");
+        log::debug!("Adapter features: {features:#?}");
 
         let downlevel_capabilities = adapter.get_downlevel_capabilities();
-        log::debug!("Adapter downlevel capabilities: {downlevel_capabilities:?}");
+        log::debug!("Adapter downlevel capabilities: {downlevel_capabilities:#?}");
 
         let limits = adapter.limits();
-        log::debug!("Adapter limits: {limits:?}");
+        log::debug!("Adapter limits: {limits:#?}");
 
         let desc = wgpu::DeviceDescriptor {
             label: None,

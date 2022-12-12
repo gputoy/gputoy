@@ -14,6 +14,7 @@ crate-type = ["cdylib"]
 # local dependencies
 gpu-compiler = { path = "../gpu-compiler" }
 gpu-common = { path = "../gpu-common", features = ["serialize", "deserialize"] }
+gpu-wasm-logger = { path = "../gpu-wasm-logger" }
 
 # crates.io dependencies
 wasm-bindgen = "0.2.82"

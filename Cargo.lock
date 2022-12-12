@@ -1503,18 +1503,13 @@ version = "0.1.0"
 name = "gpu-wasm-client"
 version = "0.1.0"
 dependencies = [
- "console_error_panic_hook",
- "console_log",
  "gpu-client",
  "gpu-common",
+ "gpu-wasm-logger",
  "js-sys",
- "lazy_static",
  "log",
- "once_cell",
- "ron 0.8.0",
  "serde",
  "serde-wasm-bindgen",
- "serde_json",
  "thiserror",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -1529,6 +1524,7 @@ dependencies = [
  "console_log",
  "gpu-common",
  "gpu-compiler",
+ "gpu-wasm-logger",
  "js-sys",
  "lazy_static",
  "log",
@@ -1539,6 +1535,14 @@ dependencies = [
  "thiserror",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+]
+
+[[package]]
+name = "gpu-wasm-logger"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "wasm-bindgen",
 ]
 
 [[package]]

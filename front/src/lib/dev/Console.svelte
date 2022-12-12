@@ -16,6 +16,13 @@
 			promptText = ''
 		}
 	}
+	function handleKeypress(event: KeyboardEvent) {
+		console.log(event)
+		if (event.key == 'Tab') {
+			console.log('Tab pressed')
+			event.preventDefault()
+		}
+	}
 
 	$: {
 		if ($wConsoleOpen) setTimeout(() => input.focus(), 5)
@@ -25,10 +32,11 @@
 <div class="container" class:show={$wConsoleOpen}>
 	<div class="prompt-container">
 		<div class="prompt-line">
-			<span> ~ </span>
+			<span style="user-select: none;"> ~ </span>
 			<input
 				bind:this={input}
 				bind:value={promptText}
+				on:keypress|capture={handleKeypress}
 				tabindex="0"
 				on:keydown={handleCommandSubmit}
 			/>
@@ -67,6 +75,7 @@
 		flex-direction: column-reverse;
 		font-family: var(--font-mono);
 		font-size: var(--sm);
+		overflow-y: scroll;
 	}
 	.prompt-container {
 		position: relative;
@@ -111,6 +120,7 @@
 	}
 	.log {
 		padding-inline: var(--padding);
+		white-space: pre-wrap;
 	}
 	.show {
 		visibility: visible;
