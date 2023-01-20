@@ -1,16 +1,20 @@
-use std::error::Error;
-use std::str::FromStr;
-
-mod viewport;
-use gpu_common::BundleArgs;
+use arrayvec::ArrayVec;
+use std::{cell::RefCell, rc::Rc, str::FromStr};
 use thiserror::Error;
+
+use gpu_common::BundleArgs;
+
+mod cache;
+mod sys;
+mod viewport;
+
+pub use cache::BundleCache;
+pub use sys::SystemBundle as System;
 pub use viewport::ViewportBundle as Viewport;
 
 use crate::resource;
 
-use self::viewport::ViewportError;
-
-pub type Bundles = BundleCache;
+pub type Bundles = Rc<RefCell<cache::BundleCache>>;
 
 /// Bundle trait
 ///
@@ -26,7 +30,10 @@ pub trait Bundle: Sized {
     type ResourceKeys: FromStr + AsRef<str>;
 
     /// Error type for this bundle.
-    type Error: Error;
+    type Error: std::error::Error;
+
+    /// Maximum instances of this bundle in any given run.
+    const MAX_INSTANCES: u32;
 
     /// Create new bundle.
     ///
@@ -55,7 +62,11 @@ pub trait Bundle: Sized {
     ///
     /// Noop by default.
     #[allow(unused_variables)]
-    fn on_run_start(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
+    fn on_run_start(
+        &mut self,
+        sys: &crate::system::System,
+        resources: &resource::Resources,
+    ) -> Result<(), Self::Error> {
         Ok(())
     }
 
@@ -66,7 +77,11 @@ pub trait Bundle: Sized {
     ///
     /// Noop by default.
     #[allow(unused_variables)]
-    fn on_run_end(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
+    fn on_run_end(
+        &mut self,
+        sys: &crate::system::System,
+        resources: &resource::Resources,
+    ) -> Result<(), Self::Error> {
         Ok(())
     }
 
@@ -76,7 +91,11 @@ pub trait Bundle: Sized {
     ///
     /// Noop by default.
     #[allow(unused_variables)]
-    fn on_frame_start(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
+    fn on_frame_start(
+        &mut self,
+        sys: &crate::system::System,
+        resources: &resource::Resources,
+    ) -> Result<(), Self::Error> {
         Ok(())
     }
 
@@ -86,121 +105,21 @@ pub trait Bundle: Sized {
     ///
     /// Noop by default.
     #[allow(unused_variables)]
-    fn on_frame_end(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
-        Ok(())
-    }
-}
-
-#[derive(Debug)]
-pub struct BundleCache {
-    inner: BundleCacheInner,
-    resources: resource::Resources,
-}
-
-impl BundleCache {
-    pub fn new(resources: resource::Resources) -> Self {
-        Self {
-            inner: BundleCacheInner::new(),
-            resources,
-        }
-    }
-    pub fn insert<B>(&mut self, bundle: B)
-    where
-        B: Bundle,
-        BundleCacheInner: BundleStore<B>,
-    {
-        self.inner.get_mut().push(bundle)
-    }
-
-    pub fn iter<'a, B>(&'a self) -> impl Iterator<Item = &B>
-    where
-        B: Bundle + 'a,
-        BundleCacheInner: BundleStore<B>,
-    {
-        self.inner.get().iter()
-    }
-
-    /// Builds and inserts bundles directly from bundles defined in [`gpu_common::Runner`].
-    pub fn build_from_runner(
+    fn on_frame_end(
         &mut self,
-        ctx: &crate::Context,
-        runner: &gpu_common::Runner,
-    ) -> Result<(), BundleError> {
-        for (ident, arg) in runner.bundles.iter() {
-            match arg {
-                BundleArgs::Viewport(arg) => self.insert::<Viewport>(
-                    Viewport::new(ctx, ident.to_owned(), &arg).map_err(BundleError::Viewport)?,
-                ),
-            }
-        }
+        sys: &crate::system::System,
+        resources: &resource::Resources,
+    ) -> Result<(), Self::Error> {
         Ok(())
-    }
-
-    pub fn on_run_start(&mut self) -> Result<(), BundleError> {
-        self.inner
-            .viewports
-            .iter_mut()
-            .map(|viewport| viewport.on_run_start(&self.resources))
-            .collect::<Result<(), ViewportError>>()
-            .map_err(BundleError::Viewport)
-    }
-
-    pub fn on_run_end(&mut self) -> Result<(), BundleError> {
-        self.inner
-            .viewports
-            .iter_mut()
-            .map(|viewport| viewport.on_run_end(&self.resources))
-            .collect::<Result<(), ViewportError>>()
-            .map_err(BundleError::Viewport)
-    }
-    pub fn on_frame_start(&mut self) -> Result<(), BundleError> {
-        self.inner
-            .viewports
-            .iter_mut()
-            .map(|viewport| viewport.on_frame_start(&self.resources))
-            .collect::<Result<(), ViewportError>>()
-            .map_err(BundleError::Viewport)
-    }
-
-    pub fn on_frame_end(&mut self) -> Result<(), BundleError> {
-        self.inner
-            .viewports
-            .iter_mut()
-            .map(|viewport| viewport.on_frame_end(&self.resources))
-            .collect::<Result<(), ViewportError>>()
-            .map_err(BundleError::Viewport)
-    }
-}
-
-#[derive(Debug)]
-pub struct BundleCacheInner {
-    viewports: Vec<Viewport>,
-}
-
-impl BundleCacheInner {
-    fn new() -> Self {
-        BundleCacheInner {
-            viewports: Vec::new(),
-        }
-    }
-}
-
-pub trait BundleStore<B: Bundle> {
-    fn get(&self) -> &Vec<B>;
-    fn get_mut(&mut self) -> &mut Vec<B>;
-}
-
-impl BundleStore<Viewport> for BundleCacheInner {
-    fn get(&self) -> &Vec<Viewport> {
-        &self.viewports
-    }
-    fn get_mut(&mut self) -> &mut Vec<Viewport> {
-        &mut self.viewports
     }
 }
 
 #[derive(Debug, Error)]
 pub enum BundleError {
+    #[error("Bundle limit exceeded for {0}. Max allowed: {1}")]
+    BundleLimitExceeded(String, u32),
     #[error(transparent)]
-    Viewport(viewport::ViewportError),
+    Viewport(#[from] viewport::ViewportError),
+    #[error(transparent)]
+    System(#[from] sys::SystemBundleError),
 }

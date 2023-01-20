@@ -134,7 +134,7 @@ args = ["migrate", "run"]
 description = "Make json schema and typescript types from rust types"
 workspace = false
 script = [
-  "cargo run --package gpu-common --features serialize,deserialize,schema",
+  "cargo run --package gpu-common --features serde,schema",
   "cd front",
   "node generate_common_types.js",
 ]

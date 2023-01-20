@@ -146,6 +146,7 @@
 		align-items: center;
 		border-bottom: 1px solid var(--border-primary);
 		padding-inline: 4px;
+		height: 100%;
 	}
 
 	.input-helper {

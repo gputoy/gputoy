@@ -2,6 +2,8 @@ use crate::Context;
 
 use super::{Resource, SubResource, TextureHandle};
 
+pub type TextureArgs = gpu_common::TextureArgs;
+
 #[derive(Debug)]
 enum TextureInner {
     /// Standard wgpu texture.
@@ -19,7 +21,7 @@ enum TextureInner {
 #[derive(Debug)]
 pub struct TextureResource {
     texture: TextureInner,
-    pub(crate) args: gpu_common::TextureArgs,
+    pub(crate) args: TextureArgs,
 }
 
 pub struct TextureView {}
@@ -69,7 +71,7 @@ impl TextureResource {
 }
 
 impl Resource for TextureResource {
-    type Args = gpu_common::TextureArgs;
+    type Args = TextureArgs;
     type SubResource = TextureView;
     type Handle = TextureHandle;
 
@@ -77,7 +79,7 @@ impl Resource for TextureResource {
     const SHADER_DECL: &'static str = "";
 
     fn new(ctx: &Context, args: &Self::Args) -> Self {
-        let texture = TextureInner::Texture(ctx.device.create_texture(&args.into()));
+        let texture = TextureInner::Texture(ctx.system.device.create_texture(&args.into()));
         Self {
             texture,
             args: args.clone(),

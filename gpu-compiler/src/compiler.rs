@@ -46,13 +46,19 @@ impl Compiler {
             })
             .collect();
 
-        // print errors to console
-        prebuild
+        let errors = prebuild
             .iter()
-            .map(|(_, r)| &r.errors)
+            .flat_map(|(_, r)| &r.errors)
             .flatten()
-            .flatten()
-            .for_each(|err| log::error!("{}", err.message));
+            .collect::<Vec<_>>();
+
+        let num_errors = errors.len();
+        if num_errors > 0 {
+            log::error!("Prebuild failed due to {} errors", num_errors);
+            errors.iter().for_each(|err| log::error!("{}", err.message));
+        } else {
+            log::info!("Prebuild complete");
+        }
 
         Ok(PrebuildResult {
             dependency_info,
@@ -70,10 +76,7 @@ impl Compiler {
         let (raw_module, errors) = match self.wgsl_parser.borrow_mut().parse(&processed_shader.data)
         {
             Ok(module) => (Some(module.into()), None),
-            Err(err) => (
-                None,
-                Some(vec![(&err, processed_shader.data.as_ref()).into()]),
-            ),
+            Err(err) => (None, Some(vec![(&err, &processed_shader).into()])),
         };
 
         FilePrebuildResult {

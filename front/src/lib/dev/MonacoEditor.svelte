@@ -9,17 +9,23 @@
 	} from '$common'
 	import dark from '$core/monaco/dark'
 	import light from '$core/monaco/light'
-	import { wFiles, wLayout, wPrebuildResult, wTheme, wUserEditorPrefs } from '$stores'
+	import {
+		wFiles,
+		wLayout,
+		wPrebuildResult,
+		wTheme,
+		wUserEditorPrefs
+	} from '$stores'
 	import type { editor, Position } from 'monaco-editor'
 	import { onMount } from 'svelte'
 	import { get } from 'svelte/store'
 
 	import setJSONSchema from '$core/monaco/json'
 	import Statusbar from '$core/monaco/statusbar'
-	import * as wgsl from '$core/monaco/wgsl'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
+
+	import gputWorker from '$core/monaco/wgsl/worker?worker'
 	import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 
 	let divEl: HTMLDivElement
@@ -44,25 +50,22 @@
 	// Initializes the monaco editor instance
 	async function initEditor() {
 		self.MonacoEnvironment = {
-			getWorker(_, label) {
+			getWorker(workerid, label) {
+				console.log('getWorker', workerid, label)
 				if (label === 'json') {
 					return new jsonWorker()
 				}
-				return new editorWorker()
+				// return new editorWorker()
+				return new gputWorker()
 			}
 		}
 		Monaco = await import('monaco-editor')
+		await import('$core/monaco/wgsl')
 		/** @ts-ignore */
 		MonacoVim = await import('monaco-vim')
 		Monaco.editor.defineTheme('dark', dark)
 		Monaco.editor.defineTheme('light', light)
 		setJSONSchema(Monaco)
-
-		Monaco.languages.register(wgsl.extensionPoint)
-		Monaco.languages.onLanguage(wgsl.id, () => {
-			Monaco.languages.setMonarchTokensProvider(wgsl.id, wgsl.monarch)
-			Monaco.languages.setLanguageConfiguration(wgsl.id, wgsl.config)
-		})
 
 		editorInstance = Monaco.editor.create(divEl, {
 			automaticLayout: true,
@@ -115,7 +118,8 @@
 		// do nothing if new file is same as current file
 		if (current === uri.path) return
 		let model = Monaco?.editor.getModel(uri)
-		if (!model) model = Monaco?.editor.createModel(file.data, file.extension, uri)
+		if (!model)
+			model = Monaco?.editor.createModel(file.data, file.extension, uri)
 
 		// override on change to target new file
 		model.onDidChangeContent((ev) => {
@@ -126,7 +130,8 @@
 		})
 
 		// store cached cursor position for this model
-		if (current) cachedPositions[current] = editorInstance?.getPosition() ?? undefined
+		if (current)
+			cachedPositions[current] = editorInstance?.getPosition() ?? undefined
 		const newPos = cachedPositions[fileid]
 
 		// set new model, set cursor positon from cache if available
@@ -189,8 +194,8 @@
 		<div id="vim-status-root" bind:this={statusEl} />
 		<div id="status-right">
 			<span>
-				Ln {cursorPosition?.position.lineNumber ?? '?'}, Col {cursorPosition?.position.column ??
-					'?'}
+				Ln {cursorPosition?.position.lineNumber ?? '?'}, Col {cursorPosition
+					?.position.column ?? '?'}
 			</span>
 			<div class="analyzer-result">
 				<span> 2 </span>

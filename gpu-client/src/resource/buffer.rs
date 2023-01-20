@@ -1,15 +1,17 @@
 use super::{BufferHandle, SubResource};
 
+pub type BufferArgs = gpu_common::BufferArgs;
+
 #[derive(Debug)]
 pub struct BufferResource {
     buffer: wgpu::Buffer,
-    args: gpu_common::BufferArgs,
+    args: BufferArgs,
 }
 pub struct BufferSubresource;
 impl SubResource for BufferSubresource {}
 
 impl super::Resource for BufferResource {
-    type Args = gpu_common::BufferArgs;
+    type Args = BufferArgs;
     type SubResource = BufferSubresource;
     type Handle = BufferHandle;
 
@@ -17,7 +19,7 @@ impl super::Resource for BufferResource {
     const SHADER_DECL: &'static str = "";
 
     fn new(ctx: &crate::Context, args: &Self::Args) -> Self {
-        let buffer = ctx.device.create_buffer(&args.into());
+        let buffer = ctx.system.device.create_buffer(&args.into());
         Self {
             buffer,
             args: args.clone(),
@@ -51,5 +53,11 @@ impl super::Resource for BufferResource {
 
     fn args(&self) -> &Self::Args {
         &self.args
+    }
+}
+
+impl BufferResource {
+    pub fn write(&self, sys: &crate::system::System, data: &[u8]) {
+        sys.queue.write_buffer(&self.buffer, 0, data)
     }
 }

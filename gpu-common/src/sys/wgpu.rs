@@ -1,9 +1,7 @@
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
-#[cfg(feature = "deserialize")]
-use serde::Deserialize;
-#[cfg(feature = "serialize")]
-use serde::Serialize;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "wgpu")]
 pub use wgpu_ext::*;
@@ -34,9 +32,15 @@ bitflags::bitflags! {
     }
 }
 
-#[cfg(feature = "serialize")]
+impl Default for BufferUsages {
+    fn default() -> Self {
+        Self::COPY_SRC | Self::UNFIORM
+    }
+}
+
+#[cfg(feature = "serde")]
 bitflags_serde_shim::impl_serde_for_bitflags!(BufferUsages);
-#[cfg(feature = "serialize")]
+#[cfg(feature = "serde")]
 bitflags_serde_shim::impl_serde_for_bitflags!(TextureUsages);
 
 pub trait ResourceArguments {
@@ -46,26 +50,18 @@ pub trait ResourceArguments {
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(tag = "ty", content = "c")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(tag = "ty", content = "c"))]
 pub enum ResourceArgs {
     Buffer(BufferArgs),
     Texture(TextureArgs),
     Sampler(SamplerArgs),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct BufferArgs {
     pub label: String,
     pub binding_type: BufferBindingType,
@@ -81,11 +77,11 @@ impl ResourceArguments for BufferArgs {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum BufferBindingType {
+    #[default]
     Uniform,
     Storage,
     ReadonlyStorage,
@@ -93,8 +89,7 @@ pub enum BufferBindingType {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct TextureArgs {
     pub label: String,
     pub size: [u32; 3],
@@ -114,8 +109,7 @@ impl ResourceArguments for TextureArgs {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct SamplerArgs {}
 
 #[cfg(feature = "wgpu")]

@@ -1,15 +1,19 @@
 <script lang="ts">
+	import type { LogLevel } from '$core/common'
 	import {
 		generateCompletions,
 		LOG_PREFIX,
 		LOG_PREFIX_STYLES,
-		submitConsoleComand
+		submitConsoleComand,
+		toLogLevel
 	} from '$core/console'
-	import { wConsole, wConsoleOpen } from '$stores'
+	import Select from '$lib/components/Select.svelte'
+	import { wConfig, wConsole, wConsoleOpen, wUserGeneralPrefs } from '$stores'
 
 	let promptText = ''
 	let input: HTMLInputElement
 	$: completions = generateCompletions(promptText)
+
 	function handleCommandSubmit(ev: KeyboardEvent) {
 		if (ev.key === 'Enter') {
 			submitConsoleComand(promptText)
@@ -24,13 +28,22 @@
 		}
 	}
 
-	$: {
-		if ($wConsoleOpen) setTimeout(() => input.focus(), 5)
+	$: if ($wConsoleOpen) setTimeout(() => input.focus(), 5)
+
+	$: filteredConsole = $wConsole.filter((log) => {
+		return log.level >= toLogLevel($wConfig.logLevel!)
+	})
+
+	function onLogLevelChange(ev: CustomEvent<any>) {
+		wConfig.update((config) => {
+			config.logLevel = ev.detail as LogLevel
+			return config
+		})
 	}
 </script>
 
 <div class="container" class:show={$wConsoleOpen}>
-	<div class="prompt-container">
+	<div class="prompt-container" class:wrap={$wUserGeneralPrefs.consoleWrap}>
 		<div class="prompt-line">
 			<span style="user-select: none;"> ~ </span>
 			<input
@@ -39,6 +52,11 @@
 				on:keypress|capture={handleKeypress}
 				tabindex="0"
 				on:keydown={handleCommandSubmit}
+			/>
+			<Select
+				bind:value={$wConfig.logLevel}
+				options={['Trace', 'Debug', 'Info', 'Warn', 'Error']}
+				on:change={onLogLevelChange}
 			/>
 		</div>
 		{#if completions.length > 0}
@@ -52,9 +70,11 @@
 		{/if}
 	</div>
 	<div class="log-container">
-		{#each $wConsole as log}
+		{#each filteredConsole as log}
 			<span class="log">
-				<span style={LOG_PREFIX_STYLES.get(log.level)}>{LOG_PREFIX.get(log.level)}</span>
+				<span class="prefix" style={LOG_PREFIX_STYLES.get(log.level)}
+					>{LOG_PREFIX.get(log.level)}</span
+				>
 				{log.message}
 			</span>
 		{/each}
@@ -70,17 +90,20 @@
 		bottom: 0px;
 		width: 100%;
 		height: fit-content;
+		min-height: 200px;
 		max-height: 100%;
 		display: flex;
 		flex-direction: column-reverse;
 		font-family: var(--font-mono);
 		font-size: var(--sm);
 		overflow-y: scroll;
+		background-color: var(--transparent-med);
 	}
+
 	.prompt-container {
 		position: relative;
 		flex-direction: row;
-		background-color: var(--transparent-med);
+		align-items: center;
 		padding-inline: var(--padding);
 	}
 	.prompt-line {
@@ -124,5 +147,10 @@
 	}
 	.show {
 		visibility: visible;
+	}
+	.prefix {
+		font-weight: bold;
+	}
+	.wrap {
 	}
 </style>

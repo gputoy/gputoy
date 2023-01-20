@@ -13,8 +13,8 @@ crate-type = ["cdylib"]
 [dependencies]
 # local dependencies
 gpu-client = { path = "../gpu-client" }
-gpu-common = { path = "../gpu-common", features = ["serialize", "deserialize"] }
-gpu-wasm-logger = { path = "../gpu-wasm-logger" }
+gpu-common = { path = "../gpu-common", features = ["serde"] }
+gpu-log = { path = "../gpu-log" }
 
 # crates.io dependencies
 wasm-bindgen = "0.2.82"
@@ -24,7 +24,6 @@ log = { version = "0.4.17", features = ["std"] }
 serde = { version = "1.0.144", features = ["derive"] }
 serde-wasm-bindgen = "0.4"
 thiserror = "1.0.4"
-
 
 [dependencies.web-sys]
 version = "=0.3.58"

@@ -9,6 +9,14 @@
       "format": "uint32",
       "minimum": 0.0
     },
+    "logLevel": {
+      "default": "Info",
+      "allOf": [
+        {
+          "$ref": "#/definitions/LogLevel"
+        }
+      ]
+    },
     "perfLevel": {
       "default": null,
       "anyOf": [
@@ -28,6 +36,16 @@
     }
   },
   "definitions": {
+    "LogLevel": {
+      "type": "string",
+      "enum": [
+        "Trace",
+        "Debug",
+        "Info",
+        "Warn",
+        "Error"
+      ]
+    },
     "PerformanceLevel": {
       "type": "string",
       "enum": [

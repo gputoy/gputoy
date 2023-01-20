@@ -1,41 +1,25 @@
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
-#[cfg(feature = "deserialize")]
-use serde::Deserialize;
-#[cfg(feature = "serialize")]
-use serde::Serialize;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ImageDimension {
-    #[cfg_attr(
-        any(feature = "serialize", feature = "deserialize"),
-        serde(rename = "1d")
-    )]
+    #[cfg_attr(feature = "serde", serde(rename = "1d"))]
     D1,
-    #[cfg_attr(
-        any(feature = "serialize", feature = "deserialize"),
-        serde(rename = "2d")
-    )]
+    #[cfg_attr(feature = "serde", serde(rename = "2d"))]
     D2,
-    #[cfg_attr(
-        any(feature = "serialize", feature = "deserialize"),
-        serde(rename = "3d")
-    )]
+    #[cfg_attr(feature = "serde", serde(rename = "3d"))]
     D3,
-    #[cfg_attr(
-        any(feature = "serialize", feature = "deserialize"),
-        serde(rename = "cube")
-    )]
+    #[cfg_attr(feature = "serde", serde(rename = "cube"))]
     Cube,
 }
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum TextureFormat {
     // Normal 8 bit formats
     /// Red channel only. 8 bit integer per channel. [0, 255] converted to/from float [0, 1] in shader.
@@ -128,8 +112,7 @@ pub enum TextureFormat {
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum StorageFormat {
     R8Unorm,
     R8Snorm,
