@@ -1,19 +1,13 @@
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
-#[cfg(feature = "deserialize")]
-use serde::Deserialize;
-#[cfg(feature = "serialize")]
-use serde::Serialize;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct Layout {
     /// Is the left side status panel open
     pub is_status_open: bool,
@@ -21,10 +15,7 @@ pub struct Layout {
     /// Order of identifiers in vec is the order it is listed in the editor.
     pub workspace: Vec<String>,
     /// Currently opened file index within workspace
-    #[cfg_attr(
-        any(feature = "serialize", feature = "deserialize"),
-        serde(rename = "fileIndex")
-    )]
+    #[cfg_attr(feature = "serde", serde(rename = "fileIndex"))]
     pub workspace_file_index: Option<usize>,
     /// Panel settings for projectPanel
     pub project_panel: PanelState,
@@ -40,12 +31,8 @@ pub struct Layout {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub enum Panel {
     EditorPanel,
     ProjectPanel,
@@ -54,8 +41,7 @@ pub enum Panel {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct PanelState {
     pub show: bool,
     pub size: f32,
@@ -63,12 +49,8 @@ pub struct PanelState {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct DirNodeState {
     pub open: bool,
     pub is_renaming: bool,

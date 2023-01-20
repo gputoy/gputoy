@@ -1,21 +1,15 @@
 use crate::actions::Action;
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
-#[cfg(feature = "deserialize")]
-use serde::Deserialize;
-#[cfg(feature = "serialize")]
-use serde::Serialize;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 use std::collections::HashMap;
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct UserPrefs {
     pub keybinds: HashMap<String, FilteredAction>,
     pub editor: UserEditorPrefs,
@@ -25,25 +19,17 @@ pub struct UserPrefs {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct UserKeymap {
-    #[cfg_attr(any(feature = "serialize", feature = "deserialize"), serde(flatten))]
+    #[cfg_attr(feature = "serde", serde(flatten))]
     pub map: HashMap<String, FilteredAction>,
 }
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FilteredAction {
     pub action: Action,
     pub condition: Option<String>,
@@ -51,12 +37,8 @@ pub struct FilteredAction {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct UserEditorPrefs {
     pub font_family: Option<String>,
     pub font_size: Option<u32>,
@@ -67,12 +49,8 @@ pub struct UserEditorPrefs {
 
 #[derive(Debug, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub enum LineNumberPrefs {
     #[default]
     On,
@@ -83,14 +61,11 @@ pub enum LineNumberPrefs {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct UserGeneralPrefs {
     pub project_panel_size: f32,
     pub editor_panel_size: f32,
     pub resource_panel_size: f32,
+    pub console_wrap: bool,
 }

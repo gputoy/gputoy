@@ -520,11 +520,15 @@
     "UserGeneralPrefs": {
       "type": "object",
       "required": [
+        "consoleWrap",
         "editorPanelSize",
         "projectPanelSize",
         "resourcePanelSize"
       ],
       "properties": {
+        "consoleWrap": {
+          "type": "boolean"
+        },
         "editorPanelSize": {
           "type": "number",
           "format": "float"

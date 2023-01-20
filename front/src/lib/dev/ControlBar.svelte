@@ -16,6 +16,9 @@
 	function handleRender() {
 		context?.render()
 	}
+	function handlePlayPause() {
+		pushAction({ ty: 'playPause' })
+	}
 </script>
 
 <div id="controlbar-container">
@@ -25,7 +28,7 @@
 		</IconButton>
 	</div>
 	<div class="middle button-container">
-		<IconButton series="first" smallIcons>
+		<IconButton series="first" smallIcons on:click={handlePlayPause}>
 			{#if playing}
 				<Icon name="pause" />
 			{:else}
@@ -42,13 +45,13 @@
 	</div>
 
 	<div class="right button-container">
-		<IconButton on:click={handleIntrospect} disabled={!ready} series="first" text="Introspect">
+		<IconButton on:click={handleIntrospect} disabled={!ready} series="first">
 			<Icon name="code" stroked thick />
 		</IconButton>
-		<IconButton on:click={handleBuild} disabled={!ready} series="middle" text="Build">
+		<IconButton on:click={handleBuild} disabled={!ready} series="middle">
 			<Icon name="tool" stroked thick />
 		</IconButton>
-		<IconButton on:click={handleRender} disabled={!ready} series="last" text="Render">
+		<IconButton on:click={handleRender} disabled={!ready} series="last">
 			<Icon name="monitor" stroked thick />
 		</IconButton>
 	</div>

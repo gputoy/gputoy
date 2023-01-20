@@ -3,6 +3,13 @@ import * as fs from 'node:fs/promises'
 import * as path from 'path'
 import * as url from 'url'
 
+const bannerComment = `
+  /**
+ * This file was automatically generated from 'cargo types' command.
+ * DO NOT MODIFY IT BY HAND. Instead, modify the source code in gpu-common,
+ * and run 'cargo types' again to regenerate this file.
+ */
+`
 const dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 async function main() {
@@ -20,6 +27,7 @@ async function main() {
       format: true,
       declareExternallyReferenced: true,
       enableConstEnums: true,
+      bannerComment
     })
 
     let eachType = compiled.split('export')

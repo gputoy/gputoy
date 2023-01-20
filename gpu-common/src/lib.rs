@@ -2,6 +2,7 @@ mod actions;
 mod compiler;
 mod config;
 mod error;
+mod event;
 mod file;
 mod layout;
 mod preferences;

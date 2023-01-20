@@ -27,12 +27,12 @@ impl Pipeline for VertexFragment {
         let vs = &files
             .file_builds
             .get(&args.vertex)
-            .ok_or(PipelineError::FileNotFound(args.vertex.clone()))?
+            .ok_or_else(|| PipelineError::FileNotFound(args.vertex.clone()))?
             .processed_shader;
         let fs = &files
             .file_builds
             .get(&args.fragment)
-            .ok_or(PipelineError::FileNotFound(args.fragment.clone()))?
+            .ok_or_else(|| PipelineError::FileNotFound(args.fragment.clone()))?
             .processed_shader;
 
         device.push_error_scope(wgpu::ErrorFilter::Validation);
@@ -48,7 +48,7 @@ impl Pipeline for VertexFragment {
         let error = device.pop_error_scope();
         wasm_bindgen_futures::spawn_local(async {
             if let Some(error) = error.await {
-                log::error!("{}", error.to_string());
+                gpu_log::error!("{}", error.to_string());
             }
         });
 
@@ -60,8 +60,8 @@ impl Pipeline for VertexFragment {
         let resources_borrow = resources.borrow();
         for target in args.targets.iter() {
             let (handle, resource) = resources_borrow
-                .get_by_ident::<resource::Texture>(&target)
-                .ok_or(PipelineError::ResourceNotFound(target.to_owned()))?;
+                .get_by_ident::<resource::Texture>(target)
+                .ok_or_else(|| PipelineError::ResourceNotFound(target.to_owned()))?;
             target_handles.push(handle);
             target_textures.push(resource);
         }

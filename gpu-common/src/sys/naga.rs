@@ -1,27 +1,25 @@
-/// Conversion from naga types to local types.
-/// This is to avoid using naga types throughout gpy_common for two reasons.
-///     1. Naga is massively heavy, so importing it to gpu_common unconditionally will blow up
-///        the size of every other module (which only matters for wasm really).
-///     2. Naga types cannot be schema'd, so typescript would have no type checking when doing things with
-///        shader info in frontend.
-///
-/// Compromises taken:
-///     * Arenas are vecs, this should be fine as long as order is preserved during conversion.
-///     * Handles are usize and 0-indexed, converted using the index() method.
-///     * StorageFlags are u32, converted using the bits() method
-///     * Functions only include name, params, and returns. Maybe in the future this can inlude more,
-///       but I don't think inner body info will be of use within gputoy for now.
-///
-/// TODO:
-///     * un-omit constants and global_variables
-///
+//! Conversion from naga types to local types.
+//! This is to avoid using naga types throughout gpu_common for two reasons.
+//!     1. Naga is heavy, so importing it to gpu_common unconditionally will blow up
+//!        the size of every other module (which only matters for wasm really).
+//!     2. Naga types cannot be schema'd, so typescript would have no type checking when doing things with
+//!        shader info in frontend.
+//!
+//! Compromises taken:
+//!     * Arenas are vecs, this should be fine as long as order is preserved during conversion.
+//!     * Handles are usize and 0-indexed, converted using the index() method.
+//!     * StorageFlags are u32, converted using the bits() method
+//!     * Functions only include name, params, and returns. Maybe in the future this can inlude more,
+//!       but I don't think inner body info will be of use within gputoy for now.
+//!
+//! TODO:
+//!     * un-omit constants and global_variables
+//!
 
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
-#[cfg(feature = "deserialize")]
-use serde::Deserialize;
-#[cfg(feature = "serialize")]
-use serde::Serialize;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 use super::common::{ImageDimension, StorageFormat};
 
@@ -30,8 +28,7 @@ pub type StorageAccess = u32;
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct CompileError {
     pub message: String,
     pub span: Option<SourceLocation>,
@@ -39,12 +36,8 @@ pub struct CompileError {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct SourceLocation {
     /// 1-based line number.
     pub line_number: u32,
@@ -58,8 +51,7 @@ pub struct SourceLocation {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Module {
     pub types: Vec<Type>,
     // pub constants: Vec<Constant>,
@@ -70,8 +62,7 @@ pub struct Module {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Type {
     pub name: Option<String>,
     pub inner: TypeInner,
@@ -79,8 +70,7 @@ pub struct Type {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum TypeInner {
     Scalar {
         kind: ScalarKind,
@@ -135,8 +125,7 @@ pub enum TypeInner {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Function {
     pub name: Option<String>,
     pub arguments: Vec<FunctionArgument>,
@@ -145,8 +134,7 @@ pub struct Function {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct FunctionArgument {
     pub name: Option<String>,
     pub ty: Handle,
@@ -155,8 +143,7 @@ pub struct FunctionArgument {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct FunctionResult {
     pub ty: Handle,
     pub binding: Option<Binding>,
@@ -164,8 +151,7 @@ pub struct FunctionResult {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct EntryPoint {
     pub name: String,
     pub stage: ShaderStage,
@@ -178,8 +164,7 @@ pub struct EntryPoint {
 #[allow(dead_code)]
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct EarlyDepthTest {
     pub conservative: Option<ConservativeDepth>,
 }
@@ -187,8 +172,7 @@ pub struct EarlyDepthTest {
 #[allow(dead_code)]
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ConservativeDepth {
     GreaterEqual,
     LessEqual,
@@ -197,8 +181,7 @@ pub enum ConservativeDepth {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ShaderStage {
     Vertex,
     Fragment,
@@ -207,8 +190,7 @@ pub enum ShaderStage {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ScalarKind {
     Sint,
     Uint,
@@ -218,8 +200,7 @@ pub enum ScalarKind {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum VectorSize {
     Bi = 2,
     Tri = 3,
@@ -228,8 +209,7 @@ pub enum VectorSize {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum AddressSpace {
     Function,
     Private,
@@ -242,8 +222,7 @@ pub enum AddressSpace {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ArraySize {
     Constant(u32),
     Dynamic,
@@ -251,8 +230,7 @@ pub enum ArraySize {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct StructMember {
     pub name: Option<String>,
     pub ty: u32,
@@ -262,8 +240,7 @@ pub struct StructMember {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ImageClass {
     Sampled {
         kind: ScalarKind,
@@ -280,8 +257,7 @@ pub enum ImageClass {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Binding {
     Builtin(Builtin),
     Location {
@@ -293,8 +269,7 @@ pub enum Binding {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Builtin {
     Position { invariant: bool },
     ViewIndex,
@@ -320,8 +295,7 @@ pub enum Builtin {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Interpolation {
     Perspective,
     Linear,
@@ -330,8 +304,7 @@ pub enum Interpolation {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum Sampling {
     Center,
     Centroid,
@@ -342,11 +315,13 @@ pub enum Sampling {
 mod naga_ext {
     use super::*;
 
-    impl From<(&naga::front::wgsl::ParseError, &str)> for CompileError {
-        fn from((err, src): (&naga::front::wgsl::ParseError, &str)) -> Self {
+    impl From<(&naga::front::wgsl::ParseError, &crate::file::File)> for CompileError {
+        fn from((err, file): (&naga::front::wgsl::ParseError, &crate::file::File)) -> Self {
             Self {
-                message: err.emit_to_string(src),
-                span: err.location(src).map(From::from),
+                message: err
+                    .emit_to_string(&file.data)
+                    .replace("wgsl", &file.canonical_name()),
+                span: err.location(&file.data).map(From::from),
             }
         }
     }

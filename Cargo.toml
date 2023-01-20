@@ -6,7 +6,7 @@ members = [
   "gpu-compiler",
   "gpu-wasm-client",
   "gpu-wasm-compiler",
-  "gpu-wasm-logger",
+  "gpu-log",
   "gpu-tauri",
 ]
 resolver = "2"

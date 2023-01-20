@@ -1,8 +1,10 @@
 import type { Action, FilteredAction, Panel, ShiftPaneArgs } from "$common"
 import { clearProject } from "$core/project"
-import { wConfig, wConsole, wConsoleOpen, wDebugPanel, wFiles, wLayout } from "$stores"
+import { wBuildDirty, wConfig, wConsole, wConsoleOpen, wDebugPanel, wFiles, wLayout, wPrebuildDirty, wRunState } from "$stores"
 import { toast } from "@zerodevx/svelte-toast"
 import isEqual from "lodash/isEqual"
+import { get } from "svelte/store"
+import context from "./context"
 
 const actionHistory: Action[] = []
 
@@ -85,6 +87,15 @@ export function reverseAction(action: Action) {
 /// ------------------- Action execution ----------------------
 
 function playPause() {
+    if (get(wPrebuildDirty)) {
+        context.prebuild()
+    }
+
+    if (get(wBuildDirty)) {
+        context.build()
+    }
+    wRunState.playPause()
+
 }
 
 function openDocument(fileid: string) {

@@ -37,38 +37,34 @@
 		on:resize={makeResizeHandler('projectPanel', 0)}
 	>
 		<!-- ---------- project pane ------------- -->
-		<Pane size={projectPaneSize.toString()}>
+		<Pane size={projectPaneSize}>
 			<ProjectPane />
 		</Pane>
 
-		<Pane size={(100 - projectPaneSize).toString()}>
+		<Pane size={100 - projectPaneSize}>
 			<Splitpanes
 				style="height: 100%;width: 100%;"
 				theme="modern-theme"
 				on:resize={makeResizeHandler('editorPanel', 1)}
 			>
-				<Pane size={(100 - editorPanelSize).toString()}>
+				<Pane size={100 - editorPanelSize}>
 					<Splitpanes
 						horizontal
 						theme="modern-theme"
 						on:resize={makeResizeHandler('resourcePanel', 1)}
 					>
 						<!-- ---------- viewport  ------------- -->
-						<Pane size={(100 - resourcePanelSize).toString()}>
+						<Pane size={100 - resourcePanelSize}>
 							<Viewport />
 						</Pane>
 						<!-- ---------- control bar   ------------- -->
-						<Pane
-							size={resourcePanelSize.toString()}
-							minSize={controlBarMinSize.toString()}
-							snapSize="5"
-						>
+						<Pane size={resourcePanelSize} minSize={controlBarMinSize} snapSize={5}>
 							<ControlBar />
 						</Pane>
 					</Splitpanes>
 				</Pane>
 				<!-- ---------- editor   ------------- -->
-				<Pane size={editorPanelSize.toString()} snapSize="10">
+				<Pane size={editorPanelSize} snapSize={10}>
 					<EditorPane />
 				</Pane>
 			</Splitpanes>
@@ -90,6 +86,7 @@
 		.splitpanes__splitter {
 			background-color: var(--border-primary);
 			position: relative;
+			z-index: 1;
 
 			&:before {
 				content: '';

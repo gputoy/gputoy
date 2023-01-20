@@ -1,0 +1,23 @@
+[package]
+name = "gpu-log"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["warn"]
+# each log type enumerated; do not use these directly
+_trace = []
+_debug = []
+_info = []
+_warn = []
+_error = []
+# actual features that should be used
+trace = ["_trace", "_debug", "_info", "_warn", "_error"]
+debug = ["_debug", "_info", "_warn", "_error"]
+info = ["_info", "_warn", "_error"]
+warn = ["_warn", "_error"]
+error = ["_error"]
+
+[dependencies]
+log = "0.4.17"
+wasm-bindgen = "0.2.83"

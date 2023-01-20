@@ -38,6 +38,8 @@ impl Bundle for ViewportBundle {
     type ResourceKeys = gpu_common::ViewportBundleResources;
     type Error = ViewportError;
 
+    const MAX_INSTANCES: u32 = 4;
+
     fn new(ctx: &crate::Context, ident: String, args: &Self::Args) -> Result<Self, Self::Error> {
         let window = WindowBuilder::new()
             .build(&ctx.event_loop)
@@ -59,10 +61,10 @@ impl Bundle for ViewportBundle {
                 .expect("couldn't append canvas to document body");
         }
 
-        log::info!("Initializing surface {}", args.target);
-        let surface = unsafe { ctx.instance.create_surface(&window) };
+        gpu_log::info!("Initializing surface {}", args.target);
+        let surface = unsafe { ctx.system.instance.create_surface(&window) };
         let size = window.inner_size();
-        let preferred_format = surface.get_supported_formats(&ctx.adapter)[0];
+        let preferred_format = surface.get_supported_formats(&ctx.system.adapter)[0];
         let surface_config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: preferred_format,
@@ -72,7 +74,7 @@ impl Bundle for ViewportBundle {
         };
 
         // Initialize surface for presentation.
-        surface.configure(&ctx.device, &surface_config);
+        surface.configure(&ctx.system.device, &surface_config);
 
         // Create texture resource from surface.
         let surface_texture = crate::resource::Texture::from_surface(
@@ -104,7 +106,11 @@ impl Bundle for ViewportBundle {
 
     fn destroy(&mut self) {}
 
-    fn on_frame_start(&mut self, resources: &resource::Resources) -> Result<(), Self::Error> {
+    fn on_frame_start(
+        &mut self,
+        _sys: &crate::system::System,
+        resources: &resource::Resources,
+    ) -> Result<(), Self::Error> {
         // Swap surface texture in resource cache.
         // Pipelines with handles to this resource will point to the updated swapchain texture.
         resources

@@ -3,11 +3,12 @@ import { toast } from '@zerodevx/svelte-toast'
 import type { Writable } from 'svelte/store'
 import actionSchema from '../../../schemas/Action.json'
 import { pushAction } from './actions'
+import type { LogLevel as LogLevelString } from './common'
 
 // Add private logging methods to window so wasm modules can use it
-// without having to import anything from frontend.
+// without having to import anything from /front.
 //
-// Methods only meant to be used within gpu-wasm-logger/log_ext.js
+// Methods only meant to be used within gpu-log/log_ext.js
 if (typeof window !== "undefined") {
     Object.assign(window, {
         __trace_ext: function (log: string) {
@@ -54,6 +55,17 @@ export type ConsoleExtras = {
     echo: (echo: string) => void
 }
 
+export function toLogLevel(level: LogLevelString) {
+    switch (level) {
+        case "Trace": return LogLevel.Trace
+        case "Debug": return LogLevel.Debug
+        case "Info": return LogLevel.Info
+        case "Warn": return LogLevel.Warn
+        case "Error": return LogLevel.Error
+        default: return 0
+    }
+}
+
 export enum LogLevel {
     /** Development use only */
     Trace = 1 << 0,
@@ -70,12 +82,12 @@ export enum LogLevel {
 }
 
 export const LOG_PREFIX = new Map([
-    [LogLevel.Trace, '[trace] '],
-    [LogLevel.Debug, '[debug] '],
-    [LogLevel.Info, '[info]  '],
-    [LogLevel.Warn, '[warn]  '],
-    [LogLevel.Error, '[error] '],
-    [LogLevel.Echo, 'hello'],
+    [LogLevel.Trace, '[trace]'],
+    [LogLevel.Debug, '[debug]'],
+    [LogLevel.Info, '[info] '],
+    [LogLevel.Warn, '[warn] '],
+    [LogLevel.Error, '[error]'],
+    [LogLevel.Echo, ''],
 ])
 
 export const LOG_PREFIX_STYLES = new Map([

@@ -1,17 +1,13 @@
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
-#[cfg(feature = "deserialize")]
-use serde::Deserialize;
-#[cfg(feature = "serialize")]
-use serde::Serialize;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
-/// Identical to regex::Match, except the text is owned
-/// and it can be serialized.
+/// Identical to regex::Match, except the text is owned and it can be serialized.
 /// TODO: get refs to work within the compiler instead of owned strings.
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Match {
     pub text: String,
     pub start: usize,
@@ -49,12 +45,8 @@ pub type FastHashMap<K, V> = rustc_hash::FxHashMap<K, V>;
 
 #[derive(Debug, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct PrebuildResult {
     pub dependency_info: DependencyInfo,
     pub file_builds: FastHashMap<crate::file::FilePath, FilePrebuildResult>,
@@ -62,8 +54,7 @@ pub struct PrebuildResult {
 
 #[derive(Debug, Default)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct DependencyInfo {
     pub deps: FastHashMap<crate::file::FilePath, FileDependencyInfo>,
 }
@@ -91,12 +82,8 @@ impl DependencyInfo {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
-#[cfg_attr(
-    any(feature = "serialize", feature = "deserialize"),
-    serde(rename_all = "camelCase")
-)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FilePrebuildResult {
     pub processed_shader: crate::File,
     pub raw_module: Option<crate::sys::Module>,
@@ -105,15 +92,11 @@ pub struct FilePrebuildResult {
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct FileDependencyInfo {
     pub imports: Vec<Match>,
     // rename to not collide with ts export keyword
-    #[cfg_attr(
-        any(feature = "serialize", feature = "deserialize"),
-        serde(rename = "exxports")
-    )]
+    #[cfg_attr(feature = "serde", serde(rename = "exxports"))]
     pub exports: FastHashMap<String, Match>,
     pub errors: Option<Vec<crate::sys::CompileError>>,
 }

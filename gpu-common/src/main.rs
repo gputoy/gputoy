@@ -1,4 +1,4 @@
-#[cfg(all(feature = "serialize", feature = "deserialize", feature = "schema"))]
+#[cfg(all(feature = "serde", feature = "schema"))]
 macro_rules! make_schemas {
     ($dir:ident, $($name:ident),*) => {
 
@@ -17,7 +17,7 @@ macro_rules! make_schemas {
 /// Writes JSON schemas to `../schemas`.
 /// Used by cargo-make command `cargo make types` (aliased to `cargo types`) which also
 /// runs node script `front/generate_common_types.js` to generate typescript types.
-#[cfg(all(feature = "serialize", feature = "deserialize", feature = "schema"))]
+#[cfg(all(feature = "serde", feature = "schema"))]
 fn main() -> std::io::Result<()> {
     use gpu_common::{realm::*, *};
     let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -50,10 +50,8 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-#[cfg(not(all(feature = "serialize", feature = "deserialize", feature = "schema")))]
+#[cfg(not(all(feature = "serde", feature = "schema")))]
 fn main() {
-    println!(
-        "You probably meant to run this with features 'serialize', 'deserialize', and 'schema'."
-    );
-    println!("Aborting.");
+    println!("You probably meant to run this with features 'serde' and 'schema'.");
+    std::process::exit(1)
 }

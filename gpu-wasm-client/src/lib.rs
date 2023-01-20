@@ -1,12 +1,23 @@
 use thiserror::Error;
 use wasm_bindgen::{prelude::*, JsValue};
 
+#[wasm_bindgen(module = "/client_ext.js")]
+extern "C" {
+    fn __check_result(result: JsValue);
+    fn __build_result(result: JsValue);
+}
+
+#[wasm_bindgen]
+pub struct Client {
+    context: gpu_client::Context,
+}
+
 #[wasm_bindgen]
 pub struct Context(gpu_client::Context);
 
 #[wasm_bindgen(start)]
 pub async fn start() -> Result<(), JsValue> {
-    gpu_wasm_logger::init().map_err(|_| Error::LoggerInit)?;
+    gpu_log::init().map_err(|_| Error::LoggerInit)?;
     Ok(())
 }
 

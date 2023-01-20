@@ -3,7 +3,7 @@ use wasm_bindgen::{prelude::*, JsValue};
 
 #[wasm_bindgen(start)]
 pub fn __init() -> Result<(), JsValue> {
-    gpu_wasm_logger::init().map_err(|_| Error::LoggerInit)?;
+    gpu_log::init().map_err(|_| Error::LoggerInit)?;
     Ok(())
 }
 

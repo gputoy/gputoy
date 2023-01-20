@@ -1,16 +1,13 @@
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
-#[cfg(feature = "deserialize")]
-use serde::Deserialize;
-#[cfg(feature = "serialize")]
-use serde::Serialize;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 use crate::{FastHashMap, FilePath};
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum PipelineArgs {
     /// # Vertex/Fragment pipeline
     ///
@@ -35,8 +32,7 @@ type Targets = Vec<String>;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct VertexFragment {
     /// # Vertex shader
     ///
@@ -60,8 +56,7 @@ pub struct VertexFragment {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct FullscreenQuad {
     /// # Fragment shader
     ///
@@ -77,8 +72,7 @@ pub struct FullscreenQuad {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Compute {
     /// # Compute shader
     ///
@@ -98,9 +92,8 @@ pub struct Compute {
 /// defined bundle called "view".
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serialize", derive(Serialize))]
-#[cfg_attr(feature = "deserialize", derive(Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Binds {
-    #[cfg_attr(any(feature = "serialize", feature = "deserialize"), serde(flatten))]
+    #[cfg_attr(feature = "serde", serde(flatten))]
     inner: FastHashMap<String, String>,
 }

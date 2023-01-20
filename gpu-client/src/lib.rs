@@ -1,7 +1,9 @@
 pub mod bundle;
+mod client;
 mod context;
 pub mod pipeline;
 pub mod resource;
+pub mod system;
 
 pub use context::*;
 
@@ -28,7 +30,7 @@ mod tests {
     #[test]
     fn test_resource_cache() {
         let ctx = make_context();
-        let mut cache = resource::ResourceCache::new();
+        let mut cache = resource::ResourceCache::default();
         let args = make_buffer_args();
         let buffer = resource::Buffer::new(&ctx, &args);
         let buffer_handle = cache.insert(buffer);

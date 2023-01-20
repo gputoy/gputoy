@@ -5,6 +5,20 @@ mod utils;
 pub use compiler::Compiler;
 pub use error::Error;
 
+// pub struct Builder {
+//     linked: crate::Linker,
+//     validator: crate::Validator,
+// }
+
+// impl Builder {
+//     pub fn process_delta(&mut self) {
+
+//     }
+//     pub fn build() ->  {
+
+//     }
+// }
+
 #[cfg(test)]
 mod tests {
     use gpu_common::Files;

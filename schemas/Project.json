@@ -40,6 +40,14 @@
           "format": "uint32",
           "minimum": 0.0
         },
+        "logLevel": {
+          "default": "Info",
+          "allOf": [
+            {
+              "$ref": "#/definitions/LogLevel"
+            }
+          ]
+        },
         "perfLevel": {
           "default": null,
           "anyOf": [
@@ -199,6 +207,16 @@
           }
         }
       }
+    },
+    "LogLevel": {
+      "type": "string",
+      "enum": [
+        "Trace",
+        "Debug",
+        "Info",
+        "Warn",
+        "Error"
+      ]
     },
     "PanelState": {
       "type": "object",

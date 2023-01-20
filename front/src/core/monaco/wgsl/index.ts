@@ -1,13 +1,11 @@
-import type * as monaco from "monaco-editor"
-type LanguageConfig = monaco.languages.LanguageConfiguration
-type Language = monaco.languages.IMonarchLanguage
-type LanguageExt = monaco.languages.ILanguageExtensionPoint
+import { Emitter, languages, type IEvent } from "monaco-editor"
 
 export const id = "wgsl"
-export const extensionPoint: LanguageExt = {
+export const extensionPoint: languages.ILanguageExtensionPoint = {
     id,
 }
-export const config: LanguageConfig = {
+
+export const config: languages.LanguageConfiguration = {
     comments: {
         lineComment: "//",
         blockComment: ["/*", "*/"],
@@ -31,7 +29,7 @@ export const config: LanguageConfig = {
         { open: "<", close: ">" },
     ],
 }
-export const monarch: Language = {
+export const monarch: languages.IMonarchLanguage = {
     defaultToken: "invalid",
 
     keywords: [
@@ -228,4 +226,168 @@ export const monarch: Language = {
             [/\/\/.*$/, "comment"],
         ],
     },
-} 
+}
+
+export type SeverityLevel = 'ignore' | 'warn' | 'error'
+
+export interface DiagnosticsOptions {
+}
+
+export interface LanguageServiceDefaults {
+    readonly languageId: string
+    readonly onDidChange: IEvent<LanguageServiceDefaults>
+    readonly diagnosticsOptions: DiagnosticsOptions
+    readonly modeConfiguration: ModeConfiguration
+    setDiagnosticsOptions(options: DiagnosticsOptions): void
+    setModeConfiguration(modeConfiguration: ModeConfiguration): void
+}
+
+export interface ModeConfiguration {
+    /**
+     * Defines whether the built-in completionItemProvider is enabled.
+     */
+    readonly completionItems?: boolean
+
+    /**
+     * Defines whether the built-in hoverProvider is enabled.
+     */
+    readonly hovers?: boolean
+
+    /**
+     * Defines whether the built-in documentSymbolProvider is enabled.
+     */
+    readonly documentSymbols?: boolean
+
+    /**
+     * Defines whether the built-in definitions provider is enabled.
+     */
+    readonly links?: boolean
+
+    /**
+     * Defines whether the built-in references provider is enabled.
+     */
+    readonly documentHighlights?: boolean
+
+    /**
+     * Defines whether the built-in rename provider is enabled.
+     */
+    readonly rename?: boolean
+
+    /**
+     * Defines whether the built-in color provider is enabled.
+     */
+    readonly colors?: boolean
+
+    /**
+     * Defines whether the built-in foldingRange provider is enabled.
+     */
+    readonly foldingRanges?: boolean
+
+    /**
+     * Defines whether the built-in diagnostic provider is enabled.
+     */
+    readonly diagnostics?: boolean
+
+    /**
+     * Defines whether the built-in selection range provider is enabled.
+     */
+    readonly selectionRanges?: boolean
+
+    /**
+     * Defines whether the built-in documentFormattingEdit provider is enabled.
+     */
+    readonly documentFormattingEdits?: boolean
+
+    /**
+     * Defines whether the built-in documentRangeFormattingEdit provider is enabled.
+     */
+    readonly documentRangeFormattingEdits?: boolean
+}
+
+export interface LanguageServiceDefaults {
+    readonly languageId: string
+    readonly onDidChange: IEvent<LanguageServiceDefaults>
+    readonly diagnosticsOptions: DiagnosticsOptions
+    readonly modeConfiguration: ModeConfiguration
+    setDiagnosticsOptions(options: DiagnosticsOptions): void
+    setModeConfiguration(modeConfiguration: ModeConfiguration): void
+}
+
+class LanguageServiceDefaultsImpl implements LanguageServiceDefaults {
+    private _onDidChange = new Emitter<LanguageServiceDefaults>();
+    private _diagnosticsOptions!: DiagnosticsOptions
+    private _modeConfiguration!: ModeConfiguration
+    private _languageId: string
+
+    constructor(
+        languageId: string,
+        diagnosticsOptions: DiagnosticsOptions,
+        modeConfiguration: ModeConfiguration
+    ) {
+        this._languageId = languageId
+        this.setDiagnosticsOptions(diagnosticsOptions)
+        this.setModeConfiguration(modeConfiguration)
+    }
+
+    get onDidChange(): IEvent<LanguageServiceDefaults> {
+        return this._onDidChange.event
+    }
+
+    get languageId(): string {
+        return this._languageId
+    }
+
+    get modeConfiguration(): ModeConfiguration {
+        return this._modeConfiguration
+    }
+
+    get diagnosticsOptions(): DiagnosticsOptions {
+        return this._diagnosticsOptions
+    }
+
+    setDiagnosticsOptions(options: DiagnosticsOptions): void {
+        this._diagnosticsOptions = options || Object.create(null)
+        this._onDidChange.fire(this)
+    }
+
+    setModeConfiguration(modeConfiguration: ModeConfiguration): void {
+        this._modeConfiguration = modeConfiguration || Object.create(null)
+        this._onDidChange.fire(this)
+    }
+}
+
+const diagnosticDefault: Required<DiagnosticsOptions> = {
+}
+
+const modeConfigurationDefault: Required<ModeConfiguration> = {
+    documentFormattingEdits: true,
+    documentRangeFormattingEdits: true,
+    completionItems: true,
+    hovers: true,
+    documentSymbols: true,
+    colors: true,
+    foldingRanges: true,
+    diagnostics: true,
+    selectionRanges: true,
+    links: false,
+    documentHighlights: false,
+    rename: false
+}
+
+export const defaults: LanguageServiceDefaults = new LanguageServiceDefaultsImpl(
+    'wgsl',
+    diagnosticDefault,
+    modeConfigurationDefault
+)
+
+languages.register({
+    id,
+    extensions: ['.wgsl'],
+    aliases: ['Wgsl', 'WGSL', 'shader'],
+})
+
+languages.onLanguage(id, () => {
+    import('./wgslMode').then(mode => mode.setupMode(defaults, id))
+    languages.setMonarchTokensProvider(id, monarch)
+    languages.setLanguageConfiguration(id, config)
+})

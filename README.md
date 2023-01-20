@@ -2,9 +2,10 @@
 ## **Note**: Until webgpu is stabilized across all browsers, `gputoy` will only run on browsers in [this](https://caniuse.com/webgpu) list.
 # **gputoy**
 
-[gputoy](https://gputoy.io) is a gpu programming development enviroment designed to be as simple as possible to create and share creations. 
+[gputoy](https://gputoy.io) is a gpu shader development enviroment designed to be as simple as possible to create and share creations. 
 
-This project is in its early stages, but ideally it should satisfy the following requirements:
+
+## MVP:
 
  * **Frictionless**
     * Instantly create a new project, regardless if user has account or is logged in (fallback to local storage). 

@@ -1,10 +1,15 @@
 import type { Config, DirNodeState, Files, FilteredAction, Layout, UserEditorPrefs, UserGeneralPrefs } from "$common"
 import type { Keybinds } from '$core/input'
+import type { RunState } from "./runstate"
 
 /**
  *              Points to gpu-back
  */
 export const API_PATH = import.meta.env.VITE_API_URL
+
+export const DEFAULT_RUN_STATE: RunState = {
+    playing: false,
+}
 
 /**
  *              Project defaults
@@ -42,7 +47,9 @@ export const DEFAULT_LAYOUT: Layout = {
 
 } as const
 export const DEFAULT_CONFIG: Config = {
-    runner: "/run.json"
+    runner: "/run.json",
+    logLevel: 'Info',
+
 } as const
 export const DEFAULT_FILES: Files = {
     map: {
@@ -88,6 +95,7 @@ export const DEFAULT_USER_GENERAL_PREFS: UserGeneralPrefs = {
     projectPanelSize: 12,
     editorPanelSize: 50,
     resourcePanelSize: 40,
+    consoleWrap: true,
 } as const
 
 export const DEFAULT_USER_EDITOR_PREFS: UserEditorPrefs = {
@@ -194,6 +202,10 @@ export const USER_CONFIG_META: ConfigMeta = {
             min: 10,
             max: 90,
         },
+        consoleWrap: {
+            type: 'toggle',
+            description: 'Enable text wrap in the console.'
+        },
     },
     editor: {
         fontSize: {
@@ -226,7 +238,8 @@ export const USER_CONFIG_META: ConfigMeta = {
 export const GENERAL_CONFIG_KEYS: readonly GeneralConfigKey[] = [
     'projectPanelSize',
     'editorPanelSize',
-    'resourcePanelSize'
+    'resourcePanelSize',
+    "consoleWrap"
 ] as const
 
 export const EDITOR_CONFIG_KEYS: readonly EditorConfigKey[] = [
@@ -369,7 +382,26 @@ export const MENU_MAP: Record<MenuKey, ReadonlyArray<ReadonlyArray<MenuEntry>>> 
         ],
     ],
     'edit': [],
-    'project': [],
+    'project': [
+        [
+            {
+                name: 'Build',
+                fAction: {
+                    action: {
+                        'ty': 'rebuild'
+                    }
+                }
+            },
+            {
+                name: 'Introspect',
+                fAction: {
+                    action: {
+                        'ty': ''
+                    }
+                }
+            }
+        ]
+    ],
     'view': [
         [
             {
@@ -399,6 +431,42 @@ export const MENU_MAP: Record<MenuKey, ReadonlyArray<ReadonlyArray<MenuEntry>>> 
                     }
                 }
             },
+        ],
+        [
+            {
+                name: 'Toggle Console',
+                fAction: {
+                    action: {
+                        'ty': 'toggleConsole',
+                    }
+                }
+            },
+            {
+                name: 'Toggle User Preferences',
+                fAction: {
+                    action: {
+                        'ty': 'toggleUserPreferences',
+                    }
+                }
+            },
+            {
+                name: 'Toggle Debug Panel',
+                fAction: {
+                    action: {
+                        'ty': 'toggleDebugPanel',
+                    }
+                }
+            },
+        ],
+        [
+            {
+                name: 'Toggle Dark Mode',
+                fAction: {
+                    action: {
+                        'ty': 'toggleDarkMode'
+                    }
+                }
+            }
         ]
     ],
     'help': []

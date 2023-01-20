@@ -115,6 +115,7 @@ export type FileTreeNode = {
  * @returns Tree representation of files 
  */
 function treeFromFiles(files: Files): FileTreeNode {
+    console.log("Running treeFromFiles")
     let ret: FileTreeNode = { dir: '', absoluteDir: '', children: [] }
     let ptr = ret
 

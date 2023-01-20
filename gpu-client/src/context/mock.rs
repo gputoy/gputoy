@@ -34,7 +34,7 @@ impl MockContext {
             limits,
         };
         let (device, queue) = adapter.request_device(&desc, None).await?;
-        let resources = ResourceCache::new();
+        let resources = ResourceCache::default();
 
         Ok(MockContext {
             adapter,

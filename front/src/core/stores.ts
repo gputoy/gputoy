@@ -1,6 +1,6 @@
 import type { Action, CompileError, Config, FileDependencyInfo, FilePrebuildResult, Files, Layout, PrebuildResult, ProjectResponse, UserEditorPrefs, UserGeneralPrefs, UserInfoResponse, UserPrefs } from "$common"
 import { initConsoleMethods, type ConsoleExtras, type Log } from "$core/console"
-import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT, DEFAULT_USER_EDITOR_PREFS, DEFAULT_USER_GENERAL_PREFS, DEFAULT_USER_KEYBINDS, type MenuKey } from "$core/consts"
+import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT, DEFAULT_RUN_STATE, DEFAULT_USER_EDITOR_PREFS, DEFAULT_USER_GENERAL_PREFS, DEFAULT_USER_KEYBINDS, type MenuKey } from "$core/consts"
 import { initFilesMethods, type FilesExtras } from "$core/files"
 import type { Keybinds } from "$core/input"
 import { initLayoutMethods, type LayoutExtras } from "$core/layout"
@@ -9,6 +9,7 @@ import { writeToProjectLocalStorage, type ProjectMeta } from "$core/project"
 import { initUserMethods, type UserExtras } from "$core/user"
 import { initTheme, type Theme } from "$core/util"
 import { derived, get, writable, type Writable } from "svelte/store"
+import { initRunStateMethods, type RunState, type RunStateExtras } from "./runstate"
 
 
 // TODO: move this to seperate file
@@ -63,6 +64,7 @@ export const wPrebuildResult = makeEnhanced<PrebuildResult | null, PrebuildResul
 export const wPrebuildDirty = writable(true)
 export const wBuildResult = writable<{} | null>(null)
 export const wBuildDirty = writable(true)
+export const wRunState = makeEnhanced<RunState, RunStateExtras>(DEFAULT_RUN_STATE, initRunStateMethods)()
 
 /**
  *                  Project stores parts, merges in derived dProject
