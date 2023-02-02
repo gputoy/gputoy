@@ -18,7 +18,7 @@ lazy_static! {
 }
 
 pub struct Compiler {
-    pub(crate) wgsl_parser: RefCell<naga::front::wgsl::Parser>,
+    pub(crate) wgsl_parser: RefCell<naga::front::wgsl::Frontend>,
     // _glsl_parser: RefCell<naga::front::glsl::Parser>,
     _internal_files: gpu_common::Files,
 }
@@ -27,11 +27,14 @@ impl Compiler {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            wgsl_parser: RefCell::new(naga::front::wgsl::Parser::new()),
+            wgsl_parser: RefCell::new(naga::front::wgsl::Frontend::new()),
             // _glsl_parser: RefCell::new(naga::front::glsl::Parser::default()),
             _internal_files: Default::default(),
         }
     }
+    // pub fn init_from_files(&mut self, files: gpu_common::Files) -> Result<PrebuildResult, Error> {
+    //     Ok()
+    // }
     pub fn prebuild(&mut self, files: &gpu_common::Files) -> Result<PrebuildResult, Error> {
         let dependency_info = Self::get_dependency_info(files);
         let prebuild: FastHashMap<_, _> = files

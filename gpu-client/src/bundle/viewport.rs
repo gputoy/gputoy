@@ -62,15 +62,20 @@ impl Bundle for ViewportBundle {
         }
 
         gpu_log::info!("Initializing surface {}", args.target);
-        let surface = unsafe { ctx.system.instance.create_surface(&window) };
+        let surface = unsafe { ctx.system.instance.create_surface(&window).unwrap() };
+
+        let capabilities = surface.get_capabilities(&ctx.system.adapter);
+        let preferred_format = capabilities.formats[0];
+
         let size = window.inner_size();
-        let preferred_format = surface.get_supported_formats(&ctx.system.adapter)[0];
         let surface_config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: preferred_format,
             width: size.width,
             height: size.height,
             present_mode: wgpu::PresentMode::Fifo,
+            alpha_mode: capabilities.alpha_modes[0],
+            view_formats: vec![],
         };
 
         // Initialize surface for presentation.

@@ -15,7 +15,7 @@ pub struct MockContext {
 impl MockContext {
     pub async fn new() -> Result<MockContext, Error> {
         let backend = wgpu::Backends::PRIMARY;
-        let instance = wgpu::Instance::new(backend);
+        let instance = wgpu::Instance::new(Default::default());
         let adapter = instance
             .request_adapter(&wgpu::RequestAdapterOptions {
                 power_preference: Default::default(),

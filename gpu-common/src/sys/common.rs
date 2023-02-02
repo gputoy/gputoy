@@ -106,8 +106,6 @@ pub enum TextureFormat {
     Depth24Plus,
     /// Special depth/stencil format with at least 24 bit integer depth and 8 bits integer stencil.
     Depth24PlusStencil8,
-    /// Special depth/stencil format with 24 bit integer depth and 8 bits integer stencil.
-    Depth24UnormStencil8,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -146,4 +144,10 @@ pub enum StorageFormat {
     Rgba32Uint,
     Rgba32Sint,
     Rgba32Float,
+    R16Unorm,
+    R16Snorm,
+    Rg16Unorm,
+    Rg16Snorm,
+    Rgba16Unorm,
+    Rgba16Snorm,
 }

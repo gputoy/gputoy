@@ -19,7 +19,11 @@ impl System {
         let backend = wgpu::Backends::BROWSER_WEBGPU;
         #[cfg(not(target_arch = "wasm32"))]
         let backend = wgpu::Backends::PRIMARY;
-        let instance = wgpu::Instance::new(backend);
+        let instance_descriptor = wgpu::InstanceDescriptor {
+            backends: backend,
+            ..Default::default()
+        };
+        let instance = wgpu::Instance::new(instance_descriptor);
 
         let adapter = wgpu::util::initialize_adapter_from_env_or_default(&instance, backend, None)
             .await
