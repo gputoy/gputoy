@@ -23,8 +23,8 @@ pub enum ResourceEvent {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FileCreated {
-    file_id: FilePath,
-    extension: SupportedExtension,
+    // file_id: FilePath,
+    // extension: SupportedExtension,
 }
 
 #[derive(Debug)]
@@ -32,7 +32,7 @@ pub struct FileCreated {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FileModified {
-    file_id: FilePath,
+    // file_id: FilePath,
     new_contents: String,
 }
 
@@ -41,5 +41,5 @@ pub struct FileModified {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
 pub struct FileDeleted {
-    file_id: FilePath,
+    // file_id: FilePath,
 }

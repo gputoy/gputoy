@@ -160,6 +160,7 @@ mod wgpu_ext {
                     depth_or_array_layers: args.size[2],
                 },
                 usage: args.usage.into(),
+                view_formats: &[],
             }
         }
     }
@@ -251,7 +252,6 @@ mod wgpu_ext {
                 TextureFormat::Depth32FloatStencil8 => Self::Depth32FloatStencil8,
                 TextureFormat::Depth24Plus => Self::Depth24Plus,
                 TextureFormat::Depth24PlusStencil8 => Self::Depth24PlusStencil8,
-                TextureFormat::Depth24UnormStencil8 => Self::Depth24UnormStencil8,
             }
         }
     }
@@ -297,7 +297,6 @@ mod wgpu_ext {
                 wgpu::TextureFormat::Depth32FloatStencil8 => Self::Depth32FloatStencil8,
                 wgpu::TextureFormat::Depth24Plus => Self::Depth24Plus,
                 wgpu::TextureFormat::Depth24PlusStencil8 => Self::Depth24PlusStencil8,
-                wgpu::TextureFormat::Depth24UnormStencil8 => Self::Depth24UnormStencil8,
                 _ => todo!(),
             }
         }
@@ -344,8 +343,7 @@ mod wgpu_ext {
                 TextureFormat::Depth32Float
                 | TextureFormat::Depth32FloatStencil8
                 | TextureFormat::Depth24Plus
-                | TextureFormat::Depth24PlusStencil8
-                | TextureFormat::Depth24UnormStencil8 => Self::Depth,
+                | TextureFormat::Depth24PlusStencil8 => Self::Depth,
             }
         }
     }

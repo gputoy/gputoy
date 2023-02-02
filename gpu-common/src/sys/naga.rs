@@ -291,6 +291,7 @@ pub enum Builtin {
     WorkGroupId,
     WorkGroupSize,
     NumWorkGroups,
+    PointCoord,
 }
 
 #[derive(Debug)]
@@ -640,6 +641,7 @@ mod naga_ext {
                 naga::BuiltIn::WorkGroupId => Self::WorkGroupId,
                 naga::BuiltIn::WorkGroupSize => Self::WorkGroupSize,
                 naga::BuiltIn::NumWorkGroups => Self::NumWorkGroups,
+                naga::BuiltIn::PointCoord => Self::PointCoord,
             }
         }
     }
@@ -679,6 +681,12 @@ mod naga_ext {
                 naga::StorageFormat::Rgba32Uint => Self::Rgba32Uint,
                 naga::StorageFormat::Rgba32Sint => Self::Rgba32Sint,
                 naga::StorageFormat::Rgba32Float => Self::Rgba32Float,
+                naga::StorageFormat::R16Unorm => todo!(),
+                naga::StorageFormat::R16Snorm => todo!(),
+                naga::StorageFormat::Rg16Unorm => todo!(),
+                naga::StorageFormat::Rg16Snorm => todo!(),
+                naga::StorageFormat::Rgba16Unorm => todo!(),
+                naga::StorageFormat::Rgba16Snorm => todo!(),
             }
         }
     }

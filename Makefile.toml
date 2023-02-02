@@ -27,7 +27,7 @@ condition = { profiles = ["development"] }
 description = "Generate wasm client"
 script = """\
   RUSTFLAGS=--cfg=web_sys_unstable_apis \
-  wasm-pack build ./gpu-wasm-client --out-dir ../front/pkg/client  --target web --mode no-install --dev
+  wasm-pack build ./gpu-wasm-client --out-dir ../front/pkg/client  --target web --dev
 """
 
 [tasks.wasm-client-prod]

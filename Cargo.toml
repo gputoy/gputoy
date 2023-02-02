@@ -10,3 +10,6 @@ members = [
   "gpu-tauri",
 ]
 resolver = "2"
+
+[patch.crates-io]
+naga = { git = "https://github.com/gputoy/naga.git" }
