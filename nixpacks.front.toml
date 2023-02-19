@@ -6,8 +6,8 @@ cmds = ['rustup default stable']
 aptPkgs = ['libssl-dev', 'binaryen', 'build-essential']
 
 [phases.build]
-cmds = ["make start-prod"]
+cmds = ["make front-build"]
 dependsOn = ['install']
 
 [start]
-cmd = 'node dist/index.js'
+cmd = 'make start-prod -o front-build'
