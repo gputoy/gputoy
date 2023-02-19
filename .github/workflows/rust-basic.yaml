@@ -1,6 +1,12 @@
-# Regular testing.
+# Rust basic testing
 name: pipeline
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "gpu-**/**"
+  pull_request:
+    paths:
+      - "gpu-**/**"
 
 jobs:
   clippy:
@@ -38,7 +44,6 @@ jobs:
     name: Format
     runs-on: ubuntu-latest
     steps:
-      - name: cargo fmt 
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -46,7 +51,7 @@ jobs:
           toolchain: stable
           override: true
           components: rustfmt
-        run: |
+      - run: |
           cargo fmt -- --check
   wasm:
     name: Wasm size check
@@ -56,6 +61,7 @@ jobs:
       - uses: action-rs/toolchain@v1
         with:
           profile: minimal
+          toolchain: stable
       - uses: jetli/wasm-bindgen-action@v0.2.0
-      - run: |        
+      - run: |
           make wasm
