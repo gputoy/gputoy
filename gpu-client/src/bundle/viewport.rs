@@ -1,4 +1,3 @@
-use gpu_common::{ViewportBundleArgs, ViewportBundleResources};
 use thiserror::Error;
 
 use winit::window::WindowBuilder;
@@ -14,7 +13,7 @@ pub struct ViewportBundle {
     surface_texture_handle: crate::resource::TextureHandle,
     // mouse_buffer_handle: BufferHandle,
     // resolution_buffer_handle: BufferHandle,
-    _args: ViewportBundleArgs,
+    _args: gpu_common::bundle::viewport::Args,
 }
 
 #[derive(Debug, Error)]
@@ -34,8 +33,9 @@ impl ViewportBundle {
 }
 
 impl Bundle for ViewportBundle {
-    type Args = gpu_common::ViewportBundleArgs;
-    type ResourceKeys = gpu_common::ViewportBundleResources;
+    type Proto = gpu_common::bundle::viewport::Bundle;
+    type Args = gpu_common::bundle::viewport::Args;
+    type ResourceKeys = gpu_common::bundle::viewport::Resources;
     type Error = ViewportError;
 
     const MAX_INSTANCES: u32 = 4;
@@ -97,7 +97,7 @@ impl Bundle for ViewportBundle {
         .map_err(ViewportError::Surface)?;
 
         // Insert texture surface with full identifier i.e. '{viewport_ident}::surface'.
-        let full_ident = Self::prefix_key_with_ident(&ident, ViewportBundleResources::Surface);
+        let full_ident = Self::prefix_key_with_ident(&ident, Self::ResourceKeys::Surface);
         let mut resources = ctx.resources.borrow_mut();
         let surface_texture_handle = resources.insert_with_ident(surface_texture, &full_ident);
 

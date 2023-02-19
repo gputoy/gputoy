@@ -1,17 +1,17 @@
-import { wConsole } from "$core/stores"
+import { wConsole } from '$core/stores'
 
 export function __trace_ext(log: string) {
-    wConsole.trace(log)
+	wConsole.trace(log)
 }
 export function __debug_ext(log: string) {
-    wConsole.debug(log)
+	wConsole.debug(log)
 }
 export function __info_ext(log: string) {
-    wConsole.info(log)
+	wConsole.info(log)
 }
 export function __warn_ext(log: string) {
-    wConsole.warn(log)
+	wConsole.warn(log)
 }
 export function __error_ext(log: string) {
-    wConsole.error(log)
+	wConsole.error(log)
 }

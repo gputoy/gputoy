@@ -2,14 +2,14 @@ use arrayvec::ArrayVec;
 use std::{cell::RefCell, rc::Rc, str::FromStr};
 use thiserror::Error;
 
-use gpu_common::BundleArgs;
+use gpu_common::bundle::BundleArgs;
 
 mod cache;
-mod sys;
+mod system;
 mod viewport;
 
 pub use cache::BundleCache;
-pub use sys::SystemBundle as System;
+pub use system::SystemBundle as System;
 pub use viewport::ViewportBundle as Viewport;
 
 use crate::resource;
@@ -23,12 +23,12 @@ pub type Bundles = Rc<RefCell<cache::BundleCache>>;
 /// between shaders and the external environment, whether that be the operating system or
 /// browser.
 pub trait Bundle: Sized {
+    /// The base bundle type that provides shader-level type information.
+    type Proto: gpu_common::bundle::Bundle;
     /// All arguments needed to initialize bundle.  
     type Args: Sized + for<'a> serde::Deserialize<'a>;
-
     /// Statically enumerated set of resources that bundle will have ownership over.
     type ResourceKeys: FromStr + AsRef<str>;
-
     /// Error type for this bundle.
     type Error: std::error::Error;
 
@@ -116,10 +116,10 @@ pub trait Bundle: Sized {
 
 #[derive(Debug, Error)]
 pub enum BundleError {
-    #[error("Bundle limit exceeded for {0}. Max allowed: {1}")]
+    #[error("Instance limit exceeded for {0}-bundle. Max instances permitted: {1}")]
     BundleLimitExceeded(String, u32),
     #[error(transparent)]
     Viewport(#[from] viewport::ViewportError),
     #[error(transparent)]
-    System(#[from] sys::SystemBundleError),
+    System(#[from] system::SystemBundleError),
 }

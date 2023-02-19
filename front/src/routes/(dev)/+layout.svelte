@@ -41,7 +41,7 @@
 		</ul>
 
 		<div class="nav-mid nav-region">
-			{$wUser?.username ?? 'anonymous'}&nbsp;/&nbsp;{$wProjectMeta.title}
+			<b>{$wUser?.username ?? 'anonymous'}</b>&nbsp;/&nbsp;{$wProjectMeta.title}
 		</div>
 
 		<div class="nav-end nav-region">
@@ -49,12 +49,18 @@
 				<div class="input-helper">
 					<Key keycode={$wLastInputAction.code} />
 					{#if $wLastInputAction.action?.ty}
-						<code style="color: var(--text-accent-color);">{$wLastInputAction.action.ty}</code>
+						<code style="color: var(--text-accent-color);"
+							>{$wLastInputAction.action.ty}</code
+						>
 					{/if}
 				</div>
 			{/if}
 			<div class="navend-container">
-				<IconButton on:click={() => saveProject(true)} disabled={$wUser == null} series="first">
+				<IconButton
+					on:click={() => saveProject(true)}
+					disabled={$wUser == null}
+					series="first"
+				>
 					<Icon name="save" stroked thick />
 				</IconButton>
 				<IconButton on:click={toggleUserModal} text="Fork" series="last">
@@ -113,7 +119,7 @@
 		justify-content: left;
 	}
 	.nav-mid {
-		font-size: var(--sm);
+		font-size: var(--xs);
 		justify-content: center;
 		text-align: center;
 		min-width: max-content;

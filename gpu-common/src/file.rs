@@ -5,7 +5,7 @@ use schemars::JsonSchema;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use std::{borrow::Cow, collections::HashMap, fmt::Display, ops::Index};
-use strum_macros::{AsRefStr, EnumString};
+use strum_macros::{AsRefStr, Display, EnumString};
 use validator::Validate;
 use validator_derive::Validate;
 
@@ -26,7 +26,25 @@ pub struct FilePath {
     path: String,
 }
 
+#[cfg(feature = "wasm")]
+impl TryFrom<&js_sys::JsString> for FilePath {
+    type Error = RootError;
+
+    fn try_from(value: &js_sys::JsString) -> Result<Self, Self::Error> {
+        FilePath::try_from(
+            value
+                .as_string()
+                .ok_or(Self::Error::InvalidStringFormat(value.clone()))?,
+        )
+    }
+}
+
 impl FilePath {
+    pub fn unknown() -> Self {
+        Self {
+            path: String::from("unknown"),
+        }
+    }
     pub fn try_from<A: AsRef<str>>(value: A) -> Result<Self, RootError> {
         let path = FilePath {
             path: value.as_ref().to_owned(),
@@ -39,6 +57,13 @@ impl FilePath {
     }
     pub fn into_inner(self) -> String {
         self.path
+    }
+}
+
+impl TryFrom<&str> for FilePath {
+    type Error = RootError;
+    fn try_from(path: &str) -> Result<Self, Self::Error> {
+        FilePath::try_from(path)
     }
 }
 
@@ -82,7 +107,6 @@ impl Files {
     }
 }
 
-/// Unsafe index for tests
 impl Index<&str> for Files {
     type Output = File;
 
@@ -127,7 +151,7 @@ impl File {
     }
 }
 
-#[derive(AsRefStr, EnumString, Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Display, AsRefStr, EnumString, Debug, Clone, Copy, Eq, PartialEq)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
@@ -168,17 +192,17 @@ mod tests {
         assert!(FilePath::try_from(path).is_err(), "{path}");
 
         let path = "/test.wgsl";
-        assert!(FilePath::try_from(path).is_err(), "{path}");
+        assert!(FilePath::try_from(path).is_ok(), "{path}");
         let path = "test.wgsl";
         assert!(FilePath::try_from(path).is_err(), "{path}");
 
         let path = "/._test.wgsl";
-        assert!(FilePath::try_from(path).is_err(), "{path}");
+        assert!(FilePath::try_from(path).is_ok(), "{path}");
         let path = "/..test.wgsl";
         assert!(FilePath::try_from(path).is_err(), "{path}");
 
         let path = "/.hidden/path-with-dash/test.wgsl";
-        assert!(FilePath::try_from(path).is_err(), "{path}");
+        assert!(FilePath::try_from(path).is_ok(), "{path}");
         let path = "/.hidden/path-with-dash/test";
         assert!(FilePath::try_from(path).is_err(), "{path}");
     }

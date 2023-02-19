@@ -1,49 +1,59 @@
-import type { Action, FilteredAction, Panel, ShiftPaneArgs } from "$common"
-import { clearProject } from "$core/project"
-import { wBuildDirty, wConfig, wConsole, wConsoleOpen, wDebugPanel, wFiles, wLayout, wPrebuildDirty, wRunState } from "$stores"
-import { toast } from "@zerodevx/svelte-toast"
-import isEqual from "lodash/isEqual"
-import { get } from "svelte/store"
-import context from "./context"
+import type { Action, FilteredAction, Panel, ShiftPaneArgs } from '$common'
+import { clearProject } from '$core/project'
+import { getAllModels, getModel } from '$monaco'
+import { wWorkerInternal } from '$monaco/wgsl/wgslMode'
+import {
+	wConfig,
+	wConsole,
+	wConsoleOpen,
+	wDebugPanel,
+	wFileDirty,
+	wFiles,
+	wLayout,
+	wModelDirty,
+	wRunState,
+	wWorkerData
+} from '$stores'
+import { toast } from '@zerodevx/svelte-toast'
+import isEqual from 'lodash/isEqual'
 
 const actionHistory: Action[] = []
 
 /**
- * Determines if two Actions are equal by value 
- * @param a 
- * @param b 
- * @returns true/false if actions are equal by value 
+ * Determines if two Actions are equal by value
+ * @param a
+ * @param b
+ * @returns true/false if actions are equal by value
  */
 export function isActionEqual(a: Action, b: Action): boolean {
-    if (a.ty !== b.ty) return false
-    // Both have action arguments within their type variant
-    if ('c' in a && 'c' in b)
-        return isEqual(a.c, b.c)
-    return true
+	if (a.ty !== b.ty) return false
+	// Both have action arguments within their type variant
+	if ('c' in a && 'c' in b) return isEqual(a.c, b.c)
+	return true
 }
 
 /**
  * Evaluates filter from filteredAction
  * TODO: implement specific filters
- * @param filter 
- * @returns 
+ * @param filter
+ * @returns
  */
 export function actionPermitted(fAction: FilteredAction) {
-    return true
+	return true
 }
 
 export const FILTER_CONDITION_LIST = [
-    'userOwnsProject',
-    'userLoggedIn',
+	'userOwnsProject',
+	'userLoggedIn',
 
-    'filesDirty',
-    'fileDirty',
-    'fileOpen',
+	'filesDirty',
+	'fileDirty',
+	'fileOpen',
 
-    'editorPanelFocused',
-    'resourcePanelFocused',
-    'projectPanelFocused',
-    'viewportPanelFocused',
+	'editorPanelFocused',
+	'resourcePanelFocused',
+	'projectPanelFocused',
+	'viewportPanelFocused'
 ]
 export type SingleFilter = typeof FILTER_CONDITION_LIST[number]
 
@@ -52,97 +62,148 @@ export type SingleFilter = typeof FILTER_CONDITION_LIST[number]
  * @param action Action to be executed
  */
 export function pushAction(action: Action) {
-    switch (action.ty) {
-        case 'playPause': playPause(); break
-        case 'openDocument': openDocument(action.c); break
-        case 'nextDocument': shiftDoument(1); break
-        case 'previousDocument': shiftDoument(-1); break
-        case 'rebuild': rebuildProject(); break
-        case 'reset': resetProject(); break
-        case 'toggleConsole': toggleConsole(); break
-        case 'togglePanel': togglePanel(action.c); break
-        case 'shiftPanel': shiftPanel(action.c); break
-        case 'focus': focusPane(action.c); break
-        case 'toggleDebugPanel': toggleDebugPanel(); break
-        case 'closeFile': closeCurrentFile(); break
-        case 'closeProject': closeProject(); break
-        case 'setRunner': setRunner(action.c); break
+	switch (action.ty) {
+		case 'playPause':
+			playPause()
+			break
+		case 'openDocument':
+			openDocument(action.c)
+			break
+		case 'nextDocument':
+			shiftDoument(1)
+			break
+		case 'previousDocument':
+			shiftDoument(-1)
+			break
+		case 'rebuild':
+			rebuildProject()
+			break
+		case 'reset':
+			resetProject()
+			break
+		case 'toggleConsole':
+			toggleConsole()
+			break
+		case 'togglePanel':
+			togglePanel(action.c)
+			break
+		case 'shiftPanel':
+			shiftPanel(action.c)
+			break
+		case 'focus':
+			focusPane(action.c)
+			break
+		case 'toggleDebugPanel':
+			toggleDebugPanel()
+			break
+		case 'closeFile':
+			closeCurrentFile()
+			break
+		case 'closeProject':
+			closeProject()
+			break
+		case 'setRunner':
+			setRunner(action.c)
+			break
+		case 'saveCurrentFile':
+			saveCurrentFile()
+			break
+		case 'saveAllFiles':
+			saveAllFiles()
+			break
 
-        /** @ts-ignore */
-        // There may be a case in the future where a new variant is added
-        // and the implementation was forgotten
-        default: toast.push('Action unrecognized or not yet implemented: ' + action.ty)
-    }
+		/** @ts-ignore */
+		// There may be a case in the future where a new variant is added
+		// and the implementation was forgotten
+		default:
+			toast.push('Action unrecognized or not yet implemented: ' + action.ty)
+	}
 }
 
 /**
- *  TODO: create action reversal system 
- * @param action 
+ *  TODO: create action reversal system
+ * @param action
  */
-export function reverseAction(action: Action) {
-
-}
-
+export function reverseAction(action: Action) {}
 
 /// ------------------- Action execution ----------------------
 
-function playPause() {
-    if (get(wPrebuildDirty)) {
-        context.prebuild()
-    }
+async function playPause() {
+	// if (get(wPrebuildDirty)) {
+	//     context.prebuild()
+	// }
 
-    if (get(wBuildDirty)) {
-        context.build()
-    }
-    wRunState.playPause()
-
+	// if (get(wBuildDirty)) {
+	//     context.build()
+	// }
+	wWorkerInternal.tryBuild()
+	wWorkerData.set(await wWorkerInternal.poll())
+	wRunState.playPause()
 }
 
 function openDocument(fileid: string) {
-    wLayout.openDocument(fileid)
+	wLayout.openDocument(fileid)
 }
 function shiftDoument(shift: number) {
-    wLayout.moveWorkspaceIdx(shift)
+	wLayout.moveWorkspaceIdx(shift)
 }
 
 function closeCurrentFile() {
-    wLayout.closeWorkspaceFile()
+	wLayout.closeWorkspaceFile()
 }
 
-function rebuildProject() {
-}
+function rebuildProject() {}
 
-function resetProject() {
-}
+function resetProject() {}
 
 function toggleConsole() {
-    wConsoleOpen.update(o => !o)
+	wConsoleOpen.update((o) => !o)
 }
 
 function togglePanel(panel: Panel) {
-    wLayout.togglePanel(panel)
+	wLayout.togglePanel(panel)
 }
 
 function toggleDebugPanel() {
-    wDebugPanel.update(show => !show)
+	wDebugPanel.update((show) => !show)
 }
 
-function shiftPanel(c: ShiftPaneArgs) {
-}
+function shiftPanel(c: ShiftPaneArgs) {}
 
-function focusPane(c: string) {
-}
+function focusPane(c: string) {}
 
 function closeProject() {
-    clearProject()
+	clearProject()
 }
 
 function setRunner(fileid: string) {
-    if (wFiles.getFile(fileid))
-        wConfig.update(config => {
-            config.runner = fileid
-            return config
-        })
-    else
-        wConsole.error("Runner not found: " + fileid)
+	if (wFiles.getFile(fileid))
+		wConfig.update((config) => {
+			config.runner = fileid
+			return config
+		})
+	else wConsole.error('Runner not found: ' + fileid)
+}
+
+async function saveCurrentFile() {
+	const currentFile = wLayout.getOpenFileId()
+	if (!currentFile) return
+	await wWorkerInternal.applyUpdateToFile(currentFile)
+	wModelDirty.remove(currentFile)
+
+	const model = getModel(currentFile)
+	if (!model) return
+	wFiles.writeFile(currentFile, model.getValue())
+	wFileDirty.remove(currentFile)
+}
+
+async function saveAllFiles() {
+	await wWorkerInternal.applyUpdateToFile()
+	wModelDirty.clear()
+
+	getAllModels().forEach((model) => {
+		const path = model.uri.path
+		wFiles.writeFile(path, model.getValue())
+	})
+	wFileDirty.clear()
 }

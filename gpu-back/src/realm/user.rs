@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use actix_identity::Identity;
 use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
-use gpu_common::realm::*;
+use gpu_common::api::*;
 use validator::Validate;
 
 use crate::{

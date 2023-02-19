@@ -19,7 +19,7 @@ macro_rules! make_schemas {
 /// runs node script `front/generate_common_types.js` to generate typescript types.
 #[cfg(all(feature = "serde", feature = "schema"))]
 fn main() -> std::io::Result<()> {
-    use gpu_common::{realm::*, *};
+    use gpu_common::{api::*, *};
     let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("..")
         .join("schemas");

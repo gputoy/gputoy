@@ -1,8 +1,8 @@
 <script lang="ts">
 	export let title: string
-	export let route: string = '/'
-	export let current: boolean = false
-	export let aClass: string = ''
+	export let route = '/'
+	export let current = false
+	export let aClass = ''
 </script>
 
 <div class={current ? 'current' : ''} {...$$restProps}>

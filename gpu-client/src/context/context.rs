@@ -70,8 +70,8 @@ impl Context {
 
         self.pipelines = Some(pipelines);
 
-        let elapsed_time = chrono::Utc::now().timestamp_millis() - start_time.timestamp_millis();
-        gpu_log::info!("Build finished in {elapsed_time}ms");
+        let _elapsed_time = chrono::Utc::now().timestamp_millis() - start_time.timestamp_millis();
+        gpu_log::info!("Build finished in {_elapsed_time}ms");
         Ok(())
     }
 

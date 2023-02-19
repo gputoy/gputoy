@@ -15,18 +15,6 @@ pub struct ResourceCache {
 impl ResourceCache {
     /// Insert resource into cache, returning a handle that can then be used
     /// to query the resource in the future with [`Self::get()`].
-    ///
-    ///
-    /// ```
-    /// use gpu_client::{Context, resource::{Buffer, BufferArgs, ResourceCache}};
-    ///
-    /// let context = Context::new();
-    /// let mut cache = ResourceCache::default();
-    ///
-    /// let args = BufferArgs::default();
-    /// let resource = Buffer::new(&context, &args);
-    /// let handle = cache.insert(resource);
-    /// ```
     pub fn insert<R>(&mut self, resource: R) -> R::Handle
     where
         R: Resource,
@@ -37,18 +25,6 @@ impl ResourceCache {
 
     /// Create resource from argument and insert into cache, returning a handle
     /// that can then be use to query the resource in the future with [`Self::get()`].
-    ///
-    ///
-    /// ```
-    /// use gpu_client::{Context, resource};
-    ///
-    /// let context = Context::new();
-    /// let mut cache = resource::ResourceCache::default();
-    ///
-    /// let args = resource::BufferArgs::default();
-    /// let handle = cache.insert(&context, &args);
-    /// ```
-    ///
     pub fn insert_from_args<R>(&mut self, ctx: &Context, args: &R::Args) -> R::Handle
     where
         R: Resource,

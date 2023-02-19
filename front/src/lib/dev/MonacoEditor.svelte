@@ -1,200 +1,39 @@
 <script lang="ts">
-	import type {
-		File,
-		FilePrebuildResult,
-		Layout,
-		PrebuildResult,
-		SupportedExtension,
-		UserEditorPrefs
-	} from '$common'
-	import dark from '$core/monaco/dark'
-	import light from '$core/monaco/light'
-	import {
-		wFiles,
-		wLayout,
-		wPrebuildResult,
-		wTheme,
-		wUserEditorPrefs
-	} from '$stores'
-	import type { editor, Position } from 'monaco-editor'
+	import { wLayout, wTheme, wUserEditorPrefs } from '$stores'
 	import { onMount } from 'svelte'
 	import { get } from 'svelte/store'
 
-	import setJSONSchema from '$core/monaco/json'
-	import Statusbar from '$core/monaco/statusbar'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 
-	import gputWorker from '$core/monaco/wgsl/worker?worker'
-	import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
+	import * as monaco from '$monaco'
 
 	let divEl: HTMLDivElement
 	let statusEl: HTMLDivElement
 
-	var Monaco: typeof import('monaco-editor')
-	/** @ts-ignore*/
-	var MonacoVim: any
-	let editorInstance: editor.IStandaloneCodeEditor | undefined = undefined
-	let vimMode: any | undefined = undefined
-
-	let cursorPosition: editor.ICursorPositionChangedEvent | null = null
-	let currentExtension: SupportedExtension | null = null
-	let cachedPositions: { [key: string]: Position | undefined } = {}
-
 	// Store subscriptions
-	wTheme.subscribe((newTheme) => Monaco?.editor.setTheme(newTheme))
-	wUserEditorPrefs.subscribe(updateEditorConfig)
-	wLayout.subscribe(changeFileFromLayout)
-	wPrebuildResult.subscribe(updateIntellisense)
+	wTheme.subscribe(monaco.setTheme)
+	wUserEditorPrefs.subscribe(monaco.updateEditorConfig)
+	wLayout.subscribe(monaco.changeFileFromLayout)
 
-	// Initializes the monaco editor instance
-	async function initEditor() {
-		self.MonacoEnvironment = {
-			getWorker(workerid, label) {
-				console.log('getWorker', workerid, label)
-				if (label === 'json') {
-					return new jsonWorker()
-				}
-				// return new editorWorker()
-				return new gputWorker()
-			}
-		}
-		Monaco = await import('monaco-editor')
-		await import('$core/monaco/wgsl')
-		/** @ts-ignore */
-		MonacoVim = await import('monaco-vim')
-		Monaco.editor.defineTheme('dark', dark)
-		Monaco.editor.defineTheme('light', light)
-		setJSONSchema(Monaco)
+	const { cursorPosition, currentExtension } = monaco
 
-		editorInstance = Monaco.editor.create(divEl, {
-			automaticLayout: true,
-			minimap: {
-				enabled: false
-			},
-			guides: {
-				highlightActiveBracketPair: true,
-				bracketPairs: true,
-				indentation: true,
-				highlightActiveIndentation: true,
-				bracketPairsHorizontal: true
-			},
-			padding: {
-				bottom: 20,
-				top: 20
-			}
+	onMount(() =>
+		monaco.initEditor(divEl, statusEl, {
+			theme: get(wTheme),
+			layout: get(wLayout),
+			prefs: get(wUserEditorPrefs)
 		})
-
-		// manually set theme and file on init
-		Monaco.editor.setTheme(get(wTheme))
-		changeFileFromLayout(get(wLayout))
-		updateEditorConfig(get(wUserEditorPrefs))
-		editorInstance.onDidChangeCursorPosition((ev) => {
-			cursorPosition = ev
-		})
-
-		// On destroy, dispose editor
-		return () => {
-			editorInstance?.dispose()
-		}
-	}
-
-	// Finds which file to display based on layout
-	function changeFileFromLayout(layout: Layout) {
-		if (!Monaco) return
-		if (layout.fileIndex == null) return
-		const fileid = layout.workspace[layout.fileIndex]
-		if (!fileid) return
-		const file = wFiles.getFile(fileid)
-		currentExtension = file?.extension ?? null
-		if (file) changeEditorFile(fileid, file)
-	}
-
-	// Sets editor file, creating model if not already created
-	function changeEditorFile(fileid: string, file: File) {
-		const uri = Monaco.Uri.file(fileid)
-		const current = editorInstance?.getModel()?.uri.path
-
-		// do nothing if new file is same as current file
-		if (current === uri.path) return
-		let model = Monaco?.editor.getModel(uri)
-		if (!model)
-			model = Monaco?.editor.createModel(file.data, file.extension, uri)
-
-		// override on change to target new file
-		model.onDidChangeContent((ev) => {
-			console.log(ev)
-			const content = editorInstance?.getModel()?.getValue()
-			if (!content) return
-			wFiles.writeFile(fileid, content)
-		})
-
-		// store cached cursor position for this model
-		if (current)
-			cachedPositions[current] = editorInstance?.getPosition() ?? undefined
-		const newPos = cachedPositions[fileid]
-
-		// set new model, set cursor positon from cache if available
-		editorInstance?.setModel(model)
-		if (newPos) editorInstance?.setPosition(newPos, 'Editor.changeEditorFile')
-
-		updateIntellisense(get(wPrebuildResult))
-	}
-
-	// Updates editor config based on user editor config
-	function updateEditorConfig(config: UserEditorPrefs) {
-		// monaco options
-		const options: editor.IEditorOptions & editor.IGlobalEditorOptions = {
-			fontSize: config.fontSize!,
-			fontFamily: config.fontFamily!,
-			lineNumbers: config.lineNumbers,
-			minimap: {
-				enabled: config.minimap
-			}
-		}
-		editorInstance?.updateOptions(options)
-
-		if (!vimMode && config.vimMode && editorInstance) {
-			vimMode = MonacoVim?.initVimMode(editorInstance, statusEl, Statusbar)
-		} else if (vimMode && !config.vimMode) {
-			vimMode.dispose()
-			vimMode = undefined
-		}
-		setTimeout(() => Monaco?.editor.remeasureFonts(), 10)
-	}
-	function updateIntellisense(prebuildResult: PrebuildResult | null) {
-		if (!prebuildResult) return
-		let model = editorInstance?.getModel()
-		let fileid = model?.uri.path
-		if (!model || !fileid) return
-		/** @ts-ignore*/
-		let result: FilePrebuildResult = prebuildResult.fileBuilds.get(fileid)
-		if (!result) return
-		let errors: editor.IMarkerData[] =
-			result.errors?.map((error) => ({
-				message: error.message,
-				severity: Monaco.MarkerSeverity.Error,
-				startColumn: error.span?.linePosition ?? 0,
-				endColumn: (error.span?.linePosition ?? 0) + (error.span?.length ?? 0),
-				startLineNumber: error.span?.lineNumber ?? 0,
-				endLineNumber: error.span?.lineNumber ?? 0
-			})) ?? []
-		Monaco.editor.setModelMarkers(model, 'owner', errors)
-	}
-	function clearFontCache() {
-		Monaco?.editor.remeasureFonts()
-	}
-
-	onMount(initEditor)
+	)
 </script>
 
 <div id="container">
 	<div id="editor-root" bind:this={divEl} />
-	<div id="status-root" class:hide={editorInstance === undefined}>
+	<div id="status-root" class:hide={monaco.noInstance}>
 		<div id="vim-status-root" bind:this={statusEl} />
 		<div id="status-right">
 			<span>
-				Ln {cursorPosition?.position.lineNumber ?? '?'}, Col {cursorPosition
+				Ln {$cursorPosition?.position.lineNumber ?? '?'}, Col {$cursorPosition
 					?.position.column ?? '?'}
 			</span>
 			<div class="analyzer-result">
@@ -203,11 +42,11 @@
 				<span> 0 </span>
 				<Icon name="alert-triangle" stroked />
 			</div>
-			<IconButton size="xs" on:click={clearFontCache} empty>
+			<IconButton size="xs" on:click={monaco.clearFontCache} empty>
 				<Icon name="refresh-ccw" stroked thick />
 			</IconButton>
-			{#if currentExtension}
-				<spam>{currentExtension}</spam>
+			{#if $currentExtension}
+				<spam>{$currentExtension}</spam>
 			{/if}
 		</div>
 	</div>

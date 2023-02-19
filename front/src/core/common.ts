@@ -152,6 +152,7 @@ export type Builtin =
       | "WorkGroupId"
       | "WorkGroupSize"
       | "NumWorkGroups"
+      | "PointCoord"
     )
   | {
       Position: {
@@ -307,7 +308,13 @@ export type StorageFormat =
   | "Rgba16Float"
   | "Rgba32Uint"
   | "Rgba32Sint"
-  | "Rgba32Float";
+  | "Rgba32Float"
+  | "R16Unorm"
+  | "R16Snorm"
+  | "Rg16Unorm"
+  | "Rg16Snorm"
+  | "Rgba16Unorm"
+  | "Rgba16Snorm";
 
 export type ImageDimension = "1d" | "2d" | "3d" | "cube";
 
@@ -356,7 +363,7 @@ export interface SourceLocation {
   offset: number;
 }
 /**
- * Identical to regex::Match, except the text is owned and it can be serialized. TODO: get refs to work within the compiler instead of owned strings.
+ * Identical to regex::Match, except the text is owned and it can be serialized. TODO: get refs to work within the analyzer instead of owned strings.
  */
 
 export interface Match {

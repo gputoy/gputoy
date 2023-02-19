@@ -8,11 +8,6 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub struct Client {
-    context: gpu_client::Context,
-}
-
-#[wasm_bindgen]
 pub struct Context(gpu_client::Context);
 
 #[wasm_bindgen(start)]

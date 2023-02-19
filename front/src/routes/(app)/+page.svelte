@@ -13,7 +13,9 @@
 	<div class="hero-container">
 		<OnMount>
 			<div class="header-container">
-				<h1 in:fade={{ delay: 250, duration: 250 }}>All those gigaflops, sitting idle</h1>
+				<h1 in:fade={{ delay: 250, duration: 250 }}>
+					All those gigaflops, sitting idle
+				</h1>
 				<h1 in:fade={{ delay: 1500, duration: 250 }}>Put them to work</h1>
 			</div>
 			<p in:fade={{ delay: 2250, duration: 250 }} />

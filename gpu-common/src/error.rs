@@ -1,14 +1,10 @@
-use std::fmt::Display;
+use thiserror::Error;
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum RootError {
+    #[cfg(feature = "wasm")]
+    #[error("Invalid utf-8 for string: {0}")]
+    InvalidStringFormat(js_sys::JsString),
+    #[error("Invalid file path: {0}")]
     InvalidFilePath(String),
-}
-
-impl Display for RootError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::InvalidFilePath(path) => write!(f, "Invalid file path: {path}"),
-        }
-    }
 }

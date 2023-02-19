@@ -1,0 +1,43 @@
+[package]
+name = "gpu-analyzer"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+service = ["serde", "wasm"]
+wasm = ["dep:wasm-bindgen", "dep:js-sys"]
+serde = ["dep:serde", "naga/serde", "codespan-reporting/serialization"]
+dev = ["service"]
+
+[dependencies]
+# local dependencies
+gpu-common = { path = "../gpu-common", features = ["naga"] }
+
+# remote dependencies
+thiserror = "1.0.38"
+log = "0.4.17"
+regex = "1.7.0"
+lazy_static = "1.4.0"
+slotmap = "1.0.6"
+serde_json = "1.0.85"
+base32 = "0.4.0"
+codespan-reporting = "0.11.1"
+
+[dependencies.serde]
+version = "1.0.147"
+optional = true
+
+[dependencies.naga]
+version = "0.11.0"
+features = ["wgsl-in", "clone", "span"]
+
+[dependencies.wasm-bindgen]
+version = "0.2.82"
+optional = true
+
+[dependencies.js-sys]
+version = "0.3.59"
+optional = true
+
+[dev-dependencies]
+walkdir = "2.3.2"

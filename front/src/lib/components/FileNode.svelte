@@ -48,7 +48,11 @@
 {:else}
 	<li class="dir">
 		<span class="entry" on:click={toggleOpen}>
-			<Icon name="chevron-right" size="16px" rotation={open ? '90deg' : '0deg'} />
+			<Icon
+				name="chevron-right"
+				size="16px"
+				rotation={open ? '90deg' : '0deg'}
+			/>
 			{fileNode.dir}
 		</span>
 		{#if open}
@@ -58,7 +62,11 @@
 						<svelte:self fileNode={child} />
 					{:else if 'fileName' in child}
 						<li class="file entry" on:click={makeFileClickHandler(child)}>
-							<FileIcon extension={getFileExtension(child)} size={14} class="file-icon" />
+							<FileIcon
+								extension={getFileExtension(child)}
+								size={14}
+								class="file-icon"
+							/>
 							{getFileName(child)}
 						</li>
 					{/if}

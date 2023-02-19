@@ -3,7 +3,7 @@ use schemars::JsonSchema;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::BundleArgs;
+use crate::bundle::BundleArgs;
 use crate::FastHashMap;
 use crate::PipelineArgs;
 

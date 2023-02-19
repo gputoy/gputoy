@@ -4,3 +4,4 @@ dist/
 front/pkg/
 front/.svelte-kit/
 front/node_modules
+front/static/*.wasm

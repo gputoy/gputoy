@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let text: string | undefined = undefined
 	export let empty = false
-	export let size: string = 'sm'
+	export let size = 'sm'
 	type SeriesPositon = 'first' | 'middle' | 'last' | 'none'
 	export let series: SeriesPositon = 'none'
 	export let smallIcons = false

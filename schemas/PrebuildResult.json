@@ -160,7 +160,8 @@
             "LocalInvocationIndex",
             "WorkGroupId",
             "WorkGroupSize",
-            "NumWorkGroups"
+            "NumWorkGroups",
+            "PointCoord"
           ]
         },
         {
@@ -523,7 +524,7 @@
       ]
     },
     "Match": {
-      "description": "Identical to regex::Match, except the text is owned and it can be serialized. TODO: get refs to work within the compiler instead of owned strings.",
+      "description": "Identical to regex::Match, except the text is owned and it can be serialized. TODO: get refs to work within the analyzer instead of owned strings.",
       "type": "object",
       "required": [
         "end",
@@ -668,7 +669,13 @@
         "Rgba16Float",
         "Rgba32Uint",
         "Rgba32Sint",
-        "Rgba32Float"
+        "Rgba32Float",
+        "R16Unorm",
+        "R16Snorm",
+        "Rg16Unorm",
+        "Rg16Snorm",
+        "Rgba16Unorm",
+        "Rgba16Snorm"
       ]
     },
     "StructMember": {

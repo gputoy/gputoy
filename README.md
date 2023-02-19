@@ -25,7 +25,7 @@
   * [gpu-common](gpu-common) - Crate encapsulating types common between frontend client and backend server. `Json` schemas and `typescript` types are generated from this crate.
   * [gpu-back](gpu-back) - Backend crate that handles data storage, authentication, and api endpoints. Full list of endpoints can be found in the crate `README`.
   * [gpu-client](gpu-client) - Platform agnostic gputoy client library that is used in `gpu-wasm` and `gpu-tauri`. Handles building projects, rendering, and gpu resource IO.
-  * [gpu-compiler](gpu-compiler) - Generates runnable for `gpu-client` by pre-processing and compiling project files and configs.
+  * [gpu-analyzer](gpu-analyzer) - Generates runnable for `gpu-client` by pre-processing and compiling project files and configs.
   * [gpu-wasm](gpu-wasm) - Wasm client for running web application at [gputoy.io/dev](https://gputoy.io/dev).
   * [gpu-tauri](gpu-tauri) - Tauri client for running native application. **(TODO)**
 
@@ -45,8 +45,8 @@ cargo install cargo-make
 ```
 Build wasm module and start svelte-kit server with:
 ```console
-cargo start
-cargo start-prod
+make start
+make start-prod
 ```
 Build wasm module
 ```console

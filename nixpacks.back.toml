@@ -6,8 +6,8 @@ cmds = ['rustup default stable']
 aptPkgs = ['libssl-dev', 'build-essential']
 
 [phases.build]
-cmds = ['cargo build --package gpu-back --release']
+cmds = ['make api-build-prod']
 dependsOn = ['install']
 
 [start]
-cmd = './target/release/gpu-back'
+cmd = 'make api-prod -o api-build-prod'

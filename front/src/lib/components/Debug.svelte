@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { wWorkerInternal } from '$monaco/wgsl/wgslMode'
 	import {
 		dCanModifyProject,
 		dProject,
@@ -9,10 +10,13 @@
 		wPrebuildResult,
 		wUser,
 		wUserModalOpen,
-		wUserPrefsOpen
+		wUserPrefsOpen,
+		wWorkerData
 	} from '$stores'
 	/** @ts-ignore */
 	import { JsonView } from '@zerodevx/svelte-json-view'
+	import IconButton from './buttons/IconButton.svelte'
+
 	$: json = {
 		canModifyProject: $dCanModifyProject,
 		user: $wUser,
@@ -26,12 +30,21 @@
 		prebuild: {
 			dirty: $wPrebuildDirty,
 			result: $wPrebuildResult
-		}
+		},
+		monacoWorker: $wWorkerInternal,
+		workerData: $wWorkerData
 	}
 </script>
 
 {#if $wDebugPanel}
 	<div class="debug-container">
+		<div>
+			<IconButton
+				on:click={async () => {
+					wWorkerData.set(await wWorkerInternal.poll())
+				}}>Reload worker</IconButton
+			>
+		</div>
 		<JsonView {json} depth={2} />
 	</div>
 {/if}
@@ -44,6 +57,7 @@
 		z-index: 10;
 		translate: -50% -50%;
 		max-height: 80%;
+		max-width: 80%;
 		overflow-y: scroll;
 		background-color: var(--background-content);
 		padding: 1rem;

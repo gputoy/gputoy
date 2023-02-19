@@ -1,9 +1,9 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		"lib": [
-			"WebWorker"
-		],
+		// "lib": [
+		// 	"WebWorker"
+		// ],
 		"outDir": "../dist",
 		"checkJs": true,
 		"esModuleInterop": true,
@@ -38,6 +38,12 @@
 			"$common": [
 				"src/core/common"
 			],
+			"$monaco": [
+				"src/monaco"
+			],
+			"$monaco/*": [
+				"src/monaco/*"
+			]
 		}
 	}
 }

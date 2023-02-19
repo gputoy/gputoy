@@ -36,7 +36,7 @@ async fn main() -> Result<(), Error> {
         .expect("Port environment variable");
 
     let cors_allowed =
-        std::env::var("CORS_ALLOW").unwrap_or_else(|_| "http://localhost:3000".into());
+        std::env::var("VITE_FE_URL").unwrap_or_else(|_| "http://localhost:3000".into());
 
     let redis_url = std::env::var("REDIS_URL").expect("Redis url environment variable");
 
@@ -51,6 +51,7 @@ async fn main() -> Result<(), Error> {
     let project_repo = Arc::new(ProjectRepository::new(&pool));
 
     log::info!("Connected to database");
+    log::info!("Starting server with port = {port} and cors = {cors_allowed}");
 
     actix_web::HttpServer::new(move || {
         actix_web::App::new()

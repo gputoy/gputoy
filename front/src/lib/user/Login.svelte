@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { wUser } from '$stores'
 
-	let username_or_email: string = ''
-	let password: string = ''
+	let username_or_email = ''
+	let password = ''
 	let invalidIdentifier = false
 	let invalidPassword = false
 	$: unauthorized = false

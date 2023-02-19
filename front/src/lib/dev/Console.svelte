@@ -21,9 +21,7 @@
 		}
 	}
 	function handleKeypress(event: KeyboardEvent) {
-		console.log(event)
 		if (event.key == 'Tab') {
-			console.log('Tab pressed')
 			event.preventDefault()
 		}
 	}

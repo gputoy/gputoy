@@ -3,13 +3,19 @@ members = [
   "gpu-back",
   "gpu-client",
   "gpu-common",
-  "gpu-compiler",
+  "gpu-analyzer",
   "gpu-wasm-client",
-  "gpu-wasm-compiler",
+  "gpu-wasm-analyzer",
   "gpu-log",
   "gpu-tauri",
 ]
 resolver = "2"
 
+[profile.release.package.gpu-wasm-analyzer]
+opt-level = 's'
+
+[profile.release.package.gpu-wasm-client]
+opt-level = 's'
+
 [patch.crates-io]
-naga = { git = "https://github.com/gputoy/naga.git" }
+naga = { git = "https://github.com/gputoy/naga", branch = "master" }

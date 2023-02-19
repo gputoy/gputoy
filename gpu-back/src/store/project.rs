@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use uuid::Uuid;
 
-use gpu_common::realm::ProjectUpsert;
+use gpu_common::api::ProjectUpsert;
 
 use crate::store::model::ProjectRow;
 

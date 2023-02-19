@@ -3,9 +3,10 @@
 	import FileIcon from '$lib/components/FileIcon.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import Logo from '$lib/components/Logo.svelte'
-	import Editor from '$lib/dev/MonacoEditor.svelte'
-	import { wFiles, wLayout, wPrebuildResult } from '$stores'
+	import MonacoEditor from '$lib/dev/MonacoEditor.svelte'
+	import { wFiles, wLayout, wModelDirty } from '$stores'
 
+	// let Editor: any
 	$: workspace = $wLayout.workspace
 	$: fileindex = $wLayout.fileIndex ?? null
 	$: fileid = fileindex != null ? workspace[fileindex] : null
@@ -40,6 +41,9 @@
 	function handleMouseLeave(index: number) {
 		highlight[index] = false
 	}
+	// onMount(async () => {
+	// 	Editor = await import('$lib/dev/MonacoEditor.svelte')
+	// })
 </script>
 
 <div class="editor-container">
@@ -53,12 +57,12 @@
 					on:mouseleave={() => handleMouseLeave(i)}
 					on:mousedown={(ev) => handleClick(ev, i)}
 				>
-					<FileIcon extension={$wFiles.map[fileid].extension} size={14} />
+					<FileIcon extension={$wFiles.map[fileid].extension} size={13} />
 					<span>
 						{getCanonicalName(fileid)}
 					</span>
-					{#if wPrebuildResult?.getFileBuild(fileid)?.errors?.length ?? 0 > 0}
-						<code>errors!</code>
+					{#if $wModelDirty[fileid] ?? false}
+						<Icon thick name="circle" size="0.75em" />
 					{/if}
 					<IconButton empty size="xs" on:click={() => handleClose(i)}>
 						<Icon
@@ -72,7 +76,7 @@
 			{/each}
 			<div class="filler" />
 		</div>
-		<Editor />
+		<MonacoEditor />
 	{:else}
 		<div class="editor-helper">
 			<Logo size="100px" fill="var(--glass-med)" />
@@ -96,7 +100,9 @@
 
 	.file-tab {
 		font-size: var(--xs);
-		padding-left: 0.4rem;
+		padding: 4px;
+		padding-left: 10px;
+		gap: 4px;
 		cursor: pointer;
 		height: 100%;
 		width: fit-content;
@@ -111,9 +117,6 @@
 		border-right: var(--border2);
 		user-select: none;
 		transition: none;
-	}
-	span {
-		margin-left: 0.4rem;
 	}
 	.filler {
 		flex: 1 1 auto;

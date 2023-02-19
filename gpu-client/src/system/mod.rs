@@ -15,28 +15,24 @@ pub struct System {
 
 impl System {
     pub async fn new() -> Result<Self, Error> {
-        #[cfg(target_arch = "wasm32")]
-        let backend = wgpu::Backends::BROWSER_WEBGPU;
-        #[cfg(not(target_arch = "wasm32"))]
-        let backend = wgpu::Backends::PRIMARY;
-        let instance_descriptor = wgpu::InstanceDescriptor {
-            backends: backend,
-            ..Default::default()
-        };
-        let instance = wgpu::Instance::new(instance_descriptor);
-
-        let adapter = wgpu::util::initialize_adapter_from_env_or_default(&instance, backend, None)
+        let instance = wgpu::Instance::default();
+        let adapter = instance
+            .request_adapter(&wgpu::RequestAdapterOptions {
+                power_preference: wgpu::PowerPreference::default(),
+                force_fallback_adapter: false,
+                // Request an adapter which can render to our surface
+                compatible_surface: None,
+            })
             .await
             .ok_or(Error::NoAdapter)?;
 
-        let features = adapter.features();
-        gpu_log::debug!("Adapter features: {features:#?}");
-
-        let downlevel_capabilities = adapter.get_downlevel_capabilities();
-        gpu_log::debug!("Adapter downlevel capabilities: {downlevel_capabilities:#?}");
-
         let limits = adapter.limits();
         gpu_log::debug!("Adapter limits: {limits:#?}");
+
+        #[cfg(target_arch = "wasm32")]
+        let features = wgpu::Features::all_webgpu_mask();
+        #[cfg(not(target_arch = "wasm32"))]
+        let features = wgpu::Features::all_native_mask();
 
         let desc = wgpu::DeviceDescriptor {
             label: None,

@@ -11,7 +11,10 @@
 		if (canvas) {
 			canvas.width = clientWidth
 			canvas.height = clientHeight
-			canvas.setAttribute('style', `width: ${clientWidth}; height: ${clientHeight};`)
+			canvas.setAttribute(
+				'style',
+				`width: ${clientWidth}; height: ${clientHeight};`
+			)
 			context?.resize(clientWidth, clientHeight)
 		}
 	}

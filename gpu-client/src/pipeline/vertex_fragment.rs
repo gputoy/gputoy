@@ -47,7 +47,7 @@ impl Pipeline for VertexFragment {
         });
         let error = device.pop_error_scope();
         wasm_bindgen_futures::spawn_local(async {
-            if let Some(error) = error.await {
+            if let Some(_error) = error.await {
                 gpu_log::error!("{}", error.to_string());
             }
         });

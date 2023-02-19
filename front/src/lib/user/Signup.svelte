@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { signUp } from '$core/api'
-	let username: string = ''
-	let password: string = ''
-	let email: string = ''
+	let username = ''
+	let password = ''
+	let email = ''
 
 	$: invalidUsername = isUsernameInvalid(username)
 	$: invalidEmail = isEmailInvalid(email)
@@ -23,7 +23,13 @@
 </script>
 
 <form on:submit|preventDefault={onSubmit} class="form" action="#" method="post">
-	<input type="email" name="email" placeholder="Email" autocomplete="email" bind:value={email} />
+	<input
+		type="email"
+		name="email"
+		placeholder="Email"
+		autocomplete="email"
+		bind:value={email}
+	/>
 	{#if invalidEmail}
 		<div class="invalid">Email is invalid</div>
 	{/if}

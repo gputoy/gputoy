@@ -2,7 +2,7 @@ use std::sync::Arc;
 use uuid::Uuid;
 
 use crate::store::model::UserRow;
-use gpu_common::realm::{NewUser, UpdateUserInfoArgs};
+use gpu_common::api::{NewUser, UpdateUserInfoArgs};
 //use actix_web::{web::Data, FromRequest};
 use sqlx::{types::Json, PgPool};
 

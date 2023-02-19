@@ -1,5 +1,7 @@
 mod actions;
-mod compiler;
+mod analyzer;
+pub mod api;
+pub mod bundle;
 mod config;
 mod error;
 mod event;
@@ -7,11 +9,10 @@ mod file;
 mod layout;
 mod preferences;
 mod project;
-pub mod realm;
 pub mod sys;
 
 pub use actions::*;
-pub use compiler::*;
+pub use analyzer::*;
 pub use config::*;
 pub use error::*;
 pub use file::*;

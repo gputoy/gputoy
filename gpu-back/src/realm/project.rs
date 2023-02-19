@@ -2,7 +2,7 @@ use std::{str::FromStr, sync::Arc};
 
 use actix_identity::Identity;
 use actix_web::{delete, get, post, web, HttpResponse};
-use gpu_common::realm::{ProjectResponse, ProjectUpsert};
+use gpu_common::api::{ProjectResponse, ProjectUpsert};
 use uuid::Uuid;
 
 use crate::{

@@ -12,19 +12,19 @@
 </script>
 
 <div id="pane-root">
-	<Accordian title="Summary">
+	<h2 class="title">{$wProjectMeta.title}</h2>
+	<p class="desc">
+		{$wProjectMeta.description}
+	</p>
+	<!-- <Accordian title="Summary">
 		<svelte:fragment slot="menu">
 			<IconButton empty>
 				<Icon stroked name="edit-2" />
 			</IconButton>
 		</svelte:fragment>
 		<svelte:fragment slot="content">
-			<h2 class="title">{$wProjectMeta.title}</h2>
-			<p class="desc">
-				{$wProjectMeta.description}
-			</p>
 		</svelte:fragment>
-	</Accordian>
+	</Accordian> -->
 	<Accordian title="Files">
 		<svelte:fragment slot="menu">
 			<IconButton empty>
@@ -46,7 +46,7 @@
 				<label>Client: {getContextHealth()}</label>
 			</div>
 			<div>
-				<label>Compiler: {getCompilerHealth()}</label>
+				<label>Analyzer: {getAnalyzerHealth()}</label>
 			</div>
 		</svelte:fragment>
 	</Accordian> -->

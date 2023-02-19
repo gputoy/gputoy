@@ -5,8 +5,12 @@
 	import { wUserEditorPrefs, wUserGeneralPrefs, wUserPrefsOpen } from '$stores'
 	import { fly } from 'svelte/transition'
 
-	const lowerGeneralKeys: String[] = GENERAL_CONFIG_KEYS.map((s) => s.toLowerCase())
-	const lowerEditorKeys: String[] = EDITOR_CONFIG_KEYS.map((s) => s.toLowerCase())
+	const lowerGeneralKeys: string[] = GENERAL_CONFIG_KEYS.map((s) =>
+		s.toLowerCase()
+	)
+	const lowerEditorKeys: string[] = EDITOR_CONFIG_KEYS.map((s) =>
+		s.toLowerCase()
+	)
 
 	let category = 'general'
 	let configSearch = ''
@@ -17,14 +21,21 @@
 	<div class="modal" transition:fly={{ x: 500, duration: 300 }}>
 		<div class="body">
 			<div class="category-list">
-				<div class="category" class:category-active={category == 'general'}>General</div>
+				<div class="category" class:category-active={category == 'general'}>
+					General
+				</div>
 				<div class="category">Editor</div>
 				<div class="category">Keybinds</div>
 				<div class="category">Theme</div>
 			</div>
 			<div class="category-body">
 				<input placeholder="Search" bind:value={configSearch} />
-				<Icon name="search" stroked size="1em" style="position:absolute;translate: 3px 3px;" />
+				<Icon
+					name="search"
+					stroked
+					size="1em"
+					style="position:absolute;translate: 3px 3px;"
+				/>
 				{#each GENERAL_CONFIG_KEYS as k, i}
 					{#if lowerGeneralKeys[i].includes(searchLower)}
 						<ConfigItem key={k} scope="general" value={$wUserGeneralPrefs[k]} />

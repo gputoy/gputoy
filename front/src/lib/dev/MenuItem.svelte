@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { actionPermitted, pushAction } from '$core/actions'
-	import { MENUKEYS, MENU_MAP, type MenuEntry, type MenuKey } from '$core/consts'
+	import {
+		MENUKEYS,
+		MENU_MAP,
+		type MenuEntry,
+		type MenuKey
+	} from '$core/consts'
 	import { findActionBind } from '$core/input'
 	import Key from '$lib/components/Key.svelte'
 	import { wMenuOpen, wUserKeybinds } from '$stores'
@@ -14,7 +19,10 @@
 	$: boundActions = Object.fromEntries(
 		MENU_MAP[key]
 			.flat()
-			.map((bind) => [bind.name, findActionBind(bind.fAction?.action, $wUserKeybinds)])
+			.map((bind) => [
+				bind.name,
+				findActionBind(bind.fAction?.action, $wUserKeybinds)
+			])
 	)
 
 	function open() {
@@ -42,7 +50,13 @@
 	}
 </script>
 
-<li class="menu-button" on:click={open} on:mouseenter={open} on:mouseleave={close} on:blur={close}>
+<li
+	class="menu-button"
+	on:click={open}
+	on:mouseenter={open}
+	on:mouseleave={close}
+	on:blur={close}
+>
 	{key.charAt(0).toUpperCase() + key.slice(1)}
 	{#if $wMenuOpen[key]}
 		<ul class="menu">
@@ -51,7 +65,9 @@
 					<li
 						class="menu-item"
 						on:click={makeMenuEntryClickHandler(menuEntry)}
-						disabled={menuEntry.fAction ? !actionPermitted(menuEntry.fAction) : false}
+						disabled={menuEntry.fAction
+							? !actionPermitted(menuEntry.fAction)
+							: false}
 					>
 						<p>{menuEntry.name}</p>
 						{#if boundActions[menuEntry.name]}
@@ -81,6 +97,7 @@
 		background-color: var(--glass-med);
 	}
 	.menu {
+		z-index: var(--z-menu);
 		position: absolute;
 		left: 0px;
 		top: 100%;

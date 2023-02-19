@@ -2,7 +2,7 @@ use std::slice::Iter;
 
 use super::*;
 
-proc_macro::bundle_cache_for! {
+macros::bundle_cache_for! {
     system: System,
     viewports: Viewport
 }
@@ -49,9 +49,7 @@ impl BundleCache {
         ctx: &crate::Context,
         runner: &gpu_common::Runner,
     ) -> Result<(), BundleError> {
-        // System bundle will be created by default
-        // Will panic if two system bundles are inserted into the cache
-        self.insert(super::System::new(ctx)).unwrap();
+        self.insert(super::System::new(ctx))?;
 
         for (ident, arg) in runner.bundles.iter() {
             match arg {
@@ -86,12 +84,12 @@ pub trait BundleStore<B: Bundle> {
 }
 
 #[macro_use]
-mod proc_macro {
+mod macros {
 
     macro_rules! bundle_cache_for {
         ($($field:ident: $bundle:ty), *) => {
-            $crate::bundle::cache::proc_macro::bundle_cache_for!(struct $($field $bundle)*);
-            $crate::bundle::cache::proc_macro::bundle_cache_for!(impl $($field $bundle)*);
+            $crate::bundle::cache::macros::bundle_cache_for!(struct $($field $bundle)*);
+            $crate::bundle::cache::macros::bundle_cache_for!(impl $($field $bundle)*);
         };
 
         (struct $($field:ident $bundle:ty)*) => {
@@ -117,10 +115,10 @@ mod proc_macro {
             }
 
             impl BundleCacheInner {
-                $crate::bundle::cache::proc_macro::bundle_cache_for!(on_run_start $($field $bundle)*);
-                $crate::bundle::cache::proc_macro::bundle_cache_for!(on_run_end $($field $bundle)*);
-                $crate::bundle::cache::proc_macro::bundle_cache_for!(on_frame_start $($field $bundle)*);
-                $crate::bundle::cache::proc_macro::bundle_cache_for!(on_frame_end $($field $bundle)*);
+                $crate::bundle::cache::macros::bundle_cache_for!(on_run_start $($field $bundle)*);
+                $crate::bundle::cache::macros::bundle_cache_for!(on_run_end $($field $bundle)*);
+                $crate::bundle::cache::macros::bundle_cache_for!(on_frame_start $($field $bundle)*);
+                $crate::bundle::cache::macros::bundle_cache_for!(on_frame_end $($field $bundle)*);
             }
 
             $(
