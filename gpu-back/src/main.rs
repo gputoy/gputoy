@@ -31,9 +31,9 @@ async fn main() -> Result<(), Error> {
     pretty_env_logger::init();
     //tracing_log::LogTracer::init().expect("LogTracer::init");
 
-    let port = std::env::var("PORT_BACK")
+    let port = std::env::var("PORT")
         .map(|p| p.parse::<u16>().expect("Port value invalid"))
-        .expect("Port environment variable");
+        .unwrap_or(8080);
 
     let cors_allowed =
         std::env::var("VITE_FE_URL").unwrap_or_else(|_| "http://localhost:3000".into());

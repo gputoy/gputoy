@@ -13,13 +13,15 @@ import type { RunState } from './runstate'
 /**
  *              Points to gpu-front (this)
  */
-export const BASE_PATH = import.meta.env.VITE_FE_URL + '/'
+export const BASE_URL = import.meta.env.VITE_FE_URL + '/'
 
 /**
  *              Points to gpu-back
  */
-export const API_PATH = import.meta.env.VITE_API_URL + '/'
+export const API_URL = import.meta.env.VITE_API_URL + '/'
 
+export const WASM_ANALYZER_URL = BASE_URL + import.meta.env.VITE_MAKE_ANALYZER_PATH
+export const WASM_CLIENT_URL = BASE_URL + import.meta.env.VITE_MAKE_CLIENT_PATH
 
 export const DEFAULT_RUN_STATE: RunState = {
 	playing: false

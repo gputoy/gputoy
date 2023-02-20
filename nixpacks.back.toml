@@ -6,8 +6,8 @@ cmds = ['rustup default stable']
 aptPkgs = ['libssl-dev', 'build-essential']
 
 [phases.build]
-cmds = ['make api-build-prod']
+cmds = ['make api-build target=prod']
 dependsOn = ['install']
 
 [start]
-cmd = 'make api-prod -o api-build-prod'
+cmd = 'make api target=prod'

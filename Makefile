@@ -1,113 +1,147 @@
 #!make
-.PHONY: all  watch-front-do watch-front
+.PHONY: all clean all-clean fmt lint
 
-COMMON = ./gpu-common ./gpu-log
-ANALYZER = ./gpu-analyzer ./gpu-wasm-analyzer
-CLIENT = ./gpu-client ./gpu-wasm-client
-API = ./gpu-common ./gpu-back 
-
-WATCH_FRONT = -w gpu-common -w gpu-log -w gpu-client -w gpu-analyzer -w gpu-wasm-analyzer -w gpu-wasm-client -w front
-
-WASM_EXP_FLAGS = RUSTFLAGS=--cfg=web_sys_unstable_apis
-WASM_ARGS_ANALYZER = build ./gpu-wasm-analyzer --out-dir ../front/pkg/analyzer  --target web
-WASM_ARGS_CLIENT = build ./gpu-wasm-client --out-dir ../front/pkg/client  --target web
-
-DEFAULT_ENV = .env
+# Defaults
+SHELL = 		/bin/sh
+DEFAULT_ENV = 	.env
+target = 		dev
 
 -include $(DEFAULT_ENV)
 
-# Tooling
+# Frontend constants
+FRONT_DIR = 				front
+FRONT_OUT =					dist
+FRONT_PACKAGE = 			$(FRONT_DIR)/package.json
+FRONT_TYPES_GENERATOR =		$(FRONT_DIR)/generate_common_types.js
+FRONT_NODE_ENV = 			VITE_MAKE_ANALYZER_PATH=$(target)/$(WASM_ANALYZER_MODULE_NAME).wasm \
+							VITE_MAKE_CLIENT_PATH=$(target)/$(WASM_CLIENT_MODULE_NAME).wasm
+_front :=					$(shell find $(FRONT_DIR)/src -name "*")
+# Rust constants (referenced by target)
+RUST_TARGET<dev> = 			debug
+RUST_TARGET<prod> = 		release
+RUST_OPT_FLAG<prod> = 		--release
+RUST_LOG<dev> = 			debug
+RUST_LOG<prod> = 			info
+# Wasm constants
+WASM_PKG = 					$(FRONT_DIR)/pkg
+WASM_OUT = 					$(FRONT_DIR)/static
+WASM_ANALYZER_MODULE_NAME = analyzer
+WASM_CLIENT_MODULE_NAME = 	client
+WASM_FLAGS = 				RUSTFLAGS=--cfg=web_sys_unstable_apis
+WASM_OPT_FLAG<dev> = 		--dev
+# Crates
+GPU_COMMON = 				gpu-common
+GPU_BACK = 					gpu-back
+GPU_ANALYZER = 				gpu-analyzer
+GPU_CLIENT = 				gpu-client
+GPU_LOG = 					gpu-log
+GPU_WASM_ANALYZER = 		gpu-wasm-analyzer
+GPU_WASM_CLIENT = 			gpu-wasm-client
+# Crate sources
+_gpu-common := 				$(shell find $(GPU_COMMON) -name "*")
+_gpu-back := 				$(shell find $(GPU_BACK) -name "*")
+_gpu-analyzer := 			$(shell find $(GPU_ANALYZER) -name "*")
+_gpu-client := 				$(shell find $(GPU_CLIENT) -name "*")
+_gpu-log := 				$(shell find $(GPU_LOG) -name "*")
+_gpu-wasm-analyzer := 		$(shell find $(GPU_WASM_ANALYZER) -name "*")
+_gpu-wasm-client := 		$(shell find $(GPU_WASM_CLIENT) -name "*")
+
+# -------------------------- ------- --------------------------
+# -------------------------- Public --------------------------
+# -------------------------- ------- --------------------------
+
+# -------------------------- Tooling --------------------------
 all:
 	cargo fmt --all
 	cargo clippy --all-features --workspace -- -D warnings
 	cargo test --all-features --workspace
 
 clean:
-	rm -rf ./dist ./target ./front/pkg ./front/static/*.wasm
+	rm -rf $(FRONT_OUT) ./target $(WASM_PKG) $(WASM_OUT)/**/*.wasm 
 
 all-clean: clean
-	rm -rf ./front/.svelte-kit ./front/node_modules ./schemas
+	rm -rf $(FRONT_DIR)/.svelte-kit $(FRONT_DIR)/node_modules schemas
 
 fmt:
 	cargo fmt --all
-	npm run format --prefix front
+	npm run format --prefix $(FRONT_DIR)
 
 lint:
-	npm run lint --prefix front
+	npm run lint --prefix $(FRONT_DIR)
 
-
-# Wasm
-wasm: wasm-analyzer wasm-client cp-wasm
-
-wasm-prod: wasm-analyzer-prod wasm-client-prod cp-wasm
-
-cp-wasm:
-	cp front/pkg/analyzer/gpu_wasm_analyzer_bg.wasm front/static/analyzer.wasm
-	cp front/pkg/client/gpu_wasm_client_bg.wasm front/static/client.wasm
-
-wasm-analyzer: $(COMMON) $(ANALYZER)
-	$(WASM_EXP_FLAGS) wasm-pack $(WASM_ARGS_ANALYZER) --dev
-
-wasm-analyzer-prod: $(COMMON) $(ANALYZER)
-	$(WASM_EXP_FLAGS) wasm-pack $(WASM_ARGS_ANALYZER) 
-
-wasm-client: $(COMMON) $(CLIENT)
-	$(WASM_EXP_FLAGS) wasm-pack $(WASM_ARGS_CLIENT) --dev
-
-wasm-client-prod: $(COMMON) $(CLIENT)
-	$(WASM_EXP_FLAGS) wasm-pack $(WASM_ARGS_CLIENT)
-
-
-# API
-api-build: $(API)
-	cargo build --package gpu-back
-
+# -------------------------- Run locally --------------------------
+# Run api -- do `make api target=prod` to run in release
 api: api-build
-	RUST_LOG=debug ./target/debug/gpu-back
+	RUST_LOG=$(RUST_LOG<$(target)>) ./target/$(RUST_TARGET<$(target)>)/gpu-back
 
-api-build-prod: $(API) 
-	cargo build --package gpu-back --release
+# Run forntend -- do `make start target=prod` to run productin build
+start: front-build
+ifeq ($(target),dev)
+	$(FRONT_NODE_ENV) npm run dev --prefix $(FRONT_DIR)
+else
+	$(FRONT_NODE_ENV) node ./dist/index.js
+endif
 
-api-prod: api-build-prod
-	RUST_LOG=info ./target/release/gpu-back
+# -------------------------- Nixpacks --------------------------
+# Build and run nixpack image, valid options are `nix-build-front` and `nix-build-back`
+nix-%: nix-build-%
+	@echo Running docker image
+	@echo -e '\t-env: $(DEFAULT_ENV)'
+	@echo -e '\t-name: gpu-$*'
+	@docker run --env-file $(DEFAULT_ENV) -it gpu-$*
+	
+
+# -------------------------- ------- --------------------------
+# -------------------------- Private --------------------------
+# -------------------------- ------- --------------------------
 
 
-# Frontend
-npmi:
-	npm i --prefix front
+# -------------------------- Build --------------------------
+# Build api executable
+api-build: target/$(RUST_TARGET<$(target)>)/$(GPU_BACK)
 
-front-build: wasm-prod npmi types 
-	npm run build --prefix front
+# Exapnds from api-build
+target/$(RUST_TARGET<$(target)>)/$(GPU_BACK): $(_gpu-common) $(_gpu-back)
+	cargo build --package $(GPU_BACK) $(RUST_OPT_FLAG<$(target)>)
 
-start: wasm npmi types
-	npm run dev --prefix front -- --port ${PORT_FRONT} 
+# Build wasm modules from gpu-wasm-analyzer and gpu-wasm-client
+# and copy them to the static(public) frontend directory so vite
+# can serve them without any name mangling
+wasm-build: $(WASM_OUT)/$(target)/$(WASM_ANALYZER_MODULE_NAME).wasm $(WASM_OUT)/$(target)/$(WASM_CLIENT_MODULE_NAME).wasm
 
-start-prod: front-build
-	node ./dist/index.js
+# Expands from wasm-build
+.SECONDEXPANSION:
+$(WASM_OUT)/$(target)/%.wasm: $(_gpu-log) $(_gpu-common) $$(_gpu-$$*) $$(_gpu-wasm-$$*)
+	$(WASM_FLAGS) wasm-pack build gpu-wasm-$* --out-dir ../$(WASM_PKG)/$* --target web $(WASM_OPT_FLAG<$(target)>)
+	@mkdir -p $(WASM_OUT)/$(target)
+	@cp $(WASM_PKG)/$*/gpu_wasm_$*_bg.wasm $(WASM_OUT)/$(target)/$*.wasm
 
-# Types
-types: 
-	cargo run --package gpu-common --features serde,schema
-	node front/generate_common_types.js
+# Build deps and maybe build node server depending on if 
+# its running in dev or prod
+front-build: wasm-build $(FRONT_DIR)/node_modules types $(if $(findstring $(target),prod),$(FRONT_OUT))
 
-# Nixpacks
+# Build nodejs server for frontend
+$(FRONT_OUT):
+	$(FRONT_NODE_ENV) npm run build --prefix $(FRONT_DIR)
+
+# -------------------------- Nixpacks --------------------------
+# Build nixpack image, valid options are `nix-build-front` and `nix-build-back`
 nix-build-%:
 	@echo Building $* image 
 	@echo -e '\t-config: nixpacks.$*.toml'
 	@echo -e '\t-name: gpu-$*'
 	@nixpacks build . -c nixpacks.$*.toml --name gpu-$*
 
-nix-%: nix-build-%
-	@echo Running docker image
-	@echo -e '\t-env: $(DEFAULT_ENV)'
-	@echo -e '\t-name: gpu-$*'
-	@docker run --env-file $(DEFAULT_ENV) -it gpu-$*
 
-# Watch
-watch-front:
-	cargo watch $(WATCH_FRONT) -- make watch-front-do
+# -------------------------- Misc --------------------------
+# Make json schemas from types defined in gpu-common
+schemas: $(_gpu-common) 
+	cargo run --package gpu-common --features serde,schema
 
-watch-front-do:
-	$(WASM_EXP_FLAGS) wasm-pack $(WASM_ARGS_ANALYZER) --dev
-	$(WASM_EXP_FLAGS) wasm-pack $(WASM_ARGS_CLIENT) --dev
-	npm run dev --prefix front -- --port ${PORT_FRONT}
+# Make ts types from schemas generated in `make schemas`
+types: schemas
+	node $(FRONT_TYPES_GENERATOR)
+
+# Fetch npm dependencies
+$(FRONT_DIR)/node_modules: $(FRONT_DIR)/package.json
+	npm i --prefix front

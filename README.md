@@ -40,23 +40,15 @@
 
 ## Build locally
 
-```console
-cargo install cargo-make
-```
-Build wasm module and start svelte-kit server with:
+Start vite dev server & build wasm dependencies
 ```console
 make start
-make start-prod
+make start target=prod
 ```
-Build wasm module
+Start api server
 ```console
-cargo wasm
-cargo wasm-prod
-```
-Run backend
-```console
-cargo api
-cargo api-prod
+make api
+make api target=prod
 ```
 
 Rebuild json schemas and typescript types from `gpu-common` types
@@ -73,12 +65,12 @@ cargo install nixpacks
 
 Build frontend image which will serve `sveltekit` server from port 3000
 ```console
-nixpacks build -c nixpacks.front.toml .
+make nix-front
 ````
 
 Build backend image which will serve `gpu-back`
 ```console
-nixpacks build -c nixpacks.back.toml .
+make nix-back
 ```
 
 

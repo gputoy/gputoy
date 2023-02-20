@@ -3,7 +3,7 @@ import { editor } from 'monaco-editor'
 import type { LanguageServiceDefaults } from './index'
 import type WgslWorker from './wgslWorker'
 
-import { BASE_PATH } from '$core/consts'
+import { WASM_ANALYZER_URL } from '$core/consts'
 import { wFiles } from '$stores'
 import { get } from 'svelte/store'
 import type { CreateData } from './wgslWorker'
@@ -68,7 +68,7 @@ export default class WorkerManager {
 				createData: <CreateData>{
 					languageSettings: this._defaults.diagnosticsOptions,
 					languageId: this._defaults.languageId,
-					wasmModuleUrl: BASE_PATH + 'analyzer.wasm',
+					wasmModuleUrl: WASM_ANALYZER_URL,
 					initFiles: get(wFiles)
 				},
 				host: {

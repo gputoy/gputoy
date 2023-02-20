@@ -1,4 +1,4 @@
-import { API_PATH } from '$core/consts'
+import { API_URL } from '$core/consts'
 import { error, type RequestHandler } from '@sveltejs/kit'
 
 export const load: RequestHandler<{ pid: string }> = async function load({
@@ -6,7 +6,7 @@ export const load: RequestHandler<{ pid: string }> = async function load({
 	params
 }) {
 	if (params.pid == undefined) return error(404, 'Project not found')
-	const projectResponse = await fetch(API_PATH + 'project/' + params.pid, {
+	const projectResponse = await fetch(API_URL + 'project/' + params.pid, {
 		method: 'GET',
 		credentials: 'include',
 		headers: {
