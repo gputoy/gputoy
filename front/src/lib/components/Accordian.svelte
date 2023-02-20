@@ -46,7 +46,6 @@
 		padding-inline: 0.25rem;
 		gap: 0.5rem;
 		flex: 0 0 auto;
-		background-color: var(--background-content);
 		user-select: none;
 	}
 	.accordian-title:hover {
@@ -70,6 +69,7 @@
 		font-size: var(--sm);
 		margin: 0px;
 		padding: 4px;
+		font-weight: bold;
 		color: var(--text-accent-color);
 	}
 	button {

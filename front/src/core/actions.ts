@@ -124,7 +124,7 @@ export function pushAction(action: Action) {
  *  TODO: create action reversal system
  * @param action
  */
-export function reverseAction(action: Action) {}
+export function reverseAction(action: Action) { }
 
 /// ------------------- Action execution ----------------------
 
@@ -152,9 +152,9 @@ function closeCurrentFile() {
 	wLayout.closeWorkspaceFile()
 }
 
-function rebuildProject() {}
+function rebuildProject() { }
 
-function resetProject() {}
+function resetProject() { }
 
 function toggleConsole() {
 	wConsoleOpen.update((o) => !o)
@@ -168,9 +168,9 @@ function toggleDebugPanel() {
 	wDebugPanel.update((show) => !show)
 }
 
-function shiftPanel(c: ShiftPaneArgs) {}
+function shiftPanel(c: ShiftPaneArgs) { }
 
-function focusPane(c: string) {}
+function focusPane(c: string) { }
 
 function closeProject() {
 	clearProject()
