@@ -9,42 +9,42 @@ target = 		dev
 -include $(DEFAULT_ENV)
 
 # Frontend constants
-FRONT_DIR = 				front
-FRONT_OUT =					dist
-FRONT_PACKAGE = 			$(FRONT_DIR)/package.json
-FRONT_TYPES_GENERATOR =		$(FRONT_DIR)/generate_common_types.js
-FRONT_NODE_ENV = 			VITE_MAKE_ANALYZER_PATH=$(target)/$(WASM_ANALYZER_MODULE_NAME).wasm \
-							VITE_MAKE_CLIENT_PATH=$(target)/$(WASM_CLIENT_MODULE_NAME).wasm
-_front :=					$(shell find $(FRONT_DIR)/src -name "*")
+FRONT_DIR = front
+FRONT_OUT =	dist
+FRONT_PACKAGE = $(FRONT_DIR)/package.json
+FRONT_TYPES_GENERATOR =	$(FRONT_DIR)/generate_common_types.js
+FRONT_NODE_ENV = VITE_MAKE_ANALYZER_PATH=$(target)/$(WASM_ANALYZER_MODULE_NAME).wasm \
+					VITE_MAKE_CLIENT_PATH=$(target)/$(WASM_CLIENT_MODULE_NAME).wasm
+_front := $(shell find $(FRONT_DIR)/src -name "*")
 # Rust constants (referenced by target)
-RUST_TARGET<dev> = 			debug
-RUST_TARGET<prod> = 		release
-RUST_OPT_FLAG<prod> = 		--release
-RUST_LOG<dev> = 			debug
-RUST_LOG<prod> = 			info
+RUST_TARGET<dev> = debug
+RUST_TARGET<prod> = release
+RUST_OPT_FLAG<prod> = --release
+RUST_LOG<dev> = debug
+RUST_LOG<prod> = info
 # Wasm constants
-WASM_PKG = 					$(FRONT_DIR)/pkg
-WASM_OUT = 					$(FRONT_DIR)/static
+WASM_PKG = $(FRONT_DIR)/pkg
+WASM_OUT = $(FRONT_DIR)/static
 WASM_ANALYZER_MODULE_NAME = analyzer
-WASM_CLIENT_MODULE_NAME = 	client
-WASM_FLAGS = 				RUSTFLAGS=--cfg=web_sys_unstable_apis
-WASM_OPT_FLAG<dev> = 		--dev
+WASM_CLIENT_MODULE_NAME = client
+WASM_FLAGS = RUSTFLAGS=--cfg=web_sys_unstable_apis
+WASM_OPT_FLAG<dev> = --dev
 # Crates
-GPU_COMMON = 				gpu-common
-GPU_BACK = 					gpu-back
-GPU_ANALYZER = 				gpu-analyzer
-GPU_CLIENT = 				gpu-client
-GPU_LOG = 					gpu-log
-GPU_WASM_ANALYZER = 		gpu-wasm-analyzer
-GPU_WASM_CLIENT = 			gpu-wasm-client
+GPU_COMMON = gpu-common
+GPU_BACK = gpu-back
+GPU_ANALYZER = gpu-analyzer
+GPU_CLIENT = gpu-client
+GPU_LOG = gpu-log
+GPU_WASM_ANALYZER = gpu-wasm-analyzer
+GPU_WASM_CLIENT = gpu-wasm-client
 # Crate sources
-_gpu-common := 				$(shell find $(GPU_COMMON) -name "*")
-_gpu-back := 				$(shell find $(GPU_BACK) -name "*")
-_gpu-analyzer := 			$(shell find $(GPU_ANALYZER) -name "*")
-_gpu-client := 				$(shell find $(GPU_CLIENT) -name "*")
-_gpu-log := 				$(shell find $(GPU_LOG) -name "*")
-_gpu-wasm-analyzer := 		$(shell find $(GPU_WASM_ANALYZER) -name "*")
-_gpu-wasm-client := 		$(shell find $(GPU_WASM_CLIENT) -name "*")
+_gpu-common := $(shell find $(GPU_COMMON) -name "*")
+_gpu-back := $(shell find $(GPU_BACK) -name "*")
+_gpu-analyzer := $(shell find $(GPU_ANALYZER) -name "*")
+_gpu-client := $(shell find $(GPU_CLIENT) -name "*")
+_gpu-log := $(shell find $(GPU_LOG) -name "*")
+_gpu-wasm-analyzer := $(shell find $(GPU_WASM_ANALYZER) -name "*")
+_gpu-wasm-client := $(shell find $(GPU_WASM_CLIENT) -name "*")
 
 # -------------------------- ------- --------------------------
 # -------------------------- Public --------------------------
