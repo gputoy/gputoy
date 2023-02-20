@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
-	import FileIcon from '$lib/components/FileIcon.svelte'
+	import FileIcon from '$lib/components/file/FileIcon.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import Logo from '$lib/components/Logo.svelte'
 	import MonacoEditor from '$lib/dev/MonacoEditor.svelte'

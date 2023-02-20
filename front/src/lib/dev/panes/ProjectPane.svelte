@@ -2,7 +2,7 @@
 	import type { FileTreeNode } from '$core/files'
 	import Accordian from '$lib/components/Accordian.svelte'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
-	import FileNode from '$lib/components/FileNode.svelte'
+	import FileNode from '$lib/components/file/FileNode.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import { wFiles, wProjectMeta } from '$stores'
 	let root: FileTreeNode | undefined
