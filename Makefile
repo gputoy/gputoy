@@ -10,11 +10,11 @@ target = 		dev
 
 # Frontend constants
 FRONT_DIR = front
-FRONT_OUT =	dist
+FRONT_OUT = dist
 FRONT_PACKAGE = $(FRONT_DIR)/package.json
 FRONT_TYPES_GENERATOR =	$(FRONT_DIR)/generate_common_types.js
 FRONT_NODE_ENV = VITE_MAKE_ANALYZER_PATH=$(target)/$(WASM_ANALYZER_MODULE_NAME).wasm \
-					VITE_MAKE_CLIENT_PATH=$(target)/$(WASM_CLIENT_MODULE_NAME).wasm
+	VITE_MAKE_CLIENT_PATH=$(target)/$(WASM_CLIENT_MODULE_NAME).wasm
 _front := $(shell find $(FRONT_DIR)/src -name "*")
 # Rust constants (referenced by target)
 RUST_TARGET<dev> = debug
