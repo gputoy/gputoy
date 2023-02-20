@@ -296,6 +296,13 @@ export const dProject = derived(
 		}
 	}
 )
+export const dActiveFile = derived(
+	[wLayout],
+	([wLayout]): string | null => {
+		if (wLayout.fileIndex == null) return null
+		return wLayout.workspace[wLayout.fileIndex]
+	}
+)
 dProject.subscribe((p) => {
 	if (p != null) writeToProjectLocalStorage(p)
 })

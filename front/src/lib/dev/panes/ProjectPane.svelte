@@ -12,25 +12,25 @@
 </script>
 
 <div id="pane-root">
-	<h2 class="title">{$wProjectMeta.title}</h2>
-	<p class="desc">
-		{$wProjectMeta.description}
-	</p>
-	<!-- <Accordian title="Summary">
+	<Accordian title="Summary">
 		<svelte:fragment slot="menu">
 			<IconButton empty>
 				<Icon stroked name="edit-2" />
 			</IconButton>
 		</svelte:fragment>
 		<svelte:fragment slot="content">
+			<h2 class="title">{$wProjectMeta.title}</h2>
+			<p class="desc">
+				{$wProjectMeta.description}
+			</p>
 		</svelte:fragment>
-	</Accordian> -->
+	</Accordian>
 	<Accordian title="Files">
 		<svelte:fragment slot="menu">
-			<IconButton empty>
+			<IconButton empty title="New file">
 				<Icon stroked name="file-plus" />
 			</IconButton>
-			<IconButton empty>
+			<IconButton empty title="New directory">
 				<Icon stroked name="folder-plus" />
 			</IconButton>
 		</svelte:fragment>

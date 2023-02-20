@@ -17,7 +17,7 @@ export type LayoutExtras = {
 export function initLayoutMethods(layout: Writable<Layout>): LayoutExtras {
 	function getOpenFileId(): string | undefined {
 		const _layout = get(layout)
-		return _layout.fileIndex ? _layout.workspace[_layout.fileIndex] : undefined
+		return _layout.fileIndex != null ? _layout.workspace[_layout.fileIndex] : undefined
 	}
 
 	function setPanelSize(panel: Panel, event: IPaneSizingEvent) {

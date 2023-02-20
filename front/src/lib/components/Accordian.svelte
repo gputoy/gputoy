@@ -10,7 +10,7 @@
 </script>
 
 <div class="accordian-container">
-	<div
+	<button
 		class="accordian-title"
 		on:click={handleClick}
 		style="border-bottom: {open ? 'none' : 'var(--border2)'};"
@@ -25,7 +25,7 @@
 		<div class="accordian-title-right">
 			<slot name="menu" />
 		</div>
-	</div>
+	</button>
 	{#if open}
 		<div class="accordian-content">
 			<slot name="content" />
@@ -62,7 +62,7 @@
 	}
 	.accordian-content {
 		flex: 1 1 auto;
-		padding: 1rem;
+		padding: 0;
 		border-bottom: var(--border2);
 		min-width: max-content;
 	}
@@ -71,5 +71,11 @@
 		margin: 0px;
 		padding: 4px;
 		color: var(--text-accent-color);
+	}
+	button {
+		font-size: var(--xs);
+		background: transparent;
+		color: var(--text-color);
+		border: none;
 	}
 </style>

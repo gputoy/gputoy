@@ -8,7 +8,7 @@
 	} from '$core/files'
 	import FileIcon from '$lib/components/FileIcon.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { wLayout } from '$stores'
+	import { dActiveFile, wLayout } from '$stores'
 
 	export let fileNode: FileTreeNode
 	$: open = $wLayout.fileTreeState[fileNode.absoluteDir]?.open ?? false
@@ -32,43 +32,56 @@
 	}
 </script>
 
+<!--  -->
 {#if fileNode.dir == ''}
 	<ul>
 		{#each Object.values(fileNode.children) as child}
 			{#if 'children' in child}
 				<svelte:self fileNode={child} />
 			{:else if 'fileName' in child}
-				<li class="file entry" on:click={makeFileClickHandler(child)}>
-					<FileIcon extension={getFileExtension(child)} size={14} />
+				<button
+					class="file entry"
+					on:click={makeFileClickHandler(child)}
+					class:active={child.id == $dActiveFile}
+				>
+					<FileIcon
+						extension={getFileExtension(child)}
+						size={14}
+						class="file-icon"
+					/>
 					{getFileName(child)}
-				</li>
+				</button>
 			{/if}
 		{/each}
 	</ul>
 {:else}
 	<li class="dir">
-		<span class="entry" on:click={toggleOpen}>
+		<button class="entry" on:click={toggleOpen}>
 			<Icon
 				name="chevron-right"
 				size="16px"
 				rotation={open ? '90deg' : '0deg'}
 			/>
 			{fileNode.dir}
-		</span>
+		</button>
 		{#if open}
 			<ul>
 				{#each Object.values(fileNode.children) as child}
 					{#if 'children' in child}
 						<svelte:self fileNode={child} />
 					{:else if 'fileName' in child}
-						<li class="file entry" on:click={makeFileClickHandler(child)}>
+						<button
+							class="file entry"
+							on:click={makeFileClickHandler(child)}
+							class:active={child.id == $dActiveFile}
+						>
 							<FileIcon
 								extension={getFileExtension(child)}
 								size={14}
 								class="file-icon"
 							/>
 							{getFileName(child)}
-						</li>
+						</button>
 					{/if}
 				{/each}
 			</ul>
@@ -110,5 +123,15 @@
 
 	.entry:hover::before {
 		background-color: var(--glass-low);
+	}
+
+	button {
+		font-size: var(--xs);
+		background: transparent;
+		color: var(--text-color);
+		border: none;
+	}
+	.active::before {
+		background-color: var(--glass-med);
 	}
 </style>
