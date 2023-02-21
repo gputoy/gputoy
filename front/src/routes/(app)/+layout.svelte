@@ -96,7 +96,7 @@
 		display: flex;
 		flex-direction: row-reverse;
 		height: 100%;
-		background-color: var(--nav-color);
+		background-color: var(--background-nav);
 		justify-content: space-between;
 		align-items: center;
 		border-bottom: var(--border);

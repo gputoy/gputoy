@@ -4,7 +4,8 @@
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import FileNode from '$lib/components/file/FileNode.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { wFiles, wProjectMeta } from '$stores'
+	import ProjectSummary from '$lib/components/ProjectSummary.svelte'
+	import { wFiles } from '$stores'
 	let root: FileTreeNode | undefined
 	$: {
 		root = wFiles.buildTree()
@@ -19,10 +20,7 @@
 			</IconButton>
 		</svelte:fragment>
 		<svelte:fragment slot="content">
-			<h2 class="title">{$wProjectMeta.title}</h2>
-			<p class="desc">
-				{$wProjectMeta.description}
-			</p>
+			<ProjectSummary />
 		</svelte:fragment>
 	</Accordian>
 	<Accordian title="Files">

@@ -42,14 +42,18 @@ body {
 	--console-info: blue;
 	--console-warn: orange;
 	--console-error: red;
+
+	--color-invalid: red;
+
+	--transition-quick: 50ms;
 }
 
 body.dark {
 	--background-content: #000000;
 	--nav-color: var(--background-content);
-	--background-alt: #0a0a0a;
-	--background-nav: #0f0f0f;
-	--background-menu: #070707;
+	--background-alt: #070707;
+	--background-nav: #0b0b0b;
+	--background-menu: #080808;
 	--accent-color: #5c8aee;
 	--heading-color: rgba(0, 0, 0, 0.7);
 

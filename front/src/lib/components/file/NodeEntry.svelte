@@ -2,12 +2,16 @@
 	import { pushAction } from '$core/actions'
 	import {
 		getCanonicalName,
+		validateRename,
+		type FileTreeNode,
 		type FileTreeNodeChild,
 		type FileWithId
 	} from '$core/files'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { dActiveFile, wLayout } from '$stores'
+	import { dActiveFile, wLayout, wUserRenaming } from '$stores'
+	import { slide } from 'svelte/transition'
+	import ValidationInput from '../ValidationInput.svelte'
 	import FileIcon from './FileIcon.svelte'
 
 	const FILE_ICON_SIZE_PX = 12
@@ -15,8 +19,19 @@
 	export let open = false
 	export let clazz = ''
 
-	function getFileName(f: FileTreeNodeChild) {
-		return getCanonicalName(f as FileWithId)
+	let isFile = 'id' in node
+	let identifier = isFile
+		? (node as FileWithId).id
+		: (node as FileTreeNode).absoluteDir
+	let name = isFile
+		? getCanonicalName(node as FileWithId)
+		: (node as FileTreeNode).dir
+	$: isEditing = $wUserRenaming == identifier
+	let validationResult: string | undefined
+
+	$: renameValue = name
+	$: {
+		validationResult = validateRename(node, renameValue)
 	}
 	function getFileExtension(f: FileTreeNodeChild) {
 		return (f as FileWithId).extension
@@ -37,11 +52,20 @@
 			}
 		}
 	}
-	function handleEdit() {
-		console.log('handling edit')
+	function handleEdit(ev: MouseEvent) {
+		wUserRenaming.set(identifier)
+		ev.stopPropagation()
 	}
-	function handleDelete() {
-		console.log('handling edit')
+	function handleDelete(ev: MouseEvent) {
+		console.log('handling delete')
+		ev.stopPropagation()
+	}
+	function handleConfirmEdit(ev: CustomEvent<string>) {
+		console.log('got new value', ev.detail)
+		wUserRenaming.set(null)
+	}
+	function handleCancelEdit() {
+		wUserRenaming.set(null)
 	}
 </script>
 
@@ -49,53 +73,43 @@
 	class={clazz}
 	on:click={makeFileClickHandler(node)}
 	class:active={'id' in node && node.id == $dActiveFile}
+	transition:slide={{ duration: 50 }}
 >
-	<div class="content left">
-		{#if 'id' in node}
-			<FileIcon
-				extension={getFileExtension(node)}
-				size={FILE_ICON_SIZE_PX}
-				class="file-icon"
+	<!-- Icon, either a file icon or directory chevron -->
+	{#if isFile}
+		<FileIcon
+			extension={getFileExtension(node)}
+			size={FILE_ICON_SIZE_PX}
+			class="file-icon"
+		/>
+	{:else}
+		<Icon name="chevron-right" stroked rotation={open ? '90deg' : '0deg'} />
+	{/if}
+	<div class="content">
+		{#if isEditing}
+			<ValidationInput
+				initValue={name}
+				validate={(val) => validateRename(node, val)}
+				on:confirm={handleConfirmEdit}
+				on:cancel={handleCancelEdit}
 			/>
-			<p class="title">
-				{getFileName(node)}
-			</p>
 		{:else}
-			<Icon name="chevron-right" stroked rotation={open ? '90deg' : '0deg'} />
-			<p class="title">
-				{node.dir}
-			</p>
+			<div class="title">
+				{name}
+			</div>
+			<div class="icon-container hidden">
+				<IconButton size="xs" empty on:click={handleEdit}>
+					<Icon name="edit-2" stroked size="12px" />
+				</IconButton>
+				<IconButton size="xs" empty on:click={handleDelete}>
+					<Icon name="trash" stroked size="12px" />
+				</IconButton>
+			</div>
 		{/if}
-	</div>
-	<div class="content right">
-		<IconButton size="xs" empty on:click={handleEdit}>
-			<Icon name="edit-2" stroked size="12px" />
-		</IconButton>
-		<IconButton size="xs" empty on:click={handleDelete}>
-			<Icon name="trash" stroked size="12px" />
-		</IconButton>
 	</div>
 </button>
 
 <style>
-	.title {
-		margin: 0px;
-		color: var(--text-color);
-		min-width: 0;
-		text-overflow: ellipsis;
-		width: min-content;
-	}
-	.left {
-		flex: 1 1 auto;
-	}
-	.right {
-		flex: 0 0 auto;
-		min-width: max-content;
-		visibility: hidden;
-	}
-	button:hover > .right {
-		visibility: visible;
-	}
 	.active p {
 		color: var(--text-important);
 	}
@@ -107,5 +121,19 @@
 		flex-direction: row;
 		gap: 4px;
 		align-items: center;
+		justify-content: space-between;
+		flex-grow: 1;
+		max-width: 100%;
+	}
+	.icon-container {
+		display: flex;
+		flex-direction: row;
+		gap: 4px;
+	}
+	.hidden {
+		visibility: hidden;
+	}
+	button:hover .hidden {
+		visibility: visible;
 	}
 </style>

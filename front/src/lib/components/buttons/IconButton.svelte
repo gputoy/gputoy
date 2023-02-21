@@ -31,6 +31,7 @@
 		min-width: max-content;
 	}
 	button {
+		cursor: pointer;
 		display: flex;
 		justify-content: center;
 		align-items: center;

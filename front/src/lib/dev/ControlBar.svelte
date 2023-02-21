@@ -62,7 +62,6 @@
 		width: calc(100% - 8px);
 		border-bottom: var(--border);
 		height: 32px;
-		background-color: var(--background-menu);
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		justify-content: space-between;

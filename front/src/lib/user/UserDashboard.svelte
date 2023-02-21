@@ -34,6 +34,6 @@
 
 	#tray {
 		height: 40px;
-		background-color: var(--background-menu);
+		background-color: var(--background-splash);
 	}
 </style>

@@ -32,7 +32,6 @@
 
 	.canvas-container {
 		padding: var(--inset);
-		background-color: var(--background-nav);
 		width: 100%;
 		height: 100%;
 		display: relative;

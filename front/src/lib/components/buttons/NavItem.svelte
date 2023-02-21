@@ -32,7 +32,6 @@
 		border-radius: 4px;
 	}
 	.current > a {
-		/* background-color: var(--background-nav); */
 		background-color: var(--glass-low);
 		outline: var(--border2);
 		color: var(--accent-color);

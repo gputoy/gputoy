@@ -48,7 +48,7 @@
 		bottom: 100%;
 		left: 0%;
 		right: 0%;
-		background-color: var(--background-menu);
+		background-color: var(--background-splash);
 		margin: 0px;
 		border: var(--border2);
 		border-bottom: none;

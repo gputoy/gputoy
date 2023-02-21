@@ -22,6 +22,7 @@
 
 <style>
 	:global(.node-entry) {
+		cursor: default;
 		width: 100%;
 		height: 1rem;
 		font-size: var(--xs);
@@ -29,11 +30,9 @@
 		color: var(--text-color);
 		border: none;
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
-		cursor: pointer;
 		position: relative;
-		gap: 8px;
+		gap: 4px;
 		user-select: none;
 	}
 	:global(.node-entry:before) {

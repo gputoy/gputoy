@@ -222,6 +222,7 @@ export const wLastInputAction = writable<{
 } | null>(null)
 export const wUserModalOpen = writable(false)
 export const wUserPrefsOpen = writable(false)
+export const wUserRenaming = writable<string | null>(null)
 
 export const wMenuOpen = writable<Record<MenuKey, boolean>>({
 	file: false,

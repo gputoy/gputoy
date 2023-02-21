@@ -76,7 +76,7 @@
 		flex: 0 0 auto;
 		border-right: var(--border2);
 		padding-top: 1rem;
-		background-color: var(--background-menu);
+		background-color: var(--background-splash);
 	}
 	.category-body {
 		height: 100%;

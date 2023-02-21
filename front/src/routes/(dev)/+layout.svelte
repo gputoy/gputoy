@@ -147,7 +147,7 @@
 	nav {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
-		background-color: var(--nav-color);
+		background-color: var(--background-nav);
 		gap: 4px;
 		align-items: center;
 		border-bottom: 1px solid var(--border-primary);

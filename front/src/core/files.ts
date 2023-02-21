@@ -1,4 +1,5 @@
 import type { File, Files } from '$common'
+import { wFiles } from '$stores'
 import { get, type Writable } from 'svelte/store'
 
 export type FilesExtras = {
@@ -79,6 +80,13 @@ export type FileTreeNode = {
 	 * List entries can either be a file or another FileTreeNode
 	 */
 	children: FileTreeNodeChild[]
+}
+
+export function parent(file: FileWithId): string {
+	const [_, ...paths] = file.id.split('/')
+	if (paths.length == 1) return ''
+	paths.pop()
+	return '/' + paths.join('/')
 }
 
 /**
@@ -180,4 +188,16 @@ function sortChildren(ptr: FileTreeNodeChild) {
  */
 export function getCanonicalName(file: File | FileWithId): string {
 	return file.fileName + '.' + file.extension
+}
+
+export function validateRename(node: FileTreeNodeChild, rename: string): string | undefined {
+	if (rename.length == 0) return 'must have name'
+	if ('id' in node) {
+		const newId = parent(node) + '/' + rename
+		if (newId.length)
+			if (newId != node.id && wFiles.getFile(newId) != null) return 'exists'
+	} else {
+		console.log(node.absoluteDir)
+	}
+	return
 }

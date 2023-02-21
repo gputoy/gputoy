@@ -50,7 +50,7 @@
 	}
 </script>
 
-<li
+<button
 	class="menu-button"
 	on:click={open}
 	on:mouseenter={open}
@@ -62,7 +62,7 @@
 		<ul class="menu">
 			{#each MENU_MAP[key] as submenu, i}
 				{#each submenu as menuEntry}
-					<li
+					<button
 						class="menu-item"
 						on:click={makeMenuEntryClickHandler(menuEntry)}
 						disabled={menuEntry.fAction
@@ -73,7 +73,7 @@
 						{#if boundActions[menuEntry.name]}
 							<Key keycode={boundActions[menuEntry.name]} />
 						{/if}
-					</li>
+					</button>
 				{/each}
 				{#if i <= submenu.length}
 					<div class="divider" />
@@ -81,9 +81,14 @@
 			{/each}
 		</ul>
 	{/if}
-</li>
+</button>
 
 <style>
+	button {
+		background-color: transparent;
+		border: none;
+		color: var(--text-color);
+	}
 	.menu-button {
 		list-style-type: none;
 		font-size: var(--xs);
@@ -109,7 +114,8 @@
 		padding-block: 0.25rem;
 		box-shadow: var(--box-shadow);
 	}
-	.menu li {
+	.menu button {
+		width: 100%;
 		transition: none;
 		padding-inline: 0.5rem;
 		padding-block: 0.3rem;
@@ -120,12 +126,12 @@
 		gap: 1rem;
 		font-weight: normal;
 	}
-	.menu li p {
+	.menu button p {
 		margin: 0px;
 		display: inline;
 		user-select: none;
 	}
-	.menu li:hover {
+	.menu button:hover {
 		background-color: var(--glass-med);
 	}
 	.divider {
