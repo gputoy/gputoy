@@ -1,15 +1,10 @@
 <script lang="ts">
-	import type { FileTreeNode } from '$core/files'
 	import Accordian from '$lib/components/Accordian.svelte'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import FileNode from '$lib/components/file/FileNode.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import ProjectSummary from '$lib/components/ProjectSummary.svelte'
-	import { wFiles } from '$stores'
-	let root: FileTreeNode | undefined
-	$: {
-		root = wFiles.buildTree()
-	}
+	import { dFileTree } from '$stores'
 </script>
 
 <div id="pane-root">
@@ -33,10 +28,18 @@
 			</IconButton>
 		</svelte:fragment>
 		<svelte:fragment slot="content">
-			{#if root}
-				<FileNode fileNode={root} />
+			{#if $dFileTree}
+				<FileNode fileNode={$dFileTree} />
 			{/if}
 		</svelte:fragment>
+	</Accordian>
+	<Accordian title="Runners">
+		<svelte:fragment slot="menu" />
+		<svelte:fragment slot="content" />
+	</Accordian>
+	<Accordian title="Resources">
+		<svelte:fragment slot="menu" />
+		<svelte:fragment slot="content" />
 	</Accordian>
 	<!-- <Accordian title="System">
 		<svelte:fragment slot="content">
@@ -58,12 +61,5 @@
 		height: 100%;
 		background-color: var(--background-alt);
 		margin: 0;
-	}
-	.title {
-		margin-block: 0rem;
-		font-size: var(--xl);
-	}
-	.desc {
-		font-size: var(--xs);
 	}
 </style>

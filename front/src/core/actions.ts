@@ -16,6 +16,7 @@ import {
 } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
 import isEqual from 'lodash/isEqual'
+import { fileWithNewPath } from './files'
 
 const actionHistory: Action[] = []
 
@@ -110,6 +111,9 @@ export function pushAction(action: Action) {
 			break
 		case 'saveAllFiles':
 			saveAllFiles()
+			break
+		case 'move':
+			moveFile(action.c[0], action.c[1])
 			break
 
 		/** @ts-ignore */
@@ -206,4 +210,25 @@ async function saveAllFiles() {
 		wFiles.writeFile(path, model.getValue())
 	})
 	wFileDirty.clear()
+}
+
+function moveFile(src: string, dest: string) {
+	let didUpdate = false
+	wFiles.update(({ map }) => {
+		let curr = map[src]
+		if (curr && map[dest] == undefined) {
+			const newFile = fileWithNewPath(curr, dest)
+			if (!newFile) return { map }
+			map[dest] = newFile
+			delete map[src]
+			didUpdate = true
+		}
+		return { map }
+	})
+	if (didUpdate) {
+		wLayout.update(layout => {
+			layout.workspace = layout.workspace.map(fileid => fileid == src ? dest : fileid)
+			return layout
+		})
+	}
 }

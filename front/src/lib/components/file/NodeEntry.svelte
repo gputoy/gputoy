@@ -1,15 +1,17 @@
 <script lang="ts">
-	import { pushAction } from '$core/actions'
 	import {
 		getCanonicalName,
+		pathParent,
 		validateRename,
 		type FileTreeNode,
 		type FileTreeNodeChild,
 		type FileWithId
 	} from '$core/files'
+
+	import { pushAction } from '$core/actions'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { dActiveFile, wLayout, wUserRenaming } from '$stores'
+	import { dActiveFile, wLayout, wUserDeleting, wUserRenaming } from '$stores'
 	import { slide } from 'svelte/transition'
 	import ValidationInput from '../ValidationInput.svelte'
 	import FileIcon from './FileIcon.svelte'
@@ -53,15 +55,19 @@
 		}
 	}
 	function handleEdit(ev: MouseEvent) {
+		wUserDeleting.set(null)
 		wUserRenaming.set(identifier)
 		ev.stopPropagation()
 	}
 	function handleDelete(ev: MouseEvent) {
-		console.log('handling delete')
+		wUserRenaming.set(null)
+		wUserDeleting.set(identifier)
 		ev.stopPropagation()
 	}
-	function handleConfirmEdit(ev: CustomEvent<string>) {
-		console.log('got new value', ev.detail)
+	function handleConfirmEdit(ev: CustomEvent<any>) {
+		let newPath = pathParent(identifier) + '/' + ev.detail.value
+		console.log('new path', newPath)
+		pushAction({ ty: 'move', c: [identifier, newPath] })
 		wUserRenaming.set(null)
 	}
 	function handleCancelEdit() {
@@ -94,9 +100,7 @@
 				on:cancel={handleCancelEdit}
 			/>
 		{:else}
-			<div class="title">
-				{name}
-			</div>
+			{name}
 			<div class="icon-container hidden">
 				<IconButton size="xs" empty on:click={handleEdit}>
 					<Icon name="edit-2" stroked size="12px" />
@@ -110,9 +114,6 @@
 </button>
 
 <style>
-	.active p {
-		color: var(--text-important);
-	}
 	.active::before {
 		background-color: var(--glass-high);
 	}
@@ -122,8 +123,9 @@
 		gap: 4px;
 		align-items: center;
 		justify-content: space-between;
-		flex-grow: 1;
+		flex: 1 1 auto;
 		max-width: 100%;
+		text-overflow: ellipsis;
 	}
 	.icon-container {
 		display: flex;

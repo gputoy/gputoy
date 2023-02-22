@@ -1,4 +1,4 @@
-import type { File, Files } from '$common'
+import type { File, Files, SupportedExtension } from '$common'
 import { wFiles } from '$stores'
 import { get, type Writable } from 'svelte/store'
 
@@ -8,7 +8,6 @@ export type FilesExtras = {
 	writeFile: (fileid: string, data: string) => void
 	updateFileMeta: (fileid: string, meta: Partial<Omit<File, 'data'>>) => void
 	removeFile: (fileid: string) => void
-	buildTree: () => FileTreeNode
 }
 export function initFilesMethods(files: Writable<Files>): FilesExtras {
 	function newFile(file: File): string {
@@ -49,11 +48,7 @@ export function initFilesMethods(files: Writable<Files>): FilesExtras {
 		})
 	}
 
-	function buildTree(): FileTreeNode {
-		return treeFromFiles(get(files))
-	}
-
-	return { newFile, getFile, writeFile, updateFileMeta, removeFile, buildTree }
+	return { newFile, getFile, writeFile, updateFileMeta, removeFile }
 }
 
 /**
@@ -82,11 +77,58 @@ export type FileTreeNode = {
 	children: FileTreeNodeChild[]
 }
 
-export function parent(file: FileWithId): string {
-	const [_, ...paths] = file.id.split('/')
-	if (paths.length == 1) return ''
+/**
+ * Retreieves parent absolute path from absoute path
+ * @param path a path i.e. '/some/path/to/file.txt'
+ * @returns parent path i.e. '/some/path/to'
+ */
+export function pathParent(path: string): string {
+	const [_, ...paths] = path.split('/')
+	if (paths.length <= 1) return ''
 	paths.pop()
 	return '/' + paths.join('/')
+}
+
+/**
+ * Retrieves file name from path
+ * @param path i.e. '/some/path/to/file.txt'
+ * @returns [fileName, extension, ...dirs]
+ */
+export function pathToParts(path: string): [string, string, string[]] | undefined {
+	if (!isValidPath(path)) return
+	const [file, ...dirs] = path.trim().split('/').reverse()
+	const [extension, ...fileName] = file.split('.').reverse()
+	return [fileName.join('.'), extension, dirs]
+}
+
+/**
+ * File name as displayed in frontend
+ * @param file
+ * @returns file name
+ */
+export function getCanonicalName(file: File | FileWithId): string {
+	return file.fileName + '.' + file.extension
+}
+
+export function fileWithNewPath(file: File | FileWithId, newPath: string): File | undefined {
+	const [fileName, extension, dirs] = pathToParts(newPath) ?? []
+	if (!fileName) return
+	return {
+		...file,
+		fileName,
+		extension: extension as SupportedExtension,
+		dir: dirs!.pop() ?? '',
+	}
+}
+
+const RE_VALID_FILE_ID = /\/([.]?[_]*[\w_-]+\/)*([.]?[_]*[\w_-]*[.][a-z]+)/g
+/**
+ * Determine whether the path has valid formatting
+ * @param path 
+ * @returns whether the path is vallid
+ */
+export function isValidPath(path: string): boolean {
+	return path.match(RE_VALID_FILE_ID)?.length == 1
 }
 
 /**
@@ -122,7 +164,7 @@ export function parent(file: FileWithId): string {
  * @param files Files from store
  * @returns Tree representation of files
  */
-function treeFromFiles(files: Files): FileTreeNode {
+export function treeFromFiles(files: Files): FileTreeNode {
 	const ret: FileTreeNode = { dir: '', absoluteDir: '', children: [] }
 	let ptr = ret
 
@@ -181,21 +223,19 @@ function sortChildren(ptr: FileTreeNodeChild) {
 	ptr.children.forEach(sortChildren)
 }
 
-/**
- * File name as displayed in frontend
- * @param file
- * @returns file name
- */
-export function getCanonicalName(file: File | FileWithId): string {
-	return file.fileName + '.' + file.extension
-}
 
+/**
+ * Ensure this potential rename is valid. If return is undefined, then it is valid
+ * @param node file node that is being renamed
+ * @param rename new name
+ * @returns error message | undefined
+ */
 export function validateRename(node: FileTreeNodeChild, rename: string): string | undefined {
-	if (rename.length == 0) return 'must have name'
+	if (rename.length == 0) return 'cannot be empty'
 	if ('id' in node) {
-		const newId = parent(node) + '/' + rename
-		if (newId.length)
-			if (newId != node.id && wFiles.getFile(newId) != null) return 'exists'
+		const newId = pathParent(node.id) + '/' + rename.trim()
+		if (newId != node.id && wFiles.getFile(newId) != null) return 'exists'
+		if (!isValidPath(newId)) return 'invalid'
 	} else {
 		console.log(node.absoluteDir)
 	}

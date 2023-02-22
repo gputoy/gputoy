@@ -78,6 +78,22 @@ export type Action =
   | {
       c: string;
       ty: "setRunner";
+    }
+  | {
+      /**
+       * @minItems 2
+       * @maxItems 2
+       */
+      c: [string, string];
+      ty: "move";
+    }
+  | {
+      /**
+       * @minItems 2
+       * @maxItems 2
+       */
+      c: [string, string];
+      ty: "copy";
     };
 
 export type Panel = "editorPanel" | "projectPanel" | "resourcePanel";

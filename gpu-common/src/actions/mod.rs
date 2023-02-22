@@ -59,6 +59,10 @@ pub enum Action {
     CloseProject,
     /// Sets runner json file
     SetRunner(String),
+    /// Move file
+    Move(String, String),
+    /// Copy file
+    Copy(String, String)
 }
 
 #[derive(Debug)]

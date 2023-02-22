@@ -11,12 +11,13 @@
 
 <style>
 	#root {
+		min-width: max-content;
 		padding: 0.5rem;
 		padding-left: 1rem;
 	}
 	.title {
 		margin-block: 0rem;
-		font-size: var(--xl);
+		font-size: var(--lg);
 	}
 	.desc {
 		font-size: var(--xs);

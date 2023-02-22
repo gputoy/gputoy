@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte'
 	import { wLayout } from '$stores'
+	import { slide } from 'svelte/transition'
 
 	export let title: string
 	function handleClick() {
@@ -27,7 +28,7 @@
 		</div>
 	</button>
 	{#if open}
-		<div class="accordian-content">
+		<div class="accordian-content" transition:slide={{ duration: 50 }}>
 			<slot name="content" />
 		</div>
 	{/if}
@@ -63,13 +64,12 @@
 		flex: 1 1 auto;
 		padding: 0;
 		border-bottom: var(--border2);
-		min-width: max-content;
+		min-width: 100px;
 	}
 	p {
 		font-size: var(--sm);
 		margin: 0px;
 		padding: 4px;
-		font-weight: bold;
 		color: var(--text-accent-color);
 	}
 	button {

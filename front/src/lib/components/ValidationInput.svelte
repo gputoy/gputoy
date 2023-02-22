@@ -6,20 +6,17 @@
 	export let initValue: string
 	let inputValue = initValue
 	export let validate: (value: string) => string | undefined
-	let validationResult: string | undefined
+	let validationErrors: string | undefined
 
 	$: {
 		console.log('validation running', inputValue)
-		validationResult = validate(inputValue)
+		validationErrors = validate(inputValue)
 	}
 	let dispatch = createEventDispatcher()
 
-	$: {
-		console.log('valid', validationResult)
-	}
-
 	function handleConfirmEdit(ev: any) {
-		dispatch('confirm', { value: inputValue })
+		if (!validationErrors) dispatch('confirm', { value: inputValue })
+		else handleCancelEdit(ev)
 		ev.stopPropagation()
 	}
 	function handleCancelEdit(ev: MouseEvent) {
@@ -29,6 +26,8 @@
 	function handleInputKeyup(ev: KeyboardEvent) {
 		if (ev.key == 'Escape') {
 			dispatch('cancel')
+		} else if (ev.key == 'Enter' && !validationErrors) {
+			dispatch('confirm', { value: inputValue })
 		}
 	}
 	onMount(() => {
@@ -39,22 +38,29 @@
 
 <div class="validated-input">
 	<input
+		type="text"
 		bind:this={input}
 		bind:value={inputValue}
 		on:submit={handleConfirmEdit}
 		on:click|capture|stopPropagation={() => {}}
 		on:keyup={handleInputKeyup}
-		aria-invalid={!!validationResult}
-		class:invalid={!!validationResult}
+		aria-invalid={!!validationErrors}
+		class:invalid={!!validationErrors}
+		spellcheck={false}
 	/>
-	{#if validationResult}
+	{#if validationErrors}
 		<div class="validation">
-			{validationResult}
+			{validationErrors}
 		</div>
 	{/if}
 </div>
 <div class="icon-container">
-	<IconButton size="xs" empty on:click={handleConfirmEdit}>
+	<IconButton
+		size="xs"
+		empty
+		on:click={handleConfirmEdit}
+		disabled={!!validationErrors}
+	>
 		<Icon name="check" stroked size="12px" />
 	</IconButton>
 	<IconButton size="xs" empty on:click={handleCancelEdit}>
@@ -64,14 +70,21 @@
 
 <style>
 	.validated-input {
+		flex: 1 1 auto;
 		position: relative;
 	}
 	input {
-		padding: 2px;
+		padding: 1px;
 		background-color: transparent;
 		z-index: 1;
+		width: 0;
+		min-width: 100%;
+		margin-right: 2px;
+		box-sizing: content-box;
+		margin-left: -1px;
 	}
 	.icon-container {
+		flex: 0 0 auto;
 		display: flex;
 		flex-direction: row;
 		gap: 4px;

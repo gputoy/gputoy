@@ -24,7 +24,7 @@ import {
 	DEFAULT_USER_KEYBINDS,
 	type MenuKey
 } from '$core/consts'
-import { initFilesMethods, type FilesExtras } from '$core/files'
+import { initFilesMethods, treeFromFiles, type FilesExtras } from '$core/files'
 import type { Keybinds } from '$core/input'
 import { initLayoutMethods, type LayoutExtras } from '$core/layout'
 import { writeToLocalStorage } from '$core/preferences'
@@ -178,6 +178,9 @@ export const wFiles = makeEnhanced<Files, FilesExtras>(
 	DEFAULT_FILES,
 	initFilesMethods
 )()
+export const dFileTree = derived([wFiles], ([files]) => {
+	return treeFromFiles(files)
+})
 export const wModelDirty = makeSet()
 export const wFileDirty = makeSet()
 
@@ -223,6 +226,7 @@ export const wLastInputAction = writable<{
 export const wUserModalOpen = writable(false)
 export const wUserPrefsOpen = writable(false)
 export const wUserRenaming = writable<string | null>(null)
+export const wUserDeleting = writable<string | null>(null)
 
 export const wMenuOpen = writable<Record<MenuKey, boolean>>({
 	file: false,

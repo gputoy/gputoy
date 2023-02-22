@@ -5,6 +5,7 @@
 	type SeriesPositon = 'first' | 'middle' | 'last' | 'none'
 	export let series: SeriesPositon = 'none'
 	export let smallIcons = false
+	export let disabled = false
 </script>
 
 <button
@@ -16,6 +17,7 @@
 	class:no-left-border={series == 'middle' || series == 'last'}
 	class:small-icons={smallIcons}
 	class:empty
+	class:disabled
 >
 	<slot />
 	{#if text}

@@ -38,9 +38,9 @@
 	:global(.node-entry:before) {
 		content: '';
 		position: absolute;
-		width: 100rem;
+		width: 200vw;
 		height: 1.2rem;
-		left: -100%;
+		left: -100vw;
 	}
 	:global(.node-entry:hover:before) {
 		background-color: var(--glass-med);

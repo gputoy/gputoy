@@ -431,6 +431,64 @@
               ]
             }
           }
+        },
+        {
+          "description": "Move file",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "move"
+              ]
+            }
+          }
+        },
+        {
+          "description": "Copy file",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string"
+                }
+              ],
+              "maxItems": 2,
+              "minItems": 2
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "copy"
+              ]
+            }
+          }
         }
       ]
     },
