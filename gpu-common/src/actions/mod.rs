@@ -3,7 +3,7 @@ use schemars::JsonSchema;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::Panel;
+use crate::Pane;
 
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
@@ -14,13 +14,11 @@ use crate::Panel;
 )]
 pub enum Action {
     /// Toggles pane open and closed
-    TogglePanel(Panel),
+    TogglePanel(Pane),
     /// Toggles debug panel
     ToggleDebugPanel,
     /// Toggle user preferences
     ToggleUserPreferences,
-    /// Shifts pane by specified amount
-    ShiftPanel(ShiftPaneArgs),
     /// Play/Pause the project
     PlayPause,
     /// Resets project to default state
@@ -30,7 +28,7 @@ pub enum Action {
     /// Toggles Console
     ToggleConsole,
     /// Focuses pane
-    Focus(Panel),
+    Focus(Pane),
     /// Closes document in editor
     CloseDocument,
     /// Next document in editor
@@ -62,13 +60,5 @@ pub enum Action {
     /// Move file
     Move(String, String),
     /// Copy file
-    Copy(String, String)
-}
-
-#[derive(Debug)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-pub struct ShiftPaneArgs {
-    pub pane: Panel,
-    pub shift: i32,
+    Copy(String, String),
 }

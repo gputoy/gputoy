@@ -64,6 +64,8 @@ export function setProperty(
 		}
 		case 'general': {
 			wUserGeneralPrefs.update((old) => {
+				// TODO: fix types to remove ts ignore
+				// @ts-ignore
 				old[configKey as GeneralConfigKey] = value
 				return old
 			})

@@ -1,17 +1,21 @@
 <script lang="ts">
+	import {
+		closeWorkspaceFile,
+		rFileIndex,
+		rWorkspace,
+		setFileIndex
+	} from '$core/layout'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import FileIcon from '$lib/components/file/FileIcon.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import Logo from '$lib/components/Logo.svelte'
 	import MonacoEditor from '$lib/dev/MonacoEditor.svelte'
-	import { wFiles, wLayout, wModelDirty } from '$stores'
+	import { wFiles, wModelDirty } from '$stores'
 
 	// let Editor: any
-	$: workspace = $wLayout.workspace
-	$: fileindex = $wLayout.fileIndex ?? null
-	$: fileid = fileindex != null ? workspace[fileindex] : null
+	$: fileid = $rFileIndex != null ? $rWorkspace[$rFileIndex] : null
 
-	$: highlight = workspace.map((v) => false)
+	$: highlight = $rWorkspace.map((v) => false)
 
 	function getFile(fileid: string) {
 		return $wFiles.map[fileid]
@@ -25,15 +29,14 @@
 	function handleClick(ev: MouseEvent, index: number) {
 		// middle click
 		if (ev.button == 1) {
-			wLayout.closeWorkspaceFile(index)
+			closeWorkspaceFile(index)
 			ev.preventDefault()
 			return
 		}
-		let fileid = workspace[index]
-		if (fileid) wLayout.update((layout) => ({ ...layout, fileIndex: index }))
+		if ($rWorkspace[index]) setFileIndex(index)
 	}
 	function handleClose(index: number) {
-		wLayout.closeWorkspaceFile(index)
+		closeWorkspaceFile(index)
 	}
 	function handleMouseEnter(index: number) {
 		highlight[index] = true
@@ -49,10 +52,10 @@
 <div class="editor-container">
 	{#if fileid}
 		<div class="file-tabs">
-			{#each workspace as fileid, i}
+			{#each $rWorkspace as fileid, i}
 				<div
 					class="file-tab"
-					class:selected={i == fileindex}
+					class:selected={i == $rFileIndex}
 					on:mouseenter={() => handleMouseEnter(i)}
 					on:mouseleave={() => handleMouseLeave(i)}
 					on:mousedown={(ev) => handleClick(ev, i)}

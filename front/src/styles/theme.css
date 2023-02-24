@@ -46,6 +46,7 @@ body {
 	--color-invalid: red;
 
 	--transition-quick: 50ms;
+	--splitpanes-transition-duration: 100ms;
 }
 
 body.dark {

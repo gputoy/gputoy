@@ -20,7 +20,8 @@ export const BASE_URL = import.meta.env.VITE_FE_URL + '/'
  */
 export const API_URL = import.meta.env.VITE_API_URL + '/'
 
-export const WASM_ANALYZER_URL = BASE_URL + import.meta.env.VITE_MAKE_ANALYZER_PATH
+export const WASM_ANALYZER_URL =
+	BASE_URL + import.meta.env.VITE_MAKE_ANALYZER_PATH
 export const WASM_CLIENT_URL = BASE_URL + import.meta.env.VITE_MAKE_CLIENT_PATH
 
 export const DEFAULT_RUN_STATE: RunState = {
@@ -35,20 +36,17 @@ export const DEFAULT_DIR_NODE_STATE: DirNodeState = {
 	isRenaming: false
 }
 export const DEFAULT_LAYOUT: Layout = {
-	isStatusOpen: true,
 	fileIndex: 0,
 	workspace: ['/shaders/main.wgsl', '/run.json'] as string[],
-	projectPanel: {
-		show: true,
-		size: 20
+	paneSize: {
+		projectPanePx: 180,
+		editorPanePercentage: 40,
+		resourcePanePercentage: 38
 	},
-	editorPanel: {
-		show: true,
-		size: 50
-	},
-	resourcePanel: {
-		show: true,
-		size: 50
+	paneToggled: {
+		projectPane: true,
+		editorPane: true,
+		resourcePane: true
 	},
 	fileTreeState: {
 		'/shaders': {
@@ -126,19 +124,19 @@ export const DEFAULT_USER_KEYBINDS: Keybinds = {
 	'C-q': {
 		action: {
 			ty: 'togglePanel',
-			c: 'projectPanel'
+			c: 'projectPane'
 		}
 	},
 	'C-e': {
 		action: {
 			ty: 'togglePanel',
-			c: 'editorPanel'
+			c: 'editorPane'
 		}
 	},
 	'C-r': {
 		action: {
 			ty: 'togglePanel',
-			c: 'resourcePanel'
+			c: 'resourcePane'
 		}
 	},
 	'C-j': {
@@ -288,7 +286,7 @@ export type ConfigItemMeta = {
  *                  Nav UI Menu
  */
 export const MENUKEYS = ['file', 'edit', 'project', 'view', 'help'] as const
-export type MenuKey = typeof MENUKEYS[number]
+export type MenuKey = (typeof MENUKEYS)[number]
 export type MenuEntry = {
 	name: string
 	fAction?: FilteredAction
@@ -423,7 +421,7 @@ export const MENU_MAP: Record<
 				fAction: {
 					action: {
 						ty: 'togglePanel',
-						c: 'projectPanel'
+						c: 'projectPane'
 					}
 				}
 			},
@@ -432,7 +430,7 @@ export const MENU_MAP: Record<
 				fAction: {
 					action: {
 						ty: 'togglePanel',
-						c: 'editorPanel'
+						c: 'editorPane'
 					}
 				}
 			},
@@ -441,7 +439,7 @@ export const MENU_MAP: Record<
 				fAction: {
 					action: {
 						ty: 'togglePanel',
-						c: 'resourcePanel'
+						c: 'resourcePane'
 					}
 				}
 			}

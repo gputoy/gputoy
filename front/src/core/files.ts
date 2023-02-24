@@ -94,7 +94,9 @@ export function pathParent(path: string): string {
  * @param path i.e. '/some/path/to/file.txt'
  * @returns [fileName, extension, ...dirs]
  */
-export function pathToParts(path: string): [string, string, string[]] | undefined {
+export function pathToParts(
+	path: string
+): [string, string, string[]] | undefined {
 	if (!isValidPath(path)) return
 	const [file, ...dirs] = path.trim().split('/').reverse()
 	const [extension, ...fileName] = file.split('.').reverse()
@@ -110,21 +112,24 @@ export function getCanonicalName(file: File | FileWithId): string {
 	return file.fileName + '.' + file.extension
 }
 
-export function fileWithNewPath(file: File | FileWithId, newPath: string): File | undefined {
+export function fileWithNewPath(
+	file: File | FileWithId,
+	newPath: string
+): File | undefined {
 	const [fileName, extension, dirs] = pathToParts(newPath) ?? []
 	if (!fileName) return
 	return {
 		...file,
 		fileName,
 		extension: extension as SupportedExtension,
-		dir: dirs!.pop() ?? '',
+		dir: dirs!.pop() ?? ''
 	}
 }
 
 const RE_VALID_FILE_ID = /\/([.]?[_]*[\w_-]+\/)*([.]?[_]*[\w_-]*[.][a-z]+)/g
 /**
  * Determine whether the path has valid formatting
- * @param path 
+ * @param path
  * @returns whether the path is vallid
  */
 export function isValidPath(path: string): boolean {
@@ -223,14 +228,16 @@ function sortChildren(ptr: FileTreeNodeChild) {
 	ptr.children.forEach(sortChildren)
 }
 
-
 /**
  * Ensure this potential rename is valid. If return is undefined, then it is valid
  * @param node file node that is being renamed
  * @param rename new name
  * @returns error message | undefined
  */
-export function validateRename(node: FileTreeNodeChild, rename: string): string | undefined {
+export function validateRename(
+	node: FileTreeNodeChild,
+	rename: string
+): string | undefined {
 	if (rename.length == 0) return 'cannot be empty'
 	if ('id' in node) {
 		const newId = pathParent(node.id) + '/' + rename.trim()

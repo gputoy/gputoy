@@ -13,7 +13,6 @@ import GputoyWorker from '$monaco/wgsl/wgslWorker'
 /** @ts-ignore */
 import { initialize } from 'monaco-editor/esm/vs/editor/editor.worker'
 
-
 /** @ts-ignore */
 declare let self: DedicatedWorkerGlobalScope
 

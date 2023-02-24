@@ -19,8 +19,6 @@ export const currentExtension = writable<SupportedExtension | null>(null)
 let Monaco: typeof import('monaco-editor')
 declare let self: { MonacoEnvironment: any }
 
-
-
 /** @ts-ignore*/
 let MonacoVim: any
 let _editorInstance: monaco.editor.IStandaloneCodeEditor | undefined = undefined
@@ -58,7 +56,7 @@ export async function initEditor(divEl: any, statusEl: any, init: EditorInit) {
 	await import('./wgsl')
 	/** @ts-ignore */
 	MonacoVim = await import('monaco-vim')
-	Monaco.editor.defineTheme('dark', dark)
+	Monaco.editor.defineTheme('dark', dark())
 	Monaco.editor.defineTheme('light', light)
 	setJSONSchema(Monaco)
 
@@ -126,7 +124,8 @@ export function changeEditorFile(fileid: string, file: File) {
 // Updates editor config based on user editor config
 export function updateEditorConfig(config: UserEditorPrefs) {
 	// monaco options
-	const options: monaco.editor.IEditorOptions & monaco.editor.IGlobalEditorOptions = {
+	const options: monaco.editor.IEditorOptions &
+		monaco.editor.IGlobalEditorOptions = {
 		fontSize: config.fontSize!,
 		fontFamily: config.fontFamily!,
 		lineNumbers: config.lineNumbers,
@@ -150,7 +149,6 @@ export function clearFontCache() {
 }
 
 export function getModel(path: string): monaco.editor.ITextModel | null {
-	console.log('getModel', Monaco.Uri.file(path))
 	return Monaco?.editor.getModel(Monaco.Uri.file(path))
 }
 export function getAllModels(): monaco.editor.ITextModel[] {

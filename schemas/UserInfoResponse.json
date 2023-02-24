@@ -76,7 +76,7 @@
           ],
           "properties": {
             "c": {
-              "$ref": "#/definitions/Panel"
+              "$ref": "#/definitions/Pane"
             },
             "ty": {
               "type": "string",
@@ -112,25 +112,6 @@
               "type": "string",
               "enum": [
                 "toggleUserPreferences"
-              ]
-            }
-          }
-        },
-        {
-          "description": "Shifts pane by specified amount",
-          "type": "object",
-          "required": [
-            "c",
-            "ty"
-          ],
-          "properties": {
-            "c": {
-              "$ref": "#/definitions/ShiftPaneArgs"
-            },
-            "ty": {
-              "type": "string",
-              "enum": [
-                "shiftPanel"
               ]
             }
           }
@@ -204,7 +185,7 @@
           ],
           "properties": {
             "c": {
-              "$ref": "#/definitions/Panel"
+              "$ref": "#/definitions/Pane"
             },
             "ty": {
               "type": "string",
@@ -518,29 +499,13 @@
         "off"
       ]
     },
-    "Panel": {
+    "Pane": {
       "type": "string",
       "enum": [
-        "editorPanel",
-        "projectPanel",
-        "resourcePanel"
+        "projectPane",
+        "editorPane",
+        "resourcePane"
       ]
-    },
-    "ShiftPaneArgs": {
-      "type": "object",
-      "required": [
-        "pane",
-        "shift"
-      ],
-      "properties": {
-        "pane": {
-          "$ref": "#/definitions/Panel"
-        },
-        "shift": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
     },
     "UserEditorPrefs": {
       "type": "object",

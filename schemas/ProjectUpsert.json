@@ -162,11 +162,9 @@
       "type": "object",
       "required": [
         "accordianOpen",
-        "editorPanel",
         "fileTreeState",
-        "isStatusOpen",
-        "projectPanel",
-        "resourcePanel",
+        "paneSize",
+        "paneToggled",
         "workspace"
       ],
       "properties": {
@@ -176,14 +174,6 @@
           "additionalProperties": {
             "type": "boolean"
           }
-        },
-        "editorPanel": {
-          "description": "Panel settings for editorPanel",
-          "allOf": [
-            {
-              "$ref": "#/definitions/PanelState"
-            }
-          ]
         },
         "fileIndex": {
           "description": "Currently opened file index within workspace",
@@ -201,23 +191,19 @@
             "$ref": "#/definitions/DirNodeState"
           }
         },
-        "isStatusOpen": {
-          "description": "Is the left side status panel open",
-          "type": "boolean"
-        },
-        "projectPanel": {
-          "description": "Panel settings for projectPanel",
+        "paneSize": {
+          "description": "Pane size data",
           "allOf": [
             {
-              "$ref": "#/definitions/PanelState"
+              "$ref": "#/definitions/PaneSize"
             }
           ]
         },
-        "resourcePanel": {
-          "description": "Panel settings for resourcePanel",
+        "paneToggled": {
+          "description": "Pane toggle data",
           "allOf": [
             {
-              "$ref": "#/definitions/PanelState"
+              "$ref": "#/definitions/PaneToggled"
             }
           ]
         },
@@ -240,19 +226,53 @@
         "Error"
       ]
     },
-    "PanelState": {
+    "PaneSize": {
+      "description": "Pane size information.\n\nPersistent layout data needed to give 'preferred size' to panes.",
       "type": "object",
       "required": [
-        "show",
-        "size"
+        "editorPanePercentage",
+        "projectPanePx",
+        "resourcePanePercentage"
       ],
       "properties": {
-        "show": {
-          "type": "boolean"
-        },
-        "size": {
+        "editorPanePercentage": {
+          "description": "What percentage of total window width the editor pane takes up.\n\nIt is assumed the viewport/resource pane will take up the remaining space left behind by the project and editor pane.",
           "type": "number",
           "format": "float"
+        },
+        "projectPanePx": {
+          "description": "How many pixels wide the project pane should be.\n\nWill change its percentage share of the window if window width changes.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "resourcePanePercentage": {
+          "description": "What percentage of total window height the resource pane takes up.",
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "PaneToggled": {
+      "description": "Pane layout information.",
+      "type": "object",
+      "required": [
+        "editorPane",
+        "projectPane",
+        "resourcePane"
+      ],
+      "properties": {
+        "editorPane": {
+          "description": "Whether the editor pane is open",
+          "type": "boolean"
+        },
+        "projectPane": {
+          "description": "Whether the project pane is open",
+          "type": "boolean"
+        },
+        "resourcePane": {
+          "description": "Whether the resource pane is open",
+          "type": "boolean"
         }
       }
     },

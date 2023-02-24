@@ -1,4 +1,4 @@
-import type { Action, FilteredAction, Panel, ShiftPaneArgs } from '$common'
+import type { Action, FilteredAction, Pane } from '$common'
 import { clearProject } from '$core/project'
 import { getAllModels, getModel } from '$monaco'
 import { wWorkerInternal } from '$monaco/wgsl/wgslMode'
@@ -9,7 +9,6 @@ import {
 	wDebugPanel,
 	wFileDirty,
 	wFiles,
-	wLayout,
 	wModelDirty,
 	wRunState,
 	wWorkerData
@@ -17,6 +16,13 @@ import {
 import { toast } from '@zerodevx/svelte-toast'
 import isEqual from 'lodash/isEqual'
 import { fileWithNewPath } from './files'
+import {
+	closeWorkspaceFile,
+	getOpenFileId,
+	moveWorkspaceIdx,
+	openDocument as layoutOpenDocument,
+	togglePanel as layoutTogglePanel
+} from './layout'
 
 const actionHistory: Action[] = []
 
@@ -56,7 +62,7 @@ export const FILTER_CONDITION_LIST = [
 	'projectPanelFocused',
 	'viewportPanelFocused'
 ]
-export type SingleFilter = typeof FILTER_CONDITION_LIST[number]
+export type SingleFilter = (typeof FILTER_CONDITION_LIST)[number]
 
 /**
  * Pushes Action to be executed
@@ -87,9 +93,6 @@ export function pushAction(action: Action) {
 			break
 		case 'togglePanel':
 			togglePanel(action.c)
-			break
-		case 'shiftPanel':
-			shiftPanel(action.c)
 			break
 		case 'focus':
 			focusPane(action.c)
@@ -128,7 +131,7 @@ export function pushAction(action: Action) {
  *  TODO: create action reversal system
  * @param action
  */
-export function reverseAction(action: Action) { }
+export function reverseAction(action: Action) {}
 
 /// ------------------- Action execution ----------------------
 
@@ -146,35 +149,33 @@ async function playPause() {
 }
 
 function openDocument(fileid: string) {
-	wLayout.openDocument(fileid)
+	layoutOpenDocument(fileid)
 }
 function shiftDoument(shift: number) {
-	wLayout.moveWorkspaceIdx(shift)
+	moveWorkspaceIdx(shift)
 }
 
 function closeCurrentFile() {
-	wLayout.closeWorkspaceFile()
+	closeWorkspaceFile()
 }
 
-function rebuildProject() { }
+function rebuildProject() {}
 
-function resetProject() { }
+function resetProject() {}
 
 function toggleConsole() {
 	wConsoleOpen.update((o) => !o)
 }
 
-function togglePanel(panel: Panel) {
-	wLayout.togglePanel(panel)
+function togglePanel(panel: Pane) {
+	layoutTogglePanel(panel)
 }
 
 function toggleDebugPanel() {
 	wDebugPanel.update((show) => !show)
 }
 
-function shiftPanel(c: ShiftPaneArgs) { }
-
-function focusPane(c: string) { }
+function focusPane(c: string) {}
 
 function closeProject() {
 	clearProject()
@@ -190,7 +191,7 @@ function setRunner(fileid: string) {
 }
 
 async function saveCurrentFile() {
-	const currentFile = wLayout.getOpenFileId()
+	const currentFile = getOpenFileId()
 	if (!currentFile) return
 	await wWorkerInternal.applyUpdateToFile(currentFile)
 	wModelDirty.remove(currentFile)
@@ -226,9 +227,5 @@ function moveFile(src: string, dest: string) {
 		return { map }
 	})
 	if (didUpdate) {
-		wLayout.update(layout => {
-			layout.workspace = layout.workspace.map(fileid => fileid == src ? dest : fileid)
-			return layout
-		})
 	}
 }

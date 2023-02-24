@@ -14,14 +14,16 @@
 		wWorkerData
 	} from '$stores'
 	/** @ts-ignore */
+	import { dLayout } from '$core/layout'
+	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import { JsonView } from '@zerodevx/svelte-json-view'
-	import IconButton from './buttons/IconButton.svelte'
 
 	$: json = {
 		canModifyProject: $dCanModifyProject,
 		user: $wUser,
 		config: $dUserPrefs,
 		project: $dProject,
+		layout: $dLayout,
 		ui: {
 			userModalOpen: $wUserModalOpen,
 			UserPrefsOpen: $wUserPrefsOpen,

@@ -30,7 +30,7 @@ export async function signUp(
 			'Content-Type': 'application/x-www-form-urlencoded'
 		},
 		body: new URLSearchParams(args as {}),
-		mode: 'cors',
+		mode: 'cors'
 	})
 	const json = await response.json()
 	if (response.status != 200) return json.message
@@ -57,7 +57,7 @@ export async function login(
 			password
 		}),
 		credentials: 'include',
-		mode: 'cors',
+		mode: 'cors'
 	})
 	if (loginRes.status != 200)
 		return {
@@ -74,7 +74,7 @@ export async function logout(): Response<undefined> {
 	const logoutRes = await fetch(API_URL + 'logout', {
 		method: 'POST',
 		credentials: 'include',
-		mode: 'cors',
+		mode: 'cors'
 	})
 	if (logoutRes.status != 200)
 		return {

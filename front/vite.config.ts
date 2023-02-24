@@ -5,10 +5,15 @@ import type { UserConfig } from 'vite'
 
 const config: UserConfig = {
 	build: {
-		target: ['ES2020'],
+		target: ['ES2020']
 	},
 	optimizeDeps: {
-		exclude: ['svelte-navigator', 'svelte-json-view', 'svelte-splitpanes', 'svelte-toast']
+		exclude: [
+			'svelte-navigator',
+			'svelte-json-view',
+			'svelte-splitpanes',
+			'svelte-toast'
+		]
 	},
 	plugins: [sveltekit()],
 	server: {
@@ -16,7 +21,7 @@ const config: UserConfig = {
 			allow: ['./pkg/']
 		},
 		port: 3000,
-		host: true,
+		host: true
 	},
 	resolve: {
 		alias: {
@@ -27,7 +32,7 @@ const config: UserConfig = {
 			$common: path.resolve(__dirname, './src/core/common'),
 			$monaco: path.resolve(__dirname, './src/monaco')
 		}
-	},
+	}
 }
 
 export default config

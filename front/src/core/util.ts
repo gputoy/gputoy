@@ -28,3 +28,13 @@ export function toggleUserModal() {
 export function toggleUserPrefs() {
 	wUserPrefsOpen.update((o) => !o)
 }
+
+export function cssVar(identifier: string): string {
+	if (!browser) return ''
+	return getComputedStyle(document.body).getPropertyValue(identifier).trim()
+}
+
+export function setCssVar(identifier: string, value: string) {
+	if (!browser) return
+	document.body.style.setProperty(identifier, value)
+}

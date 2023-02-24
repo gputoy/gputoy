@@ -3,19 +3,13 @@ import type { ProjectResponse, ProjectUpsert } from '$common'
 import * as api from '$core/api'
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from '$core/consts'
 // import context, { init } from "$core/context"
-import {
-	wConfig,
-	wFiles,
-	wLayout,
-	wProjectId,
-	wProjectMeta,
-	wUser
-} from '$stores'
+import { wConfig, wFiles, wProjectId, wProjectMeta, wUser } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
 import debounce from 'lodash/debounce'
 import generate from 'project-name-generator'
 import { get } from 'svelte/store'
 import { v4 } from 'uuid'
+import { getLayout, loadLayout } from './layout'
 
 /**
  * Project metadata, basically everything besides files, layout, and config
@@ -62,6 +56,7 @@ export const writeToProjectLocalStorage = debounce(_writeToLocalStorage, 2000)
 function _writeToLocalStorage(project: ProjectResponse) {
 	// TODO: doing dates like this will probably cause a problem
 	if (browser) {
+		toast.push('Saving to local storage', { duration: 500 })
 		project.updatedAt = Date.now().toString()
 		localStorage.setItem(project.id, JSON.stringify(project))
 	}
@@ -77,7 +72,7 @@ export async function initNewProject() {
 	const now = Date.now().toLocaleString()
 	wFiles.set(DEFAULT_FILES)
 	wConfig.set(DEFAULT_CONFIG)
-	wLayout.set(DEFAULT_LAYOUT)
+	loadLayout(DEFAULT_LAYOUT)
 	wProjectMeta.set({
 		title,
 		authorId: get(wUser)?.id ?? null,
@@ -157,7 +152,7 @@ export async function saveProject(published = false) {
 	const { title, description } = get(wProjectMeta)
 	const files = get(wFiles)
 	const config = get(wConfig)
-	const layout = get(wLayout)
+	const layout = getLayout()
 
 	const project: ProjectUpsert = {
 		id: id?.startsWith('local') ? undefined : id,
@@ -185,10 +180,7 @@ export async function saveProject(published = false) {
  * Sets project in store to param
  * @param project
  */
-export function setProject(
-	project: ProjectResponse,
-	resetContext = false
-) {
+export function setProject(project: ProjectResponse, resetContext = false) {
 	const {
 		id,
 		files,
@@ -206,7 +198,7 @@ export function setProject(
 	wProjectId.set(id)
 	wFiles.set(files)
 	wConfig.set(config ?? DEFAULT_CONFIG)
-	wLayout.set(layout ?? DEFAULT_LAYOUT)
+	loadLayout(layout ?? DEFAULT_LAYOUT)
 	wProjectMeta.set({
 		title,
 		description: description ?? undefined,

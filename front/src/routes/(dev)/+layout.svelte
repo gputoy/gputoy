@@ -5,7 +5,7 @@
 	import { toggleUserModal, toggleUserPrefs } from '$core/util'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import UiThemeButton from '$lib/components/buttons/UiThemeButton.svelte'
-	import Debug from '$lib/components/Debug.svelte'
+	import Debug from '$lib/components/debug/Debug.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import Key from '$lib/components/Key.svelte'
 	import Logo from '$lib/components/Logo.svelte'

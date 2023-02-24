@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { FileTreeNode } from '$core/files'
-	import { wLayout } from '$stores'
+	import { rFileTreeState } from '$core/layout'
 	import DirectoryContents from './DirectoryContents.svelte'
 	import NodeEntry from './NodeEntry.svelte'
 
 	export let fileNode: FileTreeNode
-	$: open = $wLayout.fileTreeState[fileNode.absoluteDir]?.open ?? false
+	$: open = $rFileTreeState[fileNode.absoluteDir]?.open ?? false
 </script>
 
 {#if fileNode.dir == ''}

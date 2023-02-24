@@ -1,13 +1,13 @@
 <script lang="ts">
+	import { rAccordianOpen, toggleAccordian } from '$core/layout'
 	import Icon from '$lib/components/Icon.svelte'
-	import { wLayout } from '$stores'
 	import { slide } from 'svelte/transition'
 
 	export let title: string
 	function handleClick() {
-		wLayout.toggleAccordian(title)
+		toggleAccordian(title)
 	}
-	$: open = $wLayout.accordianOpen[title] ?? false
+	$: open = $rAccordianOpen[title] ?? false
 </script>
 
 <div class="accordian-container">

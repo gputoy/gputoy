@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { wLayout, wTheme, wUserEditorPrefs } from '$stores'
+	import { wTheme, wUserEditorPrefs } from '$stores'
 	import { onMount } from 'svelte'
 	import { get } from 'svelte/store'
 
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 
+	import { dLayout, getLayout } from '$core/layout'
 	import * as monaco from '$monaco'
 
 	let divEl: HTMLDivElement
@@ -14,14 +15,14 @@
 	// Store subscriptions
 	wTheme.subscribe(monaco.setTheme)
 	wUserEditorPrefs.subscribe(monaco.updateEditorConfig)
-	wLayout.subscribe(monaco.changeFileFromLayout)
+	dLayout.subscribe(monaco.changeFileFromLayout)
 
 	const { cursorPosition, currentExtension } = monaco
 
 	onMount(() =>
 		monaco.initEditor(divEl, statusEl, {
 			theme: get(wTheme),
-			layout: get(wLayout),
+			layout: getLayout(),
 			prefs: get(wUserEditorPrefs)
 		})
 	)

@@ -9,9 +9,10 @@
 	} from '$core/files'
 
 	import { pushAction } from '$core/actions'
+	import { dActiveFile, toggleDirOpen } from '$core/layout'
 	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
-	import { dActiveFile, wLayout, wUserDeleting, wUserRenaming } from '$stores'
+	import { wUserDeleting, wUserRenaming } from '$stores'
 	import { slide } from 'svelte/transition'
 	import ValidationInput from '../ValidationInput.svelte'
 	import FileIcon from './FileIcon.svelte'
@@ -50,7 +51,7 @@
 		} else {
 			// is directory, toggle directory open
 			return () => {
-				wLayout.toggleDirOpen(node.absoluteDir)
+				toggleDirOpen(node.absoluteDir)
 			}
 		}
 	}
@@ -66,7 +67,6 @@
 	}
 	function handleConfirmEdit(ev: CustomEvent<any>) {
 		let newPath = pathParent(identifier) + '/' + ev.detail.value
-		console.log('new path', newPath)
 		pushAction({ ty: 'move', c: [identifier, newPath] })
 		wUserRenaming.set(null)
 	}

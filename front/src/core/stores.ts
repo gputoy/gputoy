@@ -5,7 +5,6 @@ import type {
 	FileDependencyInfo,
 	FilePrebuildResult,
 	Files,
-	Layout,
 	PrebuildResult,
 	ProjectResponse,
 	UserEditorPrefs,
@@ -17,7 +16,6 @@ import { initConsoleMethods, type ConsoleExtras, type Log } from '$core/console'
 import {
 	DEFAULT_CONFIG,
 	DEFAULT_FILES,
-	DEFAULT_LAYOUT,
 	DEFAULT_RUN_STATE,
 	DEFAULT_USER_EDITOR_PREFS,
 	DEFAULT_USER_GENERAL_PREFS,
@@ -26,7 +24,7 @@ import {
 } from '$core/consts'
 import { initFilesMethods, treeFromFiles, type FilesExtras } from '$core/files'
 import type { Keybinds } from '$core/input'
-import { initLayoutMethods, type LayoutExtras } from '$core/layout'
+import { dLayout } from '$core/layout'
 import { writeToLocalStorage } from '$core/preferences'
 import { writeToProjectLocalStorage, type ProjectMeta } from '$core/project'
 import { initUserMethods, type UserExtras } from '$core/user'
@@ -43,6 +41,12 @@ import {
 	type RunState,
 	type RunStateExtras
 } from './runstate'
+
+export function sealWritable<T>(writable: Writable<T>): Readable<T> {
+	return {
+		subscribe: writable.subscribe
+	}
+}
 
 // TODO: move this to seperate file
 export type PrebuildResultExtras = {
@@ -185,10 +189,7 @@ export const wModelDirty = makeSet()
 export const wFileDirty = makeSet()
 
 export const wConfig = makeEnhanced<Config, {}>(DEFAULT_CONFIG, () => ({}))()
-export const wLayout = makeEnhanced<Layout, LayoutExtras>(
-	DEFAULT_LAYOUT,
-	initLayoutMethods
-)()
+
 export const wProjectMeta = writable<ProjectMeta>({
 	title: 'New Project',
 	description: 'This is a new project',
@@ -283,7 +284,7 @@ export const dCanModifyProject = derived(
  * Reactive var for subscribing local storage save
  */
 export const dProject = derived(
-	[wFiles, wConfig, wLayout, wProjectId, wProjectMeta],
+	[wFiles, wConfig, dLayout, wProjectId, wProjectMeta],
 	([files, config, layout, id, meta]): ProjectResponse | null => {
 		if (!id) return null
 		return {
@@ -299,13 +300,6 @@ export const dProject = derived(
 			updatedAt: meta.updatedAt,
 			forkedFromId: meta.forkedFromId
 		}
-	}
-)
-export const dActiveFile = derived(
-	[wLayout],
-	([wLayout]): string | null => {
-		if (wLayout.fileIndex == null) return null
-		return wLayout.workspace[wLayout.fileIndex]
 	}
 )
 dProject.subscribe((p) => {

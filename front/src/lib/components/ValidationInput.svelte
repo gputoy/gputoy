@@ -9,7 +9,6 @@
 	let validationErrors: string | undefined
 
 	$: {
-		console.log('validation running', inputValue)
 		validationErrors = validate(inputValue)
 	}
 	let dispatch = createEventDispatcher()

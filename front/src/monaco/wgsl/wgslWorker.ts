@@ -206,7 +206,7 @@ export interface CreateData {
 	/** @ts-ignore */
 	languageSettings: DiagnosticsOptions
 	enableSchemaRequest: boolean
-	wasmModuleUrl: string,
+	wasmModuleUrl: string
 	initFiles: Files
 }
 
