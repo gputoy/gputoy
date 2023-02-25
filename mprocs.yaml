@@ -1,0 +1,5 @@
+procs:
+  front:
+    shell: "make start"
+  back:
+    shell: "make api"

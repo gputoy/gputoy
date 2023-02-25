@@ -21,6 +21,7 @@ import {
 	getOpenFileId,
 	moveWorkspaceIdx,
 	openDocument as layoutOpenDocument,
+	toggleAllPanels as layoutToggleAllPanels,
 	togglePanel as layoutTogglePanel
 } from './layout'
 
@@ -93,6 +94,9 @@ export function pushAction(action: Action) {
 			break
 		case 'togglePanel':
 			togglePanel(action.c)
+			break
+		case 'toggleAllPanels':
+			toggleAllPanels()
 			break
 		case 'focus':
 			focusPane(action.c)
@@ -171,6 +175,10 @@ function togglePanel(panel: Pane) {
 	layoutTogglePanel(panel)
 }
 
+function toggleAllPanels() {
+	layoutToggleAllPanels()
+}
+
 function toggleDebugPanel() {
 	wDebugPanel.update((show) => !show)
 }
@@ -214,6 +222,8 @@ async function saveAllFiles() {
 }
 
 function moveFile(src: string, dest: string) {
+	console.log('in moveFile', src, dest)
+
 	let didUpdate = false
 	wFiles.update(({ map }) => {
 		let curr = map[src]

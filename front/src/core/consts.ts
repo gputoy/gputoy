@@ -39,7 +39,7 @@ export const DEFAULT_LAYOUT: Layout = {
 	fileIndex: 0,
 	workspace: ['/shaders/main.wgsl', '/run.json'] as string[],
 	paneSize: {
-		projectPanePx: 180,
+		projectPanePx: 185,
 		editorPanePercentage: 40,
 		resourcePanePercentage: 38
 	},
@@ -120,6 +120,9 @@ export const DEFAULT_USER_EDITOR_PREFS: UserEditorPrefs = {
 export const DEFAULT_USER_KEYBINDS: Keybinds = {
 	'C-g': {
 		action: { ty: 'toggleConsole' }
+	},
+	'C-a': {
+		action: { ty: 'toggleAllPanels' }
 	},
 	'C-q': {
 		action: {

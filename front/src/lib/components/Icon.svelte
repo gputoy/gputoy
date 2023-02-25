@@ -8,6 +8,7 @@
 	export let stroked = false
 	export let thick = false
 	export let style = ''
+	export let clazz = ''
 	$: icon = feather.icons[name] as any
 </script>
 
@@ -18,6 +19,7 @@
 		class:stroked
 		class:stroke
 		class:thick
+		class={clazz}
 	>
 		{@html icon.contents}
 	</svg>

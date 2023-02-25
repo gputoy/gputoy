@@ -149,6 +149,4 @@
 	.prefix {
 		font-weight: bold;
 	}
-	.wrap {
-	}
 </style>

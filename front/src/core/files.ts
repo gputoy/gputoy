@@ -108,7 +108,8 @@ export function pathToParts(
  * @param file
  * @returns file name
  */
-export function getCanonicalName(file: File | FileWithId): string {
+export function getCanonicalName(file: string | File | FileWithId): string {
+	if (typeof file == 'string') file = wFiles.getFile(file)!
 	return file.fileName + '.' + file.extension
 }
 

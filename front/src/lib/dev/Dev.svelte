@@ -11,7 +11,7 @@
 	import ControlBar from '$lib/dev/ControlBar.svelte'
 	import EditorPane from '$lib/dev/panes/EditorPane.svelte'
 	import ProjectPane from '$lib/dev/panes/ProjectPane.svelte'
-	import Viewport from '$lib/dev/Viewport.svelte'
+	import ViewportPane from '$lib/dev/panes/ViewportPane.svelte'
 	import { onMount } from 'svelte'
 	import { Pane, Splitpanes } from 'svelte-splitpanes'
 
@@ -45,7 +45,7 @@
 			>
 				<!-- ---------- viewport  ------------- -->
 				<Pane class={clazz} size={$dPaneSizes?.viewportPanePct}>
-					<Viewport />
+					<ViewportPane />
 				</Pane>
 				<!-- ---------- control bar   ------------- -->
 				<Pane

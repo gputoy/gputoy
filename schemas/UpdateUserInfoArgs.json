@@ -55,6 +55,21 @@
           }
         },
         {
+          "description": "Toggles all panes open and closed",
+          "type": "object",
+          "required": [
+            "ty"
+          ],
+          "properties": {
+            "ty": {
+              "type": "string",
+              "enum": [
+                "toggleAllPanels"
+              ]
+            }
+          }
+        },
+        {
           "description": "Toggles debug panel",
           "type": "object",
           "required": [

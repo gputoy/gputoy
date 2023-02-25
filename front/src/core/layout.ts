@@ -8,6 +8,9 @@ import { derived, get, writable, type Readable } from 'svelte/store'
 
 declare var L: Layout
 
+/**
+ * Atomic stores of the Layout struct
+ */
 const wAccordianOpen = writable<(typeof L)['accordianOpen']>(
 	DEFAULT['accordianOpen']
 )
@@ -19,6 +22,9 @@ const wPaneSize = writable<(typeof L)['paneSize']>(DEFAULT['paneSize'])
 const wPaneToggle = writable<(typeof L)['paneToggled']>(DEFAULT['paneToggled'])
 const wWorkspace = writable<(typeof L)['workspace']>(DEFAULT['workspace'])
 
+/**
+ * Public readable atomic stores of the Layout struct
+ */
 export const rAccordianOpen = sealWritable(wAccordianOpen)
 export const rFileIndex = sealWritable(wFileIndex)
 export const rFileTreeState = sealWritable(wFileTreeState)
@@ -26,8 +32,8 @@ export const rPaneSize = sealWritable(wPaneSize)
 export const rPaneToggle = sealWritable(wPaneToggle)
 export const rWorkspace = sealWritable(wWorkspace)
 
+// whether the window size is currently being updated
 export const wUpdatingWindowSize = writable(false)
-
 // window size - top navbar height
 export const wWindowWidth = writable<number | undefined>()
 export const wWindowHeight = writable<number | undefined>()
@@ -56,6 +62,9 @@ wWindowWidth.subscribe((_) => {
 		wUpdatingWindowSize.set(false)
 	}, 10)
 })
+
+// Version writable for triggering the dPaneSizes derive
+// without changing the toggles
 const wVersionBump = writable(0)
 
 export const dLayout: Readable<Layout> = derived(
@@ -252,6 +261,22 @@ export function togglePanel(pane: Pane) {
 	} else {
 		toggle()
 	}
+}
+
+export function toggleAllPanels() {
+	let { editorPane, projectPane, resourcePane } = get(wPaneToggle)
+	if (editorPane || projectPane || resourcePane)
+		wPaneToggle.set({
+			editorPane: false,
+			projectPane: false,
+			resourcePane: false
+		})
+	else
+		wPaneToggle.set({
+			editorPane: true,
+			projectPane: true,
+			resourcePane: true
+		})
 }
 
 export function toggleDirOpen(absoluteDir: string, set?: boolean) {

@@ -10,6 +10,9 @@ export type Action =
 			ty: 'togglePanel'
 	  }
 	| {
+			ty: 'toggleAllPanels'
+	  }
+	| {
 			ty: 'toggleDebugPanel'
 	  }
 	| {

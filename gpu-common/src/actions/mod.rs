@@ -15,6 +15,8 @@ use crate::Pane;
 pub enum Action {
     /// Toggles pane open and closed
     TogglePanel(Pane),
+    /// Toggles all panes open and closed
+    ToggleAllPanels,
     /// Toggles debug panel
     ToggleDebugPanel,
     /// Toggle user preferences

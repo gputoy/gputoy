@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getCanonicalName } from '$core/files'
 	import {
 		closeWorkspaceFile,
 		rFileIndex,
@@ -15,17 +16,6 @@
 	// let Editor: any
 	$: fileid = $rFileIndex != null ? $rWorkspace[$rFileIndex] : null
 
-	$: highlight = $rWorkspace.map((v) => false)
-
-	function getFile(fileid: string) {
-		return $wFiles.map[fileid]
-	}
-
-	function getCanonicalName(fileid: string) {
-		let file = getFile(fileid)
-		return file.fileName + '.' + file.extension
-	}
-
 	function handleClick(ev: MouseEvent, index: number) {
 		// middle click
 		if (ev.button == 1) {
@@ -38,15 +28,6 @@
 	function handleClose(index: number) {
 		closeWorkspaceFile(index)
 	}
-	function handleMouseEnter(index: number) {
-		highlight[index] = true
-	}
-	function handleMouseLeave(index: number) {
-		highlight[index] = false
-	}
-	// onMount(async () => {
-	// 	Editor = await import('$lib/dev/MonacoEditor.svelte')
-	// })
 </script>
 
 <div class="editor-container">
@@ -56,8 +37,6 @@
 				<div
 					class="file-tab"
 					class:selected={i == $rFileIndex}
-					on:mouseenter={() => handleMouseEnter(i)}
-					on:mouseleave={() => handleMouseLeave(i)}
 					on:mousedown={(ev) => handleClick(ev, i)}
 				>
 					<FileIcon extension={$wFiles.map[fileid].extension} size={13} />
@@ -68,12 +47,7 @@
 						<Icon thick name="circle" size="0.75em" />
 					{/if}
 					<IconButton empty size="xs" on:click={() => handleClose(i)}>
-						<Icon
-							stroked
-							thick
-							name="x"
-							style="visibility:{highlight[i] ? 'visible' : 'hidden'};"
-						/>
+						<Icon stroked thick name="x" clazz="x-button" />
 					</IconButton>
 				</div>
 			{/each}
@@ -139,5 +113,12 @@
 		background-color: var(--background-alt);
 		border-bottom: 1px solid transparent;
 		color: var(--text-important);
+	}
+
+	:global(.file-tab:hover .x-button) {
+		visibility: visible;
+	}
+	:global(.file-tab .x-button) {
+		visibility: hidden;
 	}
 </style>
