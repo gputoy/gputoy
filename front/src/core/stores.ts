@@ -183,6 +183,8 @@ export const wFiles = makeEnhanced<Files, FilesExtras>(
 	initFilesMethods
 )()
 export const dFileTree = derived([wFiles], ([files]) => {
+	console.log('in dFileTree', files.map)
+
 	return treeFromFiles(files)
 })
 export const wModelDirty = makeSet()

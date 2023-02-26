@@ -206,7 +206,7 @@ export function openDocument(fileid: string) {
 	wFileIndex.set(maybeIndex)
 }
 
-const APPLY_PANE_SIZE_WAIT_MS = 500
+const APPLY_PANE_SIZE_WAIT_MS = 300
 const PIXEL_MIN = 100
 const PERCENTAGE_MIN = 15
 const setSizes = debounce(_setSizes, APPLY_PANE_SIZE_WAIT_MS)
@@ -290,6 +290,23 @@ export function toggleDirOpen(absoluteDir: string, set?: boolean) {
 	})
 }
 
+export function moveFileTreeState(src: string, dest: string) {
+	wFileTreeState.update((tree) => {
+		if (!tree[src]) {
+			tree[dest] = DEFAULT_DIR_NODE_STATE
+			return tree
+		}
+		for (const fileid of Object.keys(tree)) {
+			if (fileid.startsWith(src)) {
+				let newId = fileid.replace(src, dest)
+				tree[newId] = tree[fileid]
+				delete tree[fileid]
+			}
+		}
+		return tree
+	})
+}
+
 export function toggleAccordian(accordian: string, set?: boolean) {
 	wAccordianOpen.update((accordianOpen) => {
 		accordianOpen[accordian] =
@@ -301,6 +318,13 @@ export function toggleAccordian(accordian: string, set?: boolean) {
 export function replaceIdInWorkspace(src: string, dest: string) {
 	wWorkspace.update((workspace) => {
 		workspace = workspace.map((fileid) => (fileid == src ? dest : fileid))
+		return workspace
+	})
+}
+
+export function deleteIdInWorkspace(fileid: string) {
+	wWorkspace.update((workspace) => {
+		workspace = workspace.filter((id) => id != fileid)
 		return workspace
 	})
 }

@@ -22,24 +22,25 @@
 	export let open = false
 	export let clazz = ''
 
-	let isFile = 'id' in node
-	let identifier = isFile
+	$: isFile = 'id' in node
+	$: identifier = isFile
 		? (node as FileWithId).id
 		: (node as FileTreeNode).absoluteDir
-	let name = isFile
+	$: name = isFile
 		? getCanonicalName(node as FileWithId)
 		: (node as FileTreeNode).dir
 	$: isEditing = $wUserRenaming == identifier
+	$: isDeleting = $wUserDeleting == identifier
 	let validationResult: string | undefined
 
 	$: renameValue = name
 	$: {
-		validationResult = validateRename(node, renameValue)
+		if (isEditing) validationResult = validateRename(node, renameValue)
 	}
 	function getFileExtension(f: FileTreeNodeChild) {
 		return (f as FileWithId).extension
 	}
-	function makeFileClickHandler(node: FileTreeNodeChild) {
+	function makeClickHandler(node: FileTreeNodeChild) {
 		if ('id' in node) {
 			// is file, return handler that opens document
 			return () => {
@@ -60,24 +61,37 @@
 		wUserRenaming.set(identifier)
 		ev.stopPropagation()
 	}
-	function handleDelete(ev: MouseEvent) {
-		wUserRenaming.set(null)
-		wUserDeleting.set(identifier)
-		ev.stopPropagation()
-	}
 	function handleConfirmEdit(ev: CustomEvent<any>) {
 		let newPath = pathParent(identifier) + '/' + ev.detail.value
-		pushAction({ ty: 'move', c: [identifier, newPath] })
+		pushAction({
+			ty: 'move',
+			c: { src: identifier, dest: newPath, isDir: !isFile }
+		})
 		wUserRenaming.set(null)
 	}
 	function handleCancelEdit() {
 		wUserRenaming.set(null)
 	}
+
+	function handleDelete(ev: MouseEvent) {
+		wUserRenaming.set(null)
+		wUserDeleting.set(identifier)
+		ev.stopPropagation()
+	}
+	function handleConfirmDelete(ev: MouseEvent) {
+		pushAction({ ty: 'delete', c: { path: identifier, isDir: !isFile } })
+		wUserDeleting.set(null)
+		ev.stopPropagation()
+	}
+	function handleCancelDelete(ev: MouseEvent) {
+		wUserDeleting.set(null)
+		ev.stopPropagation()
+	}
 </script>
 
 <button
 	class={clazz}
-	on:click={makeFileClickHandler(node)}
+	on:click={makeClickHandler(node)}
 	class:active={'id' in node && node.id == $dActiveFile}
 	transition:slide={{ duration: 50 }}
 >
@@ -91,7 +105,7 @@
 	{:else}
 		<Icon name="chevron-right" stroked rotation={open ? '90deg' : '0deg'} />
 	{/if}
-	<div class="content">
+	<div class="content" class:strikethrough={isDeleting}>
 		{#if isEditing}
 			<ValidationInput
 				initValue={name}
@@ -99,6 +113,16 @@
 				on:confirm={handleConfirmEdit}
 				on:cancel={handleCancelEdit}
 			/>
+		{:else if isDeleting}
+			{name}
+			<div class="icon-container">
+				<IconButton size="xs" empty on:click={handleConfirmDelete}>
+					<Icon name="check" stroked size="12px" />
+				</IconButton>
+				<IconButton size="xs" empty on:click={handleCancelDelete}>
+					<Icon name="x" stroked size="12px" />
+				</IconButton>
+			</div>
 		{:else}
 			{name}
 			<div class="icon-container hidden">
@@ -125,6 +149,7 @@
 		justify-content: space-between;
 		flex: 1 1 auto;
 		max-width: 100%;
+		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
 	.icon-container {
@@ -137,5 +162,9 @@
 	}
 	button:hover .hidden {
 		visibility: visible;
+	}
+	.strikethrough {
+		text-decoration: line-through;
+		color: var(--color-invalid);
 	}
 </style>

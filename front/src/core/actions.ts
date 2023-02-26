@@ -1,4 +1,4 @@
-import type { Action, FilteredAction, Pane } from '$common'
+import type { Action, CopyMove, Delete, FilteredAction, Pane } from '$common'
 import { clearProject } from '$core/project'
 import { getAllModels, getModel } from '$monaco'
 import { wWorkerInternal } from '$monaco/wgsl/wgslMode'
@@ -15,12 +15,15 @@ import {
 } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
 import isEqual from 'lodash/isEqual'
-import { fileWithNewPath } from './files'
+import { fileWithNewPath, getChildren } from './files'
 import {
 	closeWorkspaceFile,
+	deleteIdInWorkspace,
 	getOpenFileId,
+	moveFileTreeState,
 	moveWorkspaceIdx,
 	openDocument as layoutOpenDocument,
+	replaceIdInWorkspace,
 	toggleAllPanels as layoutToggleAllPanels,
 	togglePanel as layoutTogglePanel
 } from './layout'
@@ -120,7 +123,13 @@ export function pushAction(action: Action) {
 			saveAllFiles()
 			break
 		case 'move':
-			moveFile(action.c[0], action.c[1])
+			moveFile(action.c)
+			break
+		case 'copy':
+			copyFile(action.c)
+			break
+		case 'delete':
+			deleteFile(action.c)
 			break
 
 		/** @ts-ignore */
@@ -135,7 +144,7 @@ export function pushAction(action: Action) {
  *  TODO: create action reversal system
  * @param action
  */
-export function reverseAction(action: Action) {}
+export function reverseAction(action: Action) { }
 
 /// ------------------- Action execution ----------------------
 
@@ -163,9 +172,9 @@ function closeCurrentFile() {
 	closeWorkspaceFile()
 }
 
-function rebuildProject() {}
+function rebuildProject() { }
 
-function resetProject() {}
+function resetProject() { }
 
 function toggleConsole() {
 	wConsoleOpen.update((o) => !o)
@@ -183,7 +192,7 @@ function toggleDebugPanel() {
 	wDebugPanel.update((show) => !show)
 }
 
-function focusPane(c: string) {}
+function focusPane(c: string) { }
 
 function closeProject() {
 	clearProject()
@@ -221,9 +230,18 @@ async function saveAllFiles() {
 	wFileDirty.clear()
 }
 
-function moveFile(src: string, dest: string) {
-	console.log('in moveFile', src, dest)
+function moveFile(args: CopyMove) {
+	console.log('in moveFile', args)
 
+	const { src, dest, isDir } = args
+	if (isDir) {
+		const childPaths = getChildren(src)
+		childPaths
+			.map((p) => ({ src: p, dest: p.replace(src, dest), isDir: false }))
+			.forEach((arg) => moveFile(arg))
+		moveFileTreeState(src, dest)
+		return
+	}
 	let didUpdate = false
 	wFiles.update(({ map }) => {
 		let curr = map[src]
@@ -237,5 +255,30 @@ function moveFile(src: string, dest: string) {
 		return { map }
 	})
 	if (didUpdate) {
+		replaceIdInWorkspace(src, dest)
+	}
+}
+
+function copyFile(args: CopyMove) {
+	throw new Error('Function not implemented.')
+}
+
+var _undoDeleteFiles = []
+
+// TODO: scrap recursive implementation for one that gathers the
+// list of deleted file ids before-hand.
+function deleteFile(args: Delete) {
+	console.log('in deleteFile', args)
+	const { path, isDir } = args
+
+	if (isDir) {
+		const childPaths = getChildren(path)
+		console.log('found children to delete', childPaths)
+		childPaths.forEach((p) => deleteFile({ path: p, isDir: false }))
+		return
+	}
+	let deletedFile = wFiles.removeFile(path)
+	if (deletedFile) {
+		deleteIdInWorkspace(path)
 	}
 }

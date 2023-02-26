@@ -79,23 +79,30 @@ export type Action =
 			ty: 'setRunner'
 	  }
 	| {
-			/**
-			 * @minItems 2
-			 * @maxItems 2
-			 */
-			c: [string, string]
+			c: CopyMove
 			ty: 'move'
 	  }
 	| {
-			/**
-			 * @minItems 2
-			 * @maxItems 2
-			 */
-			c: [string, string]
+			c: CopyMove
 			ty: 'copy'
+	  }
+	| {
+			c: Delete
+			ty: 'delete'
 	  }
 
 export type Pane = 'projectPane' | 'editorPane' | 'resourcePane'
+
+export interface CopyMove {
+	dest: string
+	isDir: boolean
+	src: string
+}
+
+export interface Delete {
+	isDir: boolean
+	path: string
+}
 
 export type LogLevel = 'Trace' | 'Debug' | 'Info' | 'Warn' | 'Error'
 

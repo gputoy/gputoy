@@ -7,7 +7,7 @@ export type FilesExtras = {
 	getFile: (fileid: string) => File | null
 	writeFile: (fileid: string, data: string) => void
 	updateFileMeta: (fileid: string, meta: Partial<Omit<File, 'data'>>) => void
-	removeFile: (fileid: string) => void
+	removeFile: (fileid: string) => File | undefined
 }
 export function initFilesMethods(files: Writable<Files>): FilesExtras {
 	function newFile(file: File): string {
@@ -41,11 +41,16 @@ export function initFilesMethods(files: Writable<Files>): FilesExtras {
 		newFile({ ...file, ...meta })
 	}
 
-	function removeFile(fileid: string) {
+	function removeFile(fileid: string): File | undefined {
+		let removed
 		files.update(({ map }) => {
+			let curr = map[fileid]
+			if (!curr) return { map }
 			delete map[fileid]
+			removed = curr
 			return { map }
 		})
+		return removed
 	}
 
 	return { newFile, getFile, writeFile, updateFileMeta, removeFile }
@@ -77,6 +82,10 @@ export type FileTreeNode = {
 	children: FileTreeNodeChild[]
 }
 
+export function getChildren(path: string): string[] {
+	return Object.keys(get(wFiles).map).filter((p) => p.startsWith(path))
+}
+
 /**
  * Retreieves parent absolute path from absoute path
  * @param path a path i.e. '/some/path/to/file.txt'
@@ -100,7 +109,7 @@ export function pathToParts(
 	if (!isValidPath(path)) return
 	const [file, ...dirs] = path.trim().split('/').reverse()
 	const [extension, ...fileName] = file.split('.').reverse()
-	return [fileName.join('.'), extension, dirs]
+	return [fileName.join('.'), extension, dirs.filter((s) => s.length > 0)]
 }
 
 /**

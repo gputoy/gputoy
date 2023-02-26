@@ -405,17 +405,7 @@
           ],
           "properties": {
             "c": {
-              "type": "array",
-              "items": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "string"
-                }
-              ],
-              "maxItems": 2,
-              "minItems": 2
+              "$ref": "#/definitions/CopyMove"
             },
             "ty": {
               "type": "string",
@@ -434,17 +424,7 @@
           ],
           "properties": {
             "c": {
-              "type": "array",
-              "items": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "string"
-                }
-              ],
-              "maxItems": 2,
-              "minItems": 2
+              "$ref": "#/definitions/CopyMove"
             },
             "ty": {
               "type": "string",
@@ -453,8 +433,61 @@
               ]
             }
           }
+        },
+        {
+          "description": "Delete file",
+          "type": "object",
+          "required": [
+            "c",
+            "ty"
+          ],
+          "properties": {
+            "c": {
+              "$ref": "#/definitions/Delete"
+            },
+            "ty": {
+              "type": "string",
+              "enum": [
+                "delete"
+              ]
+            }
+          }
         }
       ]
+    },
+    "CopyMove": {
+      "type": "object",
+      "required": [
+        "dest",
+        "isDir",
+        "src"
+      ],
+      "properties": {
+        "dest": {
+          "type": "string"
+        },
+        "isDir": {
+          "type": "boolean"
+        },
+        "src": {
+          "type": "string"
+        }
+      }
+    },
+    "Delete": {
+      "type": "object",
+      "required": [
+        "isDir",
+        "path"
+      ],
+      "properties": {
+        "isDir": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        }
+      }
     },
     "FilteredAction": {
       "type": "object",
