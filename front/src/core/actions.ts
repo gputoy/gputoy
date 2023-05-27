@@ -1,12 +1,17 @@
-import type { Action, CopyMove, Delete, FilteredAction, Pane } from '$common'
+import * as layout from '$core/layout'
 import { clearProject } from '$core/project'
+import type {
+	Action,
+	CopyMove,
+	Delete,
+	FilePath,
+	SupportedExtension
+} from '$gen'
 import { getAllModels, getModel } from '$monaco'
 import { wWorkerInternal } from '$monaco/wgsl/wgslMode'
 import {
 	wConfig,
 	wConsole,
-	wConsoleOpen,
-	wDebugPanel,
 	wFileDirty,
 	wFiles,
 	wModelDirty,
@@ -15,20 +20,7 @@ import {
 } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
 import isEqual from 'lodash/isEqual'
-import { fileWithNewPath, getChildren } from './files'
-import {
-	closeWorkspaceFile,
-	deleteIdInWorkspace,
-	getOpenFileId,
-	moveFileTreeState,
-	moveWorkspaceIdx,
-	openDocument as layoutOpenDocument,
-	replaceIdInWorkspace,
-	toggleAllPanels as layoutToggleAllPanels,
-	togglePanel as layoutTogglePanel
-} from './layout'
-
-const actionHistory: Action[] = []
+import { fileWithNewPath, getChildren, pathToParts } from './files'
 
 /**
  * Determines if two Actions are equal by value
@@ -38,9 +30,7 @@ const actionHistory: Action[] = []
  */
 export function isActionEqual(a: Action, b: Action): boolean {
 	if (a.ty !== b.ty) return false
-	// Both have action arguments within their type variant
-	if ('c' in a && 'c' in b) return isEqual(a.c, b.c)
-	return true
+	return 'c' in a && 'c' in b ? isEqual(a.c, b.c) : true
 }
 
 /**
@@ -49,7 +39,7 @@ export function isActionEqual(a: Action, b: Action): boolean {
  * @param filter
  * @returns
  */
-export function actionPermitted(fAction: FilteredAction) {
+export function actionPermitted(fAction: { action: Action }) {
 	return true
 }
 
@@ -74,49 +64,42 @@ export type SingleFilter = (typeof FILTER_CONDITION_LIST)[number]
  */
 export function pushAction(action: Action) {
 	switch (action.ty) {
+		case 'clear':
+			clearConsole()
+			break
 		case 'playPause':
 			playPause()
 			break
-		case 'openDocument':
-			openDocument(action.c)
+		case 'openTab':
+			layout.openTab(action.c)
 			break
-		case 'nextDocument':
-			shiftDoument(1)
+		case 'closeTab':
+			layout.closeTab()
+		case 'nextTab':
+			layout.shiftTab(1)
 			break
-		case 'previousDocument':
-			shiftDoument(-1)
+		case 'prevTab':
+			layout.shiftTab(-1)
 			break
-		case 'rebuild':
+		case 'build':
 			rebuildProject()
 			break
 		case 'reset':
 			resetProject()
 			break
-		case 'toggleConsole':
-			toggleConsole()
+		case 'toggleUi':
+			layout.toggleRegionVisibility(action.c)
 			break
-		case 'togglePanel':
-			togglePanel(action.c)
+		case 'toggleAllPanes':
+			layout.toggleAllPanes()
 			break
-		case 'toggleAllPanels':
-			toggleAllPanels()
-			break
-		case 'focus':
-			focusPane(action.c)
-			break
-		case 'toggleDebugPanel':
-			toggleDebugPanel()
-			break
-		case 'closeFile':
-			closeCurrentFile()
-			break
-		case 'closeProject':
-			closeProject()
+		case 'closeTab':
+			layout.closeTab()
 			break
 		case 'setRunner':
 			setRunner(action.c)
 			break
-		case 'saveCurrentFile':
+		case 'saveFile':
 			saveCurrentFile()
 			break
 		case 'saveAllFiles':
@@ -131,6 +114,12 @@ export function pushAction(action: Action) {
 		case 'delete':
 			deleteFile(action.c)
 			break
+		case 'newFile':
+			createNewFile(action.c)
+			break
+		case 'exit':
+			exit()
+			break
 
 		/** @ts-ignore */
 		// There may be a case in the future where a new variant is added
@@ -144,7 +133,7 @@ export function pushAction(action: Action) {
  *  TODO: create action reversal system
  * @param action
  */
-export function reverseAction(action: Action) { }
+export function reverseAction(action: Action) {}
 
 /// ------------------- Action execution ----------------------
 
@@ -161,40 +150,17 @@ async function playPause() {
 	wRunState.playPause()
 }
 
-function openDocument(fileid: string) {
-	layoutOpenDocument(fileid)
-}
-function shiftDoument(shift: number) {
-	moveWorkspaceIdx(shift)
-}
+function rebuildProject() {}
 
-function closeCurrentFile() {
-	closeWorkspaceFile()
+function resetProject() {}
+
+function clearConsole() {
+	wConsole.set([])
 }
 
-function rebuildProject() { }
+function focusPane(c: string) {}
 
-function resetProject() { }
-
-function toggleConsole() {
-	wConsoleOpen.update((o) => !o)
-}
-
-function togglePanel(panel: Pane) {
-	layoutTogglePanel(panel)
-}
-
-function toggleAllPanels() {
-	layoutToggleAllPanels()
-}
-
-function toggleDebugPanel() {
-	wDebugPanel.update((show) => !show)
-}
-
-function focusPane(c: string) { }
-
-function closeProject() {
+function exit() {
 	clearProject()
 }
 
@@ -208,7 +174,7 @@ function setRunner(fileid: string) {
 }
 
 async function saveCurrentFile() {
-	const currentFile = getOpenFileId()
+	const currentFile = layout.getOpenFileId()
 	if (!currentFile) return
 	await wWorkerInternal.applyUpdateToFile(currentFile)
 	wModelDirty.remove(currentFile)
@@ -230,16 +196,37 @@ async function saveAllFiles() {
 	wFileDirty.clear()
 }
 
-function moveFile(args: CopyMove) {
-	console.log('in moveFile', args)
+function createNewFile(args: FilePath) {
+	if (wFiles.getFile(args) != null) {
+		wConsole.error('File already exists: ' + args)
+	}
+	const [fileName, extension, dirs] = pathToParts(args)!
+	wFiles.newFile({
+		id: args,
+		fileName,
+		extension: extension as SupportedExtension,
+		dir: dirs.pop() ?? '',
+		data: ''
+	})
+}
 
+function moveFile(args: CopyMove) {
+	let paths = wFiles.paths()
+	if (!paths.includes(args.src)) {
+		wConsole.error("Source path doesn't exist: " + args.src)
+		return
+	}
+	if (paths.includes(args.dest)) {
+		wConsole.error('Destination path already exists: ' + args.dest)
+		return
+	}
 	const { src, dest, isDir } = args
 	if (isDir) {
 		const childPaths = getChildren(src)
 		childPaths
 			.map((p) => ({ src: p, dest: p.replace(src, dest), isDir: false }))
 			.forEach((arg) => moveFile(arg))
-		moveFileTreeState(src, dest)
+		layout.moveFileTreeState(src, dest)
 		return
 	}
 	let didUpdate = false
@@ -255,7 +242,7 @@ function moveFile(args: CopyMove) {
 		return { map }
 	})
 	if (didUpdate) {
-		replaceIdInWorkspace(src, dest)
+		layout.replaceIdInTabs(src, dest)
 	}
 }
 
@@ -268,17 +255,15 @@ var _undoDeleteFiles = []
 // TODO: scrap recursive implementation for one that gathers the
 // list of deleted file ids before-hand.
 function deleteFile(args: Delete) {
-	console.log('in deleteFile', args)
 	const { path, isDir } = args
 
 	if (isDir) {
 		const childPaths = getChildren(path)
-		console.log('found children to delete', childPaths)
 		childPaths.forEach((p) => deleteFile({ path: p, isDir: false }))
 		return
 	}
 	let deletedFile = wFiles.removeFile(path)
 	if (deletedFile) {
-		deleteIdInWorkspace(path)
+		layout.deleteIdInTabs(path)
 	}
 }

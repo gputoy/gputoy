@@ -1,15 +1,8 @@
 <script lang="ts">
 	export let size = '18'
-	export let fill = 'var(--text-accent-color)'
 </script>
 
-<svg
-	width={size}
-	height={size}
-	viewBox="0 0 25 25"
-	href="/"
-	style="fill: {fill};"
->
+<svg width={size} height={size} viewBox="0 0 25 25" href="/">
 	<defs id="SvgjsDefs2260" />
 	<g transform="scale(5)">
 		<g xmlns="http://www.w3.org/2000/svg">
@@ -24,4 +17,8 @@
 </svg>
 
 <style>
+	svg {
+		fill: var(--icon-color);
+		stroke: none;
+	}
 </style>

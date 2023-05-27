@@ -1,7 +1,5 @@
 <script lang="ts">
-	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import { OnMount } from 'fractils'
-	import { fade } from 'svelte/transition'
 </script>
 
 <svelte:head>
@@ -11,20 +9,7 @@
 
 <section>
 	<div class="hero-container">
-		<OnMount>
-			<div class="header-container">
-				<h1 in:fade={{ delay: 250, duration: 250 }}>
-					All those gigaflops, sitting idle
-				</h1>
-				<h1 in:fade={{ delay: 1500, duration: 250 }}>Put them to work</h1>
-			</div>
-			<p in:fade={{ delay: 2250, duration: 250 }} />
-			<div class="hero-buttons">
-				<IconButton text="Sign up" size="lg" />
-				<IconButton text="Start Creating" size="lg" />
-			</div>
-			<!-- <h1>All those gigaflops, sitting idle</h1> -->
-		</OnMount>
+		<OnMount />
 	</div>
 </section>
 <section>

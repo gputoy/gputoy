@@ -1,5 +1,5 @@
+import rootSchema from '$gen/root-schema.json'
 import type * as monaco from 'monaco-editor'
-import JSONSchema from '../../../schemas/Runner.json'
 
 const setJSONSchema = (m: typeof monaco) => {
 	m.languages.json.jsonDefaults.setDiagnosticsOptions({
@@ -9,7 +9,7 @@ const setJSONSchema = (m: typeof monaco) => {
 			{
 				uri: 'http://gputoy.io/runner.schema.json',
 				fileMatch: ['*'],
-				schema: JSONSchema
+				schema: rootSchema.definitions.Runner
 			}
 		],
 		schemaValidation: 'error'

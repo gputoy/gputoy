@@ -3,32 +3,22 @@
 	import {
 		dCanModifyProject,
 		dProject,
-		dUserPrefs,
-		wDebugPanel,
-		wMenuOpen,
 		wPrebuildDirty,
 		wPrebuildResult,
 		wUser,
-		wUserModalOpen,
-		wUserPrefsOpen,
 		wWorkerData
 	} from '$stores'
 	/** @ts-ignore */
-	import { dLayout } from '$core/layout'
-	import IconButton from '$lib/components/buttons/IconButton.svelte'
+	import { dLayout, rDebugOpen } from '$core/layout'
+	import { dPreferences } from '$core/preferences'
 	import { JsonView } from '@zerodevx/svelte-json-view'
 
 	$: json = {
 		canModifyProject: $dCanModifyProject,
 		user: $wUser,
-		config: $dUserPrefs,
+		preferences: $dPreferences,
 		project: $dProject,
 		layout: $dLayout,
-		ui: {
-			userModalOpen: $wUserModalOpen,
-			UserPrefsOpen: $wUserPrefsOpen,
-			menuOpen: $wMenuOpen
-		},
 		prebuild: {
 			dirty: $wPrebuildDirty,
 			result: $wPrebuildResult
@@ -38,13 +28,13 @@
 	}
 </script>
 
-{#if $wDebugPanel}
+{#if $rDebugOpen}
 	<div class="debug-container">
 		<div>
-			<IconButton
+			<button
 				on:click={async () => {
 					wWorkerData.set(await wWorkerInternal.poll())
-				}}>Reload worker</IconButton
+				}}>Reload worker</button
 			>
 		</div>
 		<JsonView {json} depth={2} />

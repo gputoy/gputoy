@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use gpu_common::UserPrefs;
+use gpu_common::Preferences;
 use serde::{Deserialize, Serialize};
 use sqlx::{types::Json, FromRow};
 use uuid::Uuid;
@@ -31,7 +31,7 @@ pub struct UserRow {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<String>,
     pub email_verified: bool,
-    pub config: Option<Json<UserPrefs>>,
+    pub config: Option<Json<Preferences>>,
     pub active: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,

@@ -1,16 +1,8 @@
 import { browser } from '$app/environment'
-import { wTheme, wUserModalOpen, wUserPrefsOpen } from '$stores'
+import { wTheme } from '$stores'
 import Cookies from 'js-cookie'
-import type { StartStopNotifier } from 'svelte/store'
 
 export type Theme = 'light' | 'dark'
-export const initTheme: StartStopNotifier<Theme> = (set) => {
-	if (!browser) return
-	const theme = Cookies.get('t')
-	if (theme) {
-		set(theme as Theme)
-	}
-}
 
 export function toggleTheme() {
 	wTheme.update((theme) => {
@@ -22,13 +14,6 @@ export function toggleTheme() {
 	})
 }
 
-export function toggleUserModal() {
-	wUserModalOpen.update((o) => !o)
-}
-export function toggleUserPrefs() {
-	wUserPrefsOpen.update((o) => !o)
-}
-
 export function cssVar(identifier: string): string {
 	if (!browser) return ''
 	return getComputedStyle(document.body).getPropertyValue(identifier).trim()
@@ -37,4 +22,10 @@ export function cssVar(identifier: string): string {
 export function setCssVar(identifier: string, value: string) {
 	if (!browser) return
 	document.body.style.setProperty(identifier, value)
+}
+
+export function delayedFocus(el: HTMLElement, wait: number) {
+	setTimeout(() => {
+		el.focus({ preventScroll: true })
+	}, wait)
 }

@@ -2,24 +2,24 @@
 	import feather, { type FeatherIconNames } from 'feather-icons'
 
 	export let name: FeatherIconNames
-	export let size = '1.1em'
 	export let rotation = '0deg'
 	export let stroke = false
 	export let stroked = false
 	export let thick = false
+	export let filled = false
 	export let style = ''
-	export let clazz = ''
 	$: icon = feather.icons[name] as any
 </script>
 
 {#if icon}
 	<svg
 		{...icon.attrs}
-		style="width: {size};height: {size}; transform: rotate({rotation});{style}"
+		style="transform: rotate({rotation});{style}"
 		class:stroked
 		class:stroke
 		class:thick
-		class={clazz}
+		class:filled
+		{...$$restProps}
 	>
 		{@html icon.contents}
 	</svg>
@@ -27,30 +27,20 @@
 
 <style>
 	svg {
-		overflow: visible;
 		transform-origin: 50% 50%;
-		fill: var(--text-accent-color);
-		stroke: none;
 		transition: transform var(--transition-quick) ease-out;
 	}
 	/* svg:hover {
 		fill: var(--text-important);
 	} */
 	.stroke {
-		stroke: var(--text-accent-color);
-		stroke-width: 1.5px;
-	}
-	.stroke:hover {
-		stroke: var(--text-important);
+		stroke-width: 2px;
 	}
 	.stroked {
-		fill: none;
-		stroke: var(--text-accent-color);
-		stroke-width: 1.5px;
+		stroke-width: 2px;
 	}
-	.stroked:hover {
-		stroke: var(--text-important);
-		fill: none;
+	.filled {
+		fill: var(--text-accent-color);
 	}
 	.thick {
 		stroke-width: 2.5px;

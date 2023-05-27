@@ -1,0 +1,29 @@
+{
+	"workspace": {
+		"handle-size": 3,
+		"ui-speed": "quick"
+	},
+	"editor": {
+		"auto-indent": "advanced",
+		"line-numbers": "on",
+		"font": "mono",
+		"font-size": 11,
+		"font-ligatures": true,
+		"smooth-scrolling": false,
+		"smooth-caret": false,
+		"cursor-style": "line",
+		"cursor-blinking": "blink",
+		"word-wrap": false,
+		"scroll-beyond-last-line": false,
+		"minimap": false,
+		"vim-mode": {
+			"enabled": false,
+			"some-property": 2
+		}
+	},
+	"console": {
+		"show-completions": "full",
+		"wrap": false,
+		"level": "info"
+	}
+}

@@ -1,5 +1,8 @@
 <script lang="ts">
-	import type { SupportedExtension } from '$common'
+	// Don't want to waste time on finding file icons all over the internet
+	// or creating my own.
+
+	import type { SupportedExtension } from '$gen'
 
 	export let size = 32
 	export let extension: SupportedExtension
@@ -47,6 +50,9 @@
 </svg>
 
 <style>
+	svg {
+		min-width: max-content;
+	}
 	.path0 {
 		stroke-width: 0;
 	}
@@ -59,10 +65,10 @@
 		stroke-width: 0;
 	}
 	tspan {
-		fill: var(--text-important);
 		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 		font-size: 7px;
 		text-anchor: middle;
-		stroke-width: '.3';
+		stroke: var(--text-color);
+		stroke-width: 0.5px;
 	}
 </style>

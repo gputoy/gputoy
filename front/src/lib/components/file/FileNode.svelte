@@ -21,6 +21,9 @@
 {/if}
 
 <style>
+	.dir {
+		width: 100%;
+	}
 	:global(.node-entry) {
 		cursor: default;
 		width: 100%;

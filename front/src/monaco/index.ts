@@ -1,4 +1,4 @@
-import type { File, Layout, SupportedExtension, UserEditorPrefs } from '$common'
+import type { File, Layout, Preferences, SupportedExtension } from '$gen'
 import type * as monaco from 'monaco-editor'
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
@@ -35,7 +35,7 @@ export var noInstance = _editorInstance === undefined
 export type EditorInit = {
 	theme: Theme
 	layout: Layout
-	prefs: UserEditorPrefs
+	prefs: Preferences
 }
 // Initializes the monaco editor instance
 export async function initEditor(divEl: any, statusEl: any, init: EditorInit) {
@@ -57,14 +57,11 @@ export async function initEditor(divEl: any, statusEl: any, init: EditorInit) {
 	/** @ts-ignore */
 	MonacoVim = await import('monaco-vim')
 	Monaco.editor.defineTheme('dark', dark())
-	Monaco.editor.defineTheme('light', light)
+	Monaco.editor.defineTheme('light', light())
 	setJSONSchema(Monaco)
 
 	_editorInstance = Monaco.editor.create(divEl, {
 		automaticLayout: true,
-		minimap: {
-			enabled: false
-		},
 		guides: {
 			highlightActiveBracketPair: true,
 			bracketPairs: true,
@@ -72,10 +69,12 @@ export async function initEditor(divEl: any, statusEl: any, init: EditorInit) {
 			highlightActiveIndentation: true,
 			bracketPairsHorizontal: true
 		},
+		overviewRulerBorder: false,
 		padding: {
 			bottom: 20,
 			top: 20
-		}
+		},
+		experimentalWhitespaceRendering: 'font'
 	})
 
 	// manually set theme and file on init
@@ -122,22 +121,33 @@ export function changeEditorFile(fileid: string, file: File) {
 }
 
 // Updates editor config based on user editor config
-export function updateEditorConfig(config: UserEditorPrefs) {
+export function updateEditorConfig(preferences: Preferences) {
 	// monaco options
 	const options: monaco.editor.IEditorOptions &
 		monaco.editor.IGlobalEditorOptions = {
-		fontSize: config.fontSize!,
-		fontFamily: config.fontFamily!,
-		lineNumbers: config.lineNumbers,
+		fontSize: preferences.editor['font-size'],
+		fontFamily: preferences.editor['font'],
+		fontLigatures: preferences.editor['font-ligatures'],
+		lineNumbers: preferences.editor['line-numbers'],
+		cursorStyle: preferences.editor['cursor-style'],
+		autoIndent: preferences.editor['auto-indent'],
+		smoothScrolling: preferences.editor['smooth-scrolling'],
+		cursorBlinking: preferences.editor['cursor-blinking'],
+		wordWrap: preferences.editor['word-wrap'] ? 'on' : 'off',
+		cursorSmoothCaretAnimation: preferences.editor['smooth-caret']
+			? 'on'
+			: 'off',
+		scrollBeyondLastLine: preferences.editor['scroll-beyond-last-line'],
 		minimap: {
-			enabled: config.minimap
+			enabled: preferences.editor.minimap
 		}
 	}
 	_editorInstance?.updateOptions(options)
 
-	if (!_vimMode && config.vimMode && _editorInstance) {
+	const vimMode = preferences.editor['vim-mode']
+	if (!_vimMode && vimMode.enabled && _editorInstance) {
 		_vimMode = MonacoVim?.initVimMode(_editorInstance, _statusEl, Statusbar)
-	} else if (_vimMode && !config.vimMode) {
+	} else if (_vimMode && !vimMode.enabled) {
 		_vimMode.dispose()
 		_vimMode = undefined
 	}

@@ -1,7 +1,7 @@
 import { browser } from '$app/environment'
-import type { ProjectResponse, ProjectUpsert } from '$common'
 import * as api from '$core/api'
 import { DEFAULT_CONFIG, DEFAULT_FILES, DEFAULT_LAYOUT } from '$core/consts'
+import type { ProjectResponse, ProjectUpsert } from '$gen'
 // import context, { init } from "$core/context"
 import { wConfig, wFiles, wProjectId, wProjectMeta, wUser } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
@@ -11,21 +11,17 @@ import { get } from 'svelte/store'
 import { v4 } from 'uuid'
 import { getLayout, loadLayout } from './layout'
 
-/**
- * Project metadata, basically everything besides files, layout, and config
- * This is split so each of these stores of components of the project can be
- * sunscribed to seperately
- * TODO: maybe include this within gpu-core?
- */
-export type ProjectMeta = {
-	title: string
-	description?: string
-	authorId: string | null
-	published: boolean
-	createdAt: string
-	updatedAt: string
-	forkedFromId?: string
-}
+export type ProjectMeta = Omit<ProjectResponse, 'id' | 'files' | 'layout' | ''>
+
+// {
+// 	title: string
+// 	description ?: string
+// 	authorId: string | null
+// 	published: boolean
+// 	createdAt: string
+// 	updatedAt: string
+// 	forkedFromId ?: string
+// }
 
 /**
  * Data required to display project select ui
@@ -56,7 +52,6 @@ export const writeToProjectLocalStorage = debounce(_writeToLocalStorage, 2000)
 function _writeToLocalStorage(project: ProjectResponse) {
 	// TODO: doing dates like this will probably cause a problem
 	if (browser) {
-		toast.push('Saving to local storage', { duration: 500 })
 		project.updatedAt = Date.now().toString()
 		localStorage.setItem(project.id, JSON.stringify(project))
 	}

@@ -1,11 +1,3 @@
-/**
- *  Routing messages through the browser window.
- *  On load the frontend will assign implementations of
- *  these functions to the window which will update svelte stores.
- * 
- *  For more info view front/src/core/console.ts
- */
-
 export function __trace_ext(log) {
     window.__trace_ext(log)
 }

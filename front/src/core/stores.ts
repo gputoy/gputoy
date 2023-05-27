@@ -1,3 +1,18 @@
+import { browser } from '$app/environment'
+import { initConsoleMethods, type ConsoleExtras, type Log } from '$core/console'
+import {
+	DEFAULT_CONFIG,
+	DEFAULT_FILES,
+	DEFAULT_RUN_STATE,
+	DEFAULT_USER_KEYBINDS,
+	type MenuKey
+} from '$core/consts'
+import { initFilesMethods, treeFromFiles, type FilesExtras } from '$core/files'
+import type { Keybinds } from '$core/keys'
+import { dLayout } from '$core/layout'
+import { writeToProjectLocalStorage, type ProjectMeta } from '$core/project'
+import { initUserMethods, type UserExtras } from '$core/user'
+import type { Theme } from '$core/util'
 import type {
 	Action,
 	CompileError,
@@ -7,33 +22,15 @@ import type {
 	Files,
 	PrebuildResult,
 	ProjectResponse,
-	UserEditorPrefs,
-	UserGeneralPrefs,
-	UserInfoResponse,
-	UserPrefs
-} from '$common'
-import { initConsoleMethods, type ConsoleExtras, type Log } from '$core/console'
-import {
-	DEFAULT_CONFIG,
-	DEFAULT_FILES,
-	DEFAULT_RUN_STATE,
-	DEFAULT_USER_EDITOR_PREFS,
-	DEFAULT_USER_GENERAL_PREFS,
-	DEFAULT_USER_KEYBINDS,
-	type MenuKey
-} from '$core/consts'
-import { initFilesMethods, treeFromFiles, type FilesExtras } from '$core/files'
-import type { Keybinds } from '$core/input'
-import { dLayout } from '$core/layout'
-import { writeToLocalStorage } from '$core/preferences'
-import { writeToProjectLocalStorage, type ProjectMeta } from '$core/project'
-import { initUserMethods, type UserExtras } from '$core/user'
-import { initTheme, type Theme } from '$core/util'
+	UserInfoResponse
+} from '$gen'
+import Cookies from 'js-cookie'
 import {
 	derived,
 	get,
 	writable,
 	type Readable,
+	type StartStopNotifier,
 	type Writable
 } from 'svelte/store'
 import {
@@ -206,7 +203,6 @@ export const wConsole = makeEnhanced<Log[], ConsoleExtras>(
 	[],
 	initConsoleMethods
 )()
-export const wConsoleOpen = writable(false)
 export const wConsoleHistory = writable<string[]>([])
 export const wConsoleHistoryIndex = writable(0)
 export const wConsoleCompletionIndex = writable(0)
@@ -226,8 +222,6 @@ export const wLastInputAction = writable<{
 	code: string
 	action?: Action
 } | null>(null)
-export const wUserModalOpen = writable(false)
-export const wUserPrefsOpen = writable(false)
 export const wUserRenaming = writable<string | null>(null)
 export const wUserDeleting = writable<string | null>(null)
 
@@ -239,39 +233,20 @@ export const wMenuOpen = writable<Record<MenuKey, boolean>>({
 	project: false
 })
 
-export const wDebugPanel = writable(false)
+const initTheme: StartStopNotifier<Theme> = (set) => {
+	if (!browser) return
+	const theme = Cookies.get('t')
+	if (theme) {
+		set(theme as Theme)
+	}
+}
 export const wTheme = writable<Theme>('dark', initTheme)
 
-/**
- *                  User preferences
- */
-export const wUserGeneralPrefs = writable<UserGeneralPrefs>(
-	DEFAULT_USER_GENERAL_PREFS
-)
-export const wUserEditorPrefs = writable<UserEditorPrefs>(
-	DEFAULT_USER_EDITOR_PREFS
-)
 export const wUserKeybinds = writable<Keybinds>(DEFAULT_USER_KEYBINDS)
 export const wUserTheme = writable<any>({})
 
 // TODO: type this up
 export const wWorkerData = writable(null)
-
-/**
- *                  Derives stores
- */
-export const dUserPrefs = derived(
-	[wUserGeneralPrefs, wUserEditorPrefs, wUserKeybinds, wUserTheme],
-	([$general, $editor, $keybinds, $theme]): UserPrefs => {
-		return {
-			general: $general,
-			editor: $editor,
-			keybinds: $keybinds,
-			theme: $theme
-		}
-	}
-)
-dUserPrefs.subscribe(writeToLocalStorage)
 
 /**
  *  Reactive var which indicates if user can modify current project

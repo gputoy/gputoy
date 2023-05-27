@@ -10,7 +10,6 @@
 
 	import { pushAction } from '$core/actions'
 	import { dActiveFile, toggleDirOpen } from '$core/layout'
-	import IconButton from '$lib/components/buttons/IconButton.svelte'
 	import Icon from '$lib/components/Icon.svelte'
 	import { wUserDeleting, wUserRenaming } from '$stores'
 	import { slide } from 'svelte/transition'
@@ -45,7 +44,7 @@
 			// is file, return handler that opens document
 			return () => {
 				pushAction({
-					ty: 'openDocument',
+					ty: 'openTab',
 					c: node.id
 				})
 			}
@@ -116,22 +115,22 @@
 		{:else if isDeleting}
 			{name}
 			<div class="icon-container">
-				<IconButton size="xs" empty on:click={handleConfirmDelete}>
+				<button class="xs right-flat emtpy" on:click={handleConfirmDelete}>
 					<Icon name="check" stroked size="12px" />
-				</IconButton>
-				<IconButton size="xs" empty on:click={handleCancelDelete}>
+				</button>
+				<button class="xs left-flat empty" on:click={handleCancelDelete}>
 					<Icon name="x" stroked size="12px" />
-				</IconButton>
+				</button>
 			</div>
 		{:else}
 			{name}
 			<div class="icon-container hidden">
-				<IconButton size="xs" empty on:click={handleEdit}>
-					<Icon name="edit-2" stroked size="12px" />
-				</IconButton>
-				<IconButton size="xs" empty on:click={handleDelete}>
-					<Icon name="trash" stroked size="12px" />
-				</IconButton>
+				<button class="xs right-flat emtpy" on:click={handleEdit}>
+					<Icon name="edit-2" stroked />
+				</button>
+				<button class="xs left-flat empty" on:click={handleDelete}>
+					<Icon name="trash" stroked />
+				</button>
 			</div>
 		{/if}
 	</div>
@@ -151,11 +150,11 @@
 		max-width: 100%;
 		white-space: nowrap;
 		text-overflow: ellipsis;
+		font-size: var(--sm);
 	}
 	.icon-container {
 		display: flex;
 		flex-direction: row;
-		gap: 4px;
 	}
 	.hidden {
 		visibility: hidden;

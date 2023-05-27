@@ -1,6 +1,6 @@
 import { browser } from '$app/environment'
-import type { Layout, Pane } from '$common'
 import { DEFAULT_DIR_NODE_STATE, DEFAULT_LAYOUT as DEFAULT } from '$core/consts'
+import type { Layout, Region } from '$gen'
 import { sealWritable } from '$stores'
 import debounce from 'lodash/debounce'
 import type { IPaneSizingEvent } from 'svelte-splitpanes'
@@ -14,29 +14,42 @@ declare var L: Layout
 const wAccordianOpen = writable<(typeof L)['accordianOpen']>(
 	DEFAULT['accordianOpen']
 )
-const wFileIndex = writable<(typeof L)['fileIndex']>(DEFAULT['fileIndex'])
 const wFileTreeState = writable<(typeof L)['fileTreeState']>(
 	DEFAULT['fileTreeState']
 )
 const wPaneSize = writable<(typeof L)['paneSize']>(DEFAULT['paneSize'])
 const wPaneToggle = writable<(typeof L)['paneToggled']>(DEFAULT['paneToggled'])
-const wWorkspace = writable<(typeof L)['workspace']>(DEFAULT['workspace'])
+const wTabs = writable<(typeof L)['tabs']>(DEFAULT['tabs'])
+const wTabIndex = writable<(typeof L)['tabIndex']>(DEFAULT['tabIndex'])
 
 /**
  * Public readable atomic stores of the Layout struct
  */
 export const rAccordianOpen = sealWritable(wAccordianOpen)
-export const rFileIndex = sealWritable(wFileIndex)
 export const rFileTreeState = sealWritable(wFileTreeState)
 export const rPaneSize = sealWritable(wPaneSize)
 export const rPaneToggle = sealWritable(wPaneToggle)
-export const rWorkspace = sealWritable(wWorkspace)
+export const rTabs = sealWritable(wTabs)
+export const rTabIndex = sealWritable(wTabIndex)
 
 // whether the window size is currently being updated
 export const wUpdatingWindowSize = writable(false)
 // window size - top navbar height
 export const wWindowWidth = writable<number | undefined>()
 export const wWindowHeight = writable<number | undefined>()
+
+// other ui regions that need state to track if they're open
+// these are not included in the Layout struct since there is no point
+// to serializing them (i.e. user prefs shouldn't stay open across sessions)
+const wUserModalOpen = writable(false)
+const wUserPrefsOpen = writable(false)
+const wTerminalOpen = writable(false)
+const wDebugOpen = writable(false)
+
+export const rUserModalOpen = sealWritable(wUserModalOpen)
+export const rUserPrefsOpen = sealWritable(wUserPrefsOpen)
+export const rTerminalOpen = sealWritable(wTerminalOpen)
+export const rDebugOpen = sealWritable(wDebugOpen)
 
 // Raw pane sizes, tracked by on:resize via the svelte component
 // and the forceUpdateRawPaneSize function below
@@ -46,8 +59,8 @@ var _rawPaneEvents: any = {
 	resourcePane: undefined
 }
 
-function forceUpdateRawPaneSize(pane: Pane, ev: Partial<IPaneSizingEvent>) {
-	_rawPaneEvents[pane] = { ..._rawPaneEvents[pane], ...ev }
+function forceUpdateRawPaneSize(region: Region, ev: Partial<IPaneSizingEvent>) {
+	_rawPaneEvents[region] = { ..._rawPaneEvents[region], ...ev }
 }
 
 // Due to css transition, some panes were floating around when the
@@ -68,35 +81,21 @@ wWindowWidth.subscribe((_) => {
 const wVersionBump = writable(0)
 
 export const dLayout: Readable<Layout> = derived(
-	[
-		rAccordianOpen,
-		rFileIndex,
-		rFileTreeState,
-		rPaneSize,
-		rPaneToggle,
-		rWorkspace
-	],
-	([
-		accordianOpen,
-		fileIndex,
-		fileTreeState,
-		paneSize,
-		paneToggled,
-		workspace
-	]) => {
+	[rAccordianOpen, rFileTreeState, rPaneSize, rPaneToggle, rTabIndex, rTabs],
+	([accordianOpen, fileTreeState, paneSize, paneToggled, tabIndex, tabs]) => {
 		return {
 			accordianOpen,
-			fileIndex,
 			fileTreeState,
 			paneSize,
 			paneToggled,
-			workspace
+			tabIndex,
+			tabs
 		}
 	}
 )
 
 export const dActiveFile = derived(
-	[rFileIndex, rWorkspace],
+	[rTabIndex, rTabs],
 	([fileIndex, workspace]): string | null => {
 		if (fileIndex == null) return null
 		return workspace[fileIndex]
@@ -111,7 +110,7 @@ export const dPaneSizes = derived(
 
 		const CONTROL_BAR_HEIGHT: number = 32
 
-		const { projectPanePx, editorPanePercentage, resourcePanePercentage } =
+		const { projectPanePx, editorPanePercentage, controlPanePercentage } =
 			get(wPaneSize)
 
 		let projectPanePct = (projectPanePx / (width ?? 1000)) * 100
@@ -124,13 +123,14 @@ export const dPaneSizes = derived(
 			forceUpdateRawPaneSize('editorPane', { size: editorPanePct })
 		let centerPanePct = 100 - projectPanePct - editorPanePct
 
-		let controlBarMinSize = (CONTROL_BAR_HEIGHT / (height ?? 1000)) * 100
-		let resourcePanePct = toggle.resourcePane
-			? resourcePanePercentage
+		let controlBarMinSize: number =
+			(CONTROL_BAR_HEIGHT / (height ?? 1000)) * 100
+		let controlPanePct = toggle.controlPane
+			? controlPanePercentage
 			: controlBarMinSize
-		if (toggle.resourcePane)
-			forceUpdateRawPaneSize('resourcePane', { size: resourcePanePct })
-		let viewportPanePct = 100 - resourcePanePct
+		if (toggle.controlPane)
+			forceUpdateRawPaneSize('controlPane', { size: controlPanePct })
+		let viewportPanePct = 100 - controlPanePct
 
 		const ret = {
 			projectPanePx,
@@ -138,7 +138,7 @@ export const dPaneSizes = derived(
 			editorPanePct,
 			centerPanePct,
 			viewportPanePct,
-			resourcePanePct,
+			controlPanePct,
 			controlBarMinSize,
 			version
 		}
@@ -155,8 +155,8 @@ export function loadLayout(layout: Layout) {
 	wFileTreeState.set(layout.fileTreeState)
 	wPaneSize.set(layout.paneSize)
 	wPaneToggle.set(layout.paneToggled)
-	wWorkspace.set(layout.workspace)
-	wFileIndex.set(layout.fileIndex)
+	wTabs.set(layout.tabs)
+	wTabIndex.set(layout.tabIndex)
 }
 
 /**
@@ -164,46 +164,46 @@ export function loadLayout(layout: Layout) {
  */
 
 export function getOpenFileId(): string | undefined {
-	const fileIndex = get(rFileIndex)
-	const workspace = get(rWorkspace)
+	const fileIndex = get(rTabIndex)
+	const workspace = get(rTabs)
 	return fileIndex != null ? workspace[fileIndex] : undefined
 }
 
 export function setFileIndex(index: number) {
-	wFileIndex.set(index)
+	wTabIndex.set(index)
 }
 
-export function moveWorkspaceIdx(shift: number) {
-	wFileIndex.update((fileIndex) => {
-		const len = get(rWorkspace).length
+export function shiftTab(shift: number) {
+	wTabIndex.update((fileIndex) => {
+		const len = get(rTabs).length
 		if (len == 0) return fileIndex
 		return ((((fileIndex ?? 0) + shift) % len) + len) % len
 	})
 }
 
-export function closeWorkspaceFile(idx?: number) {
-	let fileIndex = get(rFileIndex)
-	let workspace = get(rWorkspace)
+export function closeTab(idx?: number) {
+	let fileIndex = get(rTabIndex)
+	let workspace = get(rTabs)
 	if (!idx && fileIndex == null) return
 	const closeIdx = idx ?? fileIndex!
 	workspace.splice(closeIdx, 1)
 	if (workspace.length > 0) fileIndex = Math.max(0, (fileIndex ?? 0) - 1)
 	else fileIndex = null
-	wFileIndex.set(fileIndex)
-	wWorkspace.set(workspace)
+	wTabIndex.set(fileIndex)
+	wTabs.set(workspace)
 }
 
-export function openDocument(fileid: string) {
+export function openTab(fileid: string) {
 	let maybeIndex
-	wWorkspace.update((workspace) => {
-		maybeIndex = workspace.indexOf(fileid)
+	wTabs.update((tabs) => {
+		maybeIndex = tabs.indexOf(fileid)
 		// add file to workspace
 		if (maybeIndex < 0) {
-			maybeIndex = workspace.push(fileid) - 1
+			maybeIndex = tabs.push(fileid) - 1
 		}
-		return workspace
+		return tabs
 	})
-	wFileIndex.set(maybeIndex)
+	wTabIndex.set(maybeIndex)
 }
 
 const APPLY_PANE_SIZE_WAIT_MS = 300
@@ -213,7 +213,7 @@ const setSizes = debounce(_setSizes, APPLY_PANE_SIZE_WAIT_MS)
 function _setSizes(p?: number, e?: number, r?: number) {
 	wPaneSize.update((size) => ({
 		projectPanePx: p ?? size.projectPanePx,
-		resourcePanePercentage: r ?? size.resourcePanePercentage,
+		controlPanePercentage: r ?? size.controlPanePercentage,
 		editorPanePercentage: e ?? size.editorPanePercentage
 	}))
 }
@@ -240,42 +240,92 @@ export function applySplitpaneEvent(event: CustomEvent<IPaneSizingEvent[]>) {
 		setSizes(undefined, undefined, resourcePanePct)
 	}
 }
-const PROJECT_PANE_PIXEL_THRESHOLD = 100
-const BIAS_PERCENT = 5
-export function togglePanel(pane: Pane) {
-	const toggle = () =>
+export function toggleRegionVisibility(region: Region) {
+	const BIAS_PERCENT = 5
+	if (
+		region == 'projectPane' ||
+		region == 'controlPane' ||
+		region == 'editorPane'
+	) {
+		const toggle = () =>
+			wPaneToggle.update((toggle) => {
+				toggle[region] = !toggle[region]
+				return toggle
+			})
+
+		let lastEvent = _rawPaneEvents[region] as IPaneSizingEvent
+		if (!lastEvent) return toggle()
+		let tooSmallToOpen =
+			Math.max(lastEvent.min, lastEvent.snap) + BIAS_PERCENT > lastEvent.size
+
+		if (tooSmallToOpen) {
+			wVersionBump.update((v) => {
+				return v + 1
+			})
+		} else {
+			toggle()
+		}
+	} else {
+		const toggle = (val: boolean) => {
+			return !val
+		}
+		;({
+			preferences: () => {
+				wUserPrefsOpen.update(toggle)
+			},
+			terminal: () => {
+				wTerminalOpen.update(toggle)
+			},
+			debug: () => {
+				wDebugOpen.update(toggle)
+			},
+			user: () => {
+				wUserModalOpen.update(toggle)
+			}
+		})[region]()
+	}
+}
+export function setRegionVisibility(region: Region, visibility: boolean) {
+	if (
+		region == 'projectPane' ||
+		region == 'controlPane' ||
+		region == 'editorPane'
+	) {
 		wPaneToggle.update((toggle) => {
-			toggle[pane] = !toggle[pane]
+			toggle[region] = visibility
 			return toggle
 		})
-
-	let lastEvent = _rawPaneEvents[pane] as IPaneSizingEvent
-	if (!lastEvent) return toggle()
-	let tooSmallToOpen =
-		Math.max(lastEvent.min, lastEvent.snap) + BIAS_PERCENT > lastEvent.size
-
-	if (tooSmallToOpen) {
-		wVersionBump.update((v) => {
-			return v + 1
-		})
 	} else {
-		toggle()
+		;({
+			preferences: () => {
+				wUserPrefsOpen.set(visibility)
+			},
+			terminal: () => {
+				wTerminalOpen.set(visibility)
+			},
+			debug: () => {
+				wDebugOpen.set(visibility)
+			},
+			user: () => {
+				wUserModalOpen.set(visibility)
+			}
+		})[region]()
 	}
 }
 
-export function toggleAllPanels() {
-	let { editorPane, projectPane, resourcePane } = get(wPaneToggle)
-	if (editorPane || projectPane || resourcePane)
+export function toggleAllPanes() {
+	let { editorPane, projectPane, controlPane } = get(wPaneToggle)
+	if (editorPane || projectPane || controlPane)
 		wPaneToggle.set({
 			editorPane: false,
 			projectPane: false,
-			resourcePane: false
+			controlPane: false
 		})
 	else
 		wPaneToggle.set({
 			editorPane: true,
 			projectPane: true,
-			resourcePane: true
+			controlPane: true
 		})
 }
 
@@ -315,16 +365,16 @@ export function toggleAccordian(accordian: string, set?: boolean) {
 	})
 }
 
-export function replaceIdInWorkspace(src: string, dest: string) {
-	wWorkspace.update((workspace) => {
-		workspace = workspace.map((fileid) => (fileid == src ? dest : fileid))
-		return workspace
+export function replaceIdInTabs(src: string, dest: string) {
+	wTabs.update((tabs) => {
+		tabs = tabs.map((fileid) => (fileid == src ? dest : fileid))
+		return tabs
 	})
 }
 
-export function deleteIdInWorkspace(fileid: string) {
-	wWorkspace.update((workspace) => {
-		workspace = workspace.filter((id) => id != fileid)
-		return workspace
+export function deleteIdInTabs(fileid: string) {
+	wTabs.update((tabs) => {
+		tabs = tabs.filter((id) => id != fileid)
+		return tabs
 	})
 }

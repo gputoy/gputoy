@@ -8,10 +8,6 @@
 	transition: width 0s ease, height 0s ease !important;
 }
 
-.splitpanes.modern-theme .splitpanes__pane {
-	background-color: var(--background-content);
-}
-
 .splitpanes.modern-theme .splitpanes__splitter {
 	background-color: var(--border-primary);
 	position: relative;
@@ -23,52 +19,51 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	transition: opacity 0.4s;
-	background-color: var(--accent-color);
+	transition: opacity 0.2s;
 	opacity: 0;
 	z-index: 1;
 }
 
+.splitpanes.modern-theme .splitpanes__pane {
+	background-color: var(--border-primary);
+}
+
 .splitpanes.modern-theme .splitpanes__splitter:hover:before {
-	opacity: 0.4;
+	opacity: 0.2;
 }
 
 .splitpanes.modern-theme .splitpanes__splitter.splitpanes__splitter__active {
-	z-index: 2;
+	z-index: var(--z-splitter);
 	/* Fix an issue of overlap fighting with a near hovered splitter */
 }
 
+.splitpanes--horizontal > .splitpanes__splitter {
+	min-height: 0px !important;
+}
+
 .modern-theme.splitpanes--vertical > .splitpanes__splitter:before {
-	left: -3px;
-	right: -3px;
+	left: calc(var(--half-handle-size) * -1);
+	right: calc(var(--half-handle-size) * -1);
 	height: 100%;
 	cursor: col-resize;
+	background-image: linear-gradient(
+		var(--border-primary) 0%,
+		var(--accent-color) 5%,
+		var(--accent-color) 95%,
+		var(--border-primary) 100%
+	);
 }
 
 .modern-theme.splitpanes--horizontal > .splitpanes__splitter:before {
-	top: -3px;
-	bottom: -3px;
+	top: calc(var(--half-handle-size) * -1);
+	bottom: calc(var(--half-handle-size) * -1);
 	width: 100%;
 	cursor: row-resize;
-}
-
-.splitpanes.no-splitter .splitpanes__pane {
-	background-color: var(--background-content);
-}
-
-.splitpanes.no-splitter .splitpanes__splitter {
-	background-color: var(--border-primary);
-	position: relative;
-}
-
-.no-splitter.splitpanes--horizontal > .splitpanes__splitter:before {
-	width: 0.125rem;
-	pointer-events: none;
-	cursor: none;
-}
-
-.no-splitter.splitpanes--vertical > .splitpanes__splitter:before {
-	height: 0.125rem;
-	pointer-events: none;
-	cursor: none;
+	background-image: linear-gradient(
+		90deg,
+		var(--border-primary) 0%,
+		var(--accent-color) 5%,
+		var(--accent-color) 95%,
+		var(--border-primary) 100%
+	);
 }

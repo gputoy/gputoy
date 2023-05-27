@@ -1,15 +1,9 @@
 [workspace]
-members = [
-  "gpu-back",
-  "gpu-client",
-  "gpu-common",
-  "gpu-analyzer",
-  "gpu-wasm-client",
-  "gpu-wasm-analyzer",
-  "gpu-log",
-  "gpu-tauri",
-]
+members = ["gpu-*"]
 resolver = "2"
+
+[profile.release.package.gpu-wasm-common]
+opt-level = 's'
 
 [profile.release.package.gpu-wasm-analyzer]
 opt-level = 's'

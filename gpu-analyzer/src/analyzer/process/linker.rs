@@ -64,11 +64,7 @@ impl super::Process for LinkerProcess {
             processed_src.push_str(export);
             processed_src.push(NEWLINE);
             let len = processed_src.len() - idx;
-            inserts.push(LinkerInsertion {
-                _delete: false,
-                _idx: idx,
-                _len: len,
-            });
+            inserts.push(LinkerInsertion::insertion(idx, len));
         }
 
         let user_src = model.value();

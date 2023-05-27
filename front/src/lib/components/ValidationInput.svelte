@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount } from 'svelte'
-	import IconButton from './buttons/IconButton.svelte'
 	import Icon from './Icon.svelte'
 	let input: HTMLInputElement
 	export let initValue: string
@@ -54,17 +53,16 @@
 	{/if}
 </div>
 <div class="icon-container">
-	<IconButton
-		size="xs"
-		empty
+	<button
+		class="xs right-flat empty"
 		on:click={handleConfirmEdit}
 		disabled={!!validationErrors}
 	>
 		<Icon name="check" stroked size="12px" />
-	</IconButton>
-	<IconButton size="xs" empty on:click={handleCancelEdit}>
+	</button>
+	<button class="xs left-flat empty" on:click={handleCancelEdit}>
 		<Icon name="x" stroked size="12px" />
-	</IconButton>
+	</button>
 </div>
 
 <style>

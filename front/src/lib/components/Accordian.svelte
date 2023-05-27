@@ -11,50 +11,60 @@
 </script>
 
 <div class="accordian-container">
-	<button
-		class="accordian-title"
-		on:click={handleClick}
-		style="border-bottom: {open ? 'none' : 'var(--border2)'};"
-	>
+	<button class="accordian-title" on:click={handleClick}>
 		<div class="accordian-title-left">
-			<Icon stroked name="chevron-right" rotation={open ? '90deg' : '0deg'} />
-			<p>
-				{title}
-			</p>
+			<Icon
+				class="xs"
+				stroked
+				name="chevron-right"
+				rotation={open ? '90deg' : '0deg'}
+			/>
+			{title}
 		</div>
 
 		<div class="accordian-title-right">
 			<slot name="menu" />
 		</div>
 	</button>
-	{#if open}
-		<div class="accordian-content" transition:slide={{ duration: 50 }}>
-			<slot name="content" />
-		</div>
-	{/if}
+	<div
+		class="accordian-content hide"
+		transition:slide={{ duration: 50 }}
+		class:unhide={open}
+	>
+		<slot name="content" />
+	</div>
 </div>
 
 <style>
 	.accordian-container {
 		display: flex;
 		height: fit-content;
+		width: 100%;
 		flex-direction: column;
+		background-color: var(--background-alt);
+		border-radius: var(--pane-radius);
 	}
 	.accordian-title {
+		height: var(--sm-nav);
+		font-size: var(--sm);
+		border-radius: var(--pane-radius);
+		padding-inline: var(--gap4);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding-inline: 0.25rem;
-		gap: 0.5rem;
 		flex: 0 0 auto;
 		user-select: none;
+		background: transparent;
+		font-weight: bold;
+		color: var(--text-accent-color);
 	}
 	.accordian-title:hover {
-		background-color: var(--glass-med);
+		background-color: var(--background-nav);
 	}
 	.accordian-title-left {
 		display: flex;
 		align-items: center;
+		gap: var(--nav-gap);
 	}
 	.accordian-title-right {
 		display: flex;
@@ -63,19 +73,7 @@
 	.accordian-content {
 		flex: 1 1 auto;
 		padding: 0;
-		border-bottom: var(--border2);
+		/* border-bottom: var(--border); */
 		min-width: 100px;
-	}
-	p {
-		font-size: var(--sm);
-		margin: 0px;
-		padding: 4px;
-		color: var(--text-accent-color);
-	}
-	button {
-		font-size: var(--xs);
-		background: transparent;
-		color: var(--text-color);
-		border: none;
 	}
 </style>

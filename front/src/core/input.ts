@@ -1,95 +1,325 @@
-import type { Action, FilteredAction } from '$common'
-import { isActionEqual, pushAction } from '$core/actions'
-import {
-	wLastInputAction,
-	wUserKeybinds,
-	wUserModalOpen,
-	wUserPrefsOpen
-} from '$stores'
-import { get } from 'svelte/store'
+import { pushAction } from '$core/actions'
+import type { Completions } from '$core/completions'
+import * as completions from '$core/completions'
+import type { ConfigValueClass } from '$gen'
+import { wConsole } from '$stores'
+import * as wasm from '$wasm/common'
+import { writable, type Readable, type Writable } from 'svelte/store'
+import { handleClientError } from './console'
 
-/**
- *  Map of keybinds to action
- */
-export type Keybinds = {
-	[key: string]: FilteredAction
+type UserPositonState = {
+	activeWord: string
+	wordIndex: number
+	wordStart: number
+	wordEnd: number
 }
 
-/**
- * Returns list of keybinds bound for input action
- * @param find action to find binds for in keybinds
- * @returns list of bound keybinds for action
- */
-export function findActionBinds(find: Action, keybinds: Keybinds): string[] {
-	return Object.entries(keybinds)
-		.filter(([_, filteredAction]) => isActionEqual(find, filteredAction.action))
-		.map(([keybind, _]) => keybind)
+type InputRef = {
+	key: string
+	elem: HTMLInputElement
+	class: ConfigValueClass
+	onChange: (val: any) => void
 }
 
-/**
- * Returns first bind found, and null if no bind is bound for input action
- * @param find action to find bind for in keybinds
- * @returns first keybind for Action, or null if it doesn't exist
- */
-export function findActionBind(
-	find: Action | undefined,
-	keybinds: Keybinds
-): string | null {
-	if (!find) return null
-	const foundBinds = findActionBinds(find, keybinds)
-	return foundBinds.length > 0 ? foundBinds[0] : null
-}
+class Input {
+	private history: string[] = []
+	private historyIdx: number = -1
+	private stashedInput: string | null = null
 
-/**
- * Transforms keyboard event to canonical keycode
- * @param ev Keyboard event
- * @returns Keybind. ex. 'C-k' is Ctrl+k, 'C-S-x' is Ctrl+Shft+x
- */
-export function toKeyIdx(ev: KeyboardEvent): string {
-	return (
-		(ev.ctrlKey ? 'C-' : '') +
-		(ev.shiftKey ? 'S-' : '') +
-		(ev.altKey ? 'A-' : '') +
-		ev.key.toLowerCase()
-	)
-}
+	constructor(
+		private ref: InputRef,
+		private wCompletions: Writable<Completions>
+	) {}
 
-/**
- * 'keydown' handler, attached to document on mount within (dev)/+layout.svelte
- * @param ev KeyboardEvent from listener
- * @returns void
- */
-function onKeyDown(ev: KeyboardEvent) {
-	if (ev.key === 'Control' || ev.key === 'Shift' || ev.key === 'Alt') return
-	if (!(ev.ctrlKey || ev.shiftKey || ev.altKey)) return
-
-	if (ev.key === 'Escape') {
-		wUserPrefsOpen.set(false)
-		wUserModalOpen.set(false)
+	elem(): HTMLInputElement {
+		return this.ref.elem
 	}
 
-	const keyidx = toKeyIdx(ev)
-	const filteredAction = get(wUserKeybinds)[keyidx]
-	wLastInputAction.set({
-		code: keyidx,
-		action: filteredAction?.action
+	attach() {
+		const elem = this.elem()
+		elem.addEventListener('keydown', this.onKeyDown.bind(this))
+		elem.addEventListener('keypress', this.onKeyPress.bind(this))
+	}
+
+	deattach() {
+		const elem = this.elem()
+		elem.removeEventListener('keydown', this.onKeyDown)
+		elem.removeEventListener('keypress', this.onKeyDown)
+	}
+
+	private onKeyDown(event: KeyboardEvent) {
+		const elem = this.elem()
+		if (!elem) return
+		switch (event.key) {
+			case 'Esc':
+				console.log('Esc')
+				break
+			case 'Tab':
+				let userPosition = this.getUserPosition(elem)
+				if (userPosition.activeWord.length == 0) {
+					this.refreshCompletions(true)
+					this.moveCompletionIndex(0, userPosition)
+				} else if (event.shiftKey) this.moveCompletionIndex(-1, userPosition)
+				else this.moveCompletionIndex(1, userPosition)
+				event.preventDefault()
+				break
+			case 'ArrowUp':
+				this.moveHistoryIndex(1)
+				event.preventDefault()
+				break
+			case 'ArrowDown':
+				this.moveHistoryIndex(-1)
+				event.preventDefault()
+				break
+			case 'ArrowLeft':
+			case 'ArrowRight':
+				this.refreshCompletions()
+				break
+			case 'Enter':
+				this.ref.onChange(this.ref.elem.value)
+				event.preventDefault()
+				break
+			case 'Backspace':
+			case 'Delete':
+				let start = elem.selectionStart || 0
+				let end = elem.selectionEnd || 0
+
+				if (start < end) start++
+
+				this.removeRange(start, end)
+				elem.setSelectionRange(start - 1, start - 1)
+				this.refreshCompletions()
+
+				event.preventDefault()
+				break
+		}
+	}
+
+	private onKeyPress(event: KeyboardEvent) {
+		if (!this.elem) return
+		switch (event.key) {
+			case 'Tab':
+			case 'ArrowUp':
+			case 'ArrowDown':
+			case 'Enter':
+			case 'Backspace':
+			case 'Delete':
+				event.preventDefault()
+				break
+			default:
+				let charCode = event.charCode || event.which
+				this.pushChar(String.fromCharCode(charCode))
+				this.refreshCompletions()
+				event.preventDefault()
+				event.stopImmediatePropagation()
+		}
+	}
+
+	moveCompletionIndex(shift: number, userPosition: UserPositonState) {
+		// const elem = this.elem()
+		// let completion: completions.Completion | undefined
+		// let currentIndex: number
+		// this.wCompletions.update((completions) => {
+		//     let newIndex = completions.index + shift
+		//     if (newIndex < 0) newIndex = Math.max(-1, newIndex + completions.len)
+		//     completions.index = newIndex % completions.len
+		//     currentIndex = completions.index
+		//     completion = completions.list[completions.index]
+		//     return completions
+		// })
+		// if (completion) {
+		//     let insertText = completions.getCompletionInsertText(completion)
+		//     let start = elem.value.substring(0, userPosition.wordStart)
+		//     let end = elem.value.substring(userPosition.wordEnd)
+		//     elem.value = start.concat(insertText, end)
+		// }
+	}
+
+	moveHistoryIndex(shift: number) {
+		const elem = this.elem()
+		if (!elem) return
+		let oldIndex = this.historyIdx
+		let newIndex = Math.min(
+			this.history.length - 1,
+			Math.max(-1, this.historyIdx + shift)
+		)
+		this.historyIdx = newIndex
+		console.log({ oldIndex, newIndex })
+
+		if (oldIndex == -1 && newIndex == -1) return
+		else if (oldIndex == -1 && newIndex == 0) {
+			this.stashedInput = elem.value
+			elem.value = this.history[this.history.length - 1 - this.historyIdx]
+		} else if (oldIndex == 0 && newIndex == -1) {
+			elem.value = this.stashedInput ?? ''
+			this.stashedInput == null
+			return
+		} else {
+			elem.value = this.history[this.history.length - 1 - this.historyIdx]
+		}
+
+		this.refreshCompletions()
+	}
+
+	removeRange(start: number, end: number) {
+		const elem = this.elem()
+		if (!elem) return
+		let val = elem.value
+		elem.value = val.substring(0, start - 1) + val.substring(end)
+	}
+
+	pushChar(char: string) {
+		const elem = this.elem()
+		if (!elem) return
+		if (this.historyIdx > -1) {
+			this.stashedInput = null
+			this.historyIdx = -1
+		}
+		console.log('start', elem.value)
+
+		const selectStart = elem.selectionStart ?? elem.value.length - 1
+		const newSelectStart = selectStart + char.length
+		let start = elem.value.substring(0, selectStart)
+		let end = elem.value.substring(selectStart)
+
+		elem.value = start.concat(char, end)
+		elem.selectionStart = newSelectStart
+		elem.selectionEnd = newSelectStart
+		console.log('end', elem.value)
+	}
+
+	/**
+	 * Returns char index and word index of user selection position
+	 * @returns [charIndex, wordIndex]
+	 */
+	getUserPosition(elem: HTMLInputElement): UserPositonState {
+		const rawSplits = elem.value.split(' ')
+		let offset = 0,
+			wordIndex = 0,
+			activeWord = ''
+		let selectionStart = elem.selectionStart ?? elem.value.length - 1
+		console.log('selectionStart', { selectionStart, rawSplits })
+
+		for (const [i, part] of rawSplits.entries()) {
+			console.log({ i, part })
+
+			if (part.length > 0 || i == rawSplits.length - 1)
+				if (selectionStart > offset && selectionStart <= offset + part.length) {
+					wordIndex = i
+					activeWord = part
+					break
+				}
+
+			offset += part.length + 1
+		}
+
+		return {
+			activeWord,
+			wordIndex,
+			wordStart: offset,
+			wordEnd: offset + activeWord.length
+		}
+	}
+
+	/**
+	 * Given the current input value and user selection position,
+	 * generate console prompt action and argument completions. Then, notify frontend
+	 * of new completions using svelte stores.
+	 */
+	refreshCompletions(forceShow = false) {
+		const elem = this.elem()
+		if (!elem) return
+
+		const completionInfo = wasm.completion(
+			this.elem().value,
+			this.elem().selectionStart ?? 0
+		)
+		if ('severity' in completionInfo) {
+			handleClientError(completionInfo)
+			return
+		}
+
+		const completionResult = completions.generateCompletions(completionInfo)
+		console.log({ completionInfo, completionResult })
+
+		this.wCompletions.set(completionResult)
+	}
+
+	submitConsoleComand(consoleCommand: string) {
+		wConsole.echo(consoleCommand)
+		this.pushToHistory(consoleCommand)
+		this.historyIdx = -1
+		this.clear()
+		let result = wasm.action(consoleCommand)
+		if ('message' in result) {
+			handleClientError(result)
+		} else {
+			pushAction(result)
+		}
+	}
+
+	pushToHistory(command: string) {
+		const lastCommand = this.history.pop()
+		if (!lastCommand || lastCommand == command) this.history.push(command)
+		else this.history.push(lastCommand, command)
+	}
+
+	clear() {
+		const elem = this.elem()
+		if (!elem) return
+		elem.value = ''
+		this.wCompletions.set({
+			completions: []
+		})
+	}
+}
+
+class InputController {
+	private _map: { [key: string]: Input } = {}
+	private activeInputKey: string | null = null
+
+	private _wCompletions: Writable<Completions> = writable({
+		completions: []
 	})
-	// TODO: use filtered action conditional
-	if (filteredAction === undefined) return
-	pushAction(filteredAction.action)
 
-	ev.preventDefault()
-	ev.stopImmediatePropagation()
+	currentInput(): Input | null {
+		return this.activeInputKey ? this._map[this.activeInputKey] : null
+	}
+	currentElem(): HTMLInputElement | null {
+		return this.currentInput()?.elem() ?? null
+	}
+
+	register(inputRef: InputRef) {
+		this._map[inputRef.key] = new Input(inputRef, this._wCompletions)
+		console.log('registered ', inputRef.key)
+	}
+
+	deregister(key: string) {
+		if (this.activeInputKey == key) this.deattach()
+		delete this._map[key]
+		console.log('deregistered', key)
+	}
+
+	attach(key: string) {
+		this.deattach()
+		const input = this._map[key]
+		if (!input) {
+			wConsole.debug('Cant attach, No input at key ' + key)
+			return
+		}
+		input.attach()
+		this.activeInputKey = key
+	}
+
+	deattach() {
+		this.currentInput()?.deattach()
+	}
+
+	completions(): Readable<Completions> {
+		return {
+			subscribe: this._wCompletions.subscribe
+		}
+	}
 }
 
-/**
- * Initializes keydown listener for document to bind user keybinds to
- * various editor actions.
- *
- * To only be used as an argument to onMount within (dev)/+layout.svelte
- * @returns event listener cleanup
- */
-export function initKeys() {
-	document.addEventListener('keydown', onKeyDown, { capture: true })
-	return document.removeEventListener('keydown', onKeyDown)
-}
+export default new InputController()

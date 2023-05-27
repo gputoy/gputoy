@@ -1,14 +1,11 @@
-@import '@fontsource/fira-mono';
-@import '@fontsource/jetbrains-mono';
-@import '@fontsource/inter';
-@import '@fontsource/raleway';
+/* 
+	Defines the default css rules for app elements.
 
-html {
-	height: 100%;
-}
+	If trying to find the rule definition for a native browser component or
+	a svelte component with no rules, assume they come from here.
+*/
 
 body {
-	margin: 0;
 	display: flex;
 	flex-direction: column;
 	width: 100vw;
@@ -45,24 +42,133 @@ h2 {
 
 h3 {
 	color: var(--text-accent-color);
-	font-family: var(--font-heading);
+	font-family: var(--font-mono);
 	font-weight: bold;
 	font-size: var(--2xl);
 }
 
+h4 {
+	margin: 2px;
+	font-weight: normal;
+}
+
 code {
 	color: var(--text-color);
-	font-weight: 600;
 }
 
 input {
+	height: var(--md-input);
+	justify-content: right;
 	color: var(--text-color);
 	background-color: var(--input-color);
-	padding: 1rem;
 	border: none;
-	padding: 4px;
-	outline: 1px solid var(--border-secondary);
-	font-size: var(--xs);
+	border-bottom: 1px solid transparent;
+	outline: none;
+	border-radius: var(--pane-radius);
+	padding-inline: var(--gap4);
+	box-sizing: border-box;
+	/* font-family: var(--font-mono); */
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+input:hover,
+input:active {
+	background-color: var(--input-hover);
+}
+
+select {
+	cursor: pointer;
+	background-color: var(--input-color);
+	color: var(--text-color);
+	border: none;
+	border-bottom: 1px solid transparent;
+	outline: none;
+	border-radius: var(--pane-radius);
+	box-sizing: border-box;
+	/* font-family: var(--font-mono); */
+	flex-grow: 1;
+	font-size: var(--sm);
+}
+
+button {
+	display: flex;
+	gap: var(--gap4);
+	padding: 0px;
+	padding-inline: var(--gap4);
+	min-width: var(--md-input);
+	height: var(--md-input);
+	font-size: var(--md);
+	background-color: var(--button-color);
+	color: var(--text-accent-color);
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: none;
+	box-shadow: var(--box-shadow);
+	user-select: none;
+	box-sizing: border-box;
+}
+
+/* button:disabled {
+	background-color: red;
+} */
+
+svg {
+	fill: none;
+	stroke: var(--icon-color);
+	min-width: max-content;
+}
+
+button svg {
+	width: var(--md-icon);
+	height: var(--md-icon);
+}
+
+button:hover svg {
+	stroke: var(--text-important);
+}
+
+.pi2 {
+	padding-inline: var(--gap2);
+}
+
+.pi4 {
+	padding-inline: var(--gap4);
+}
+
+button:disabled {
+	color: var(--border-secondary);
+}
+
+button:hover:enabled {
+	background-color: var(--button-hovered);
+	color: var(--text-important);
+}
+
+button:hover svg {
+	stroke: var(--text-important);
+}
+
+button:hover svg.filled {
+	fill: var(--text-important);
+}
+
+button:active:enabled {
+	color: var(--accent-color);
+	background-color: transparent;
+	box-shadow: none;
+	outline: none;
+}
+
+select option {
+	background-color: var(--input-color);
+	outline: none;
+}
+
+input[type='checkbox'] {
+	background-color: red;
 }
 
 input.invalid {
@@ -70,25 +176,193 @@ input.invalid {
 	border-color: var(--color-invalid);
 }
 
-input:focus {
-	outline: 1px var(--accent-color) solid;
+input:focus,
+select:focus {
+	outline: none;
+	border-bottom: 1px solid var(--accent-color-transparent) !important;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
 }
 
-input:invalid {
-	outline: 1px var(--accent-color) solid;
+input.Cmd {
+	flex: 1 1 auto;
+	background-color: transparent;
+	outline: none;
+	font-family: var(--font-mono);
+	font-size: var(--sm);
 }
 
+input,
+button,
 select {
-	background-color: var(--input-color);
-	color: var(--text-color);
-	padding: 4px;
-	outline: 1px solid var(--border-secondary);
-	font-size: var(--xs);
-	border: none;
+	border-radius: var(--button-radius);
 }
 
-option {
-	background-color: var(--input-color);
+.middle {
+	border-radius: 0px;
+}
+
+.start {
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+.end {
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+
+/* 
+	UTILITIES
+*/
+.flat {
+	border-radius: 0px;
+}
+
+.left-flat {
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+
+.right-flat {
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+.top-flat {
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+}
+
+.bottom-flat {
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+.left-round {
+	border-top-left-radius: var(--pane-radius);
+	border-bottom-left-radius: var(--pane-radius);
+}
+
+.right-round {
+	border-top-right-radius: var(--pane-radius);
+	border-bottom-right-radius: var(--pane-radius);
+}
+
+.top-round {
+	border-top-left-radius: var(--pane-radius);
+	border-top-right-radius: var(--pane-radius);
+}
+
+.bottom-round {
+	border-bottom-left-radius: var(--pane-radius);
+	border-bottom-right-radius: var(--pane-radius);
+}
+
+.hide {
+	display: none;
+}
+
+.unhide {
+	display: inherit;
+}
+
+.xs {
+	font-size: var(--xs);
+	height: var(--xs-input);
+}
+
+.xs svg {
+	width: var(--xs-icon);
+	height: var(--xs-icon);
+	min-width: var(--xs-icon);
+}
+
+svg.xs {
+	width: var(--xs-icon);
+	height: var(--xs-icon);
+	min-width: var(--xs-icon);
+}
+
+button.xs {
+	width: var(--xs-input);
+}
+
+.sm {
+	/* padding: 0 4px; */
+	font-size: var(--sm);
+	height: var(--sm-input);
+}
+
+.sm svg {
+	width: var(--sm-icon);
+	height: var(--sm-icon);
+	min-width: var(--sm-icon);
+}
+
+svg.sm {
+	width: var(--sm-icon);
+	height: var(--sm-icon);
+	min-width: var(--sm-icon);
+}
+
+button.sm {
+	min-width: var(--sm-input);
+}
+
+.md {
+	font-size: var(--md);
+	height: var(--md-input);
+}
+
+.md svg {
+	width: var(--md-icon);
+	height: var(--md-icon);
+	min-width: var(--md-icon);
+}
+
+svg.md {
+	width: var(--md-icon);
+	height: var(--md-icon);
+	min-width: var(--md-icon);
+}
+
+button.md {
+	min-width: var(--md-input);
+}
+
+.lg {
+	font-size: var(--lg);
+	height: var(--lg-input);
+}
+
+.lg svg {
+	width: var(--lg-icon);
+	height: var(--lg-icon);
+	min-width: var(--lg-icon);
+}
+
+svg.lg {
+	width: var(--lg-icon);
+	height: var(--lg-icon);
+	min-width: var(--lg-icon);
+}
+
+button.lg {
+	min-width: var(--lg-input);
+}
+
+.no-left-border {
+	border-left: none;
+}
+
+.small-icons :global(svg) {
+	width: 12px;
+	height: 12px;
+}
+
+.clear {
+	background-color: transparent !important;
 }
 
 textarea {
@@ -114,6 +388,10 @@ label {
 	background-color: rgba(0, 102, 255, 0.048);
 }
 
+.pane {
+	border-radius: var(--pane-radius);
+}
+
 /* ===== Scrollbar CSS ===== */
 /* Firefox */
 * {
@@ -132,6 +410,18 @@ label {
 
 *::-webkit-scrollbar-thumb {
 	background-color: var(--glass-med);
+}
+
+/* ===== No-scrollbar CSS ===== */
+/* Firefox */
+.no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+/* Chrome, Edge, and Safari */
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
 }
 
 /* vim editor mode */

@@ -32,15 +32,18 @@
 		list-style: none;
 		gap: var(--spacing);
 		font-size: var(--xs);
+		min-width: max-content;
 	}
 	.foldLines {
 		position: relative;
+		min-width: max-content;
 	}
 	.foldLines:before {
 		position: absolute;
 		content: '';
 		background-color: var(--border-primary);
-		width: 1px;
+		width: 2px;
 		height: 100%;
+		translate: -6px 0px;
 	}
 </style>

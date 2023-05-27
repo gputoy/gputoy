@@ -1,9 +1,8 @@
-import { wConsole, wConsoleHistory } from '$stores'
+import type { ClientError, LogLevel as LogLevelString } from '$gen'
+import rootSchema from '$gen/root-schema.json'
+import { wConsole } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
 import type { Writable } from 'svelte/store'
-import actionSchema from '../../../schemas/Action.json'
-import { pushAction } from './actions'
-import type { LogLevel as LogLevelString } from './common'
 
 // Add private logging methods to window so wasm modules can use it
 // without having to import anything from /front.
@@ -29,23 +28,10 @@ if (typeof window !== 'undefined') {
 	})
 }
 
-const CONSOLE_ACTION_NAMES = actionSchema.oneOf.map(
-	(actionDef) => actionDef.properties.ty.enum[0]
-)
-const CONSOLE_COMPLETIONS = actionSchema.oneOf.map((actionDef) => ({
-	action: actionDef.properties.ty.enum[0],
-	description: actionDef.description,
-	args: actionDef.properties.c
-})) as ReadonlyArray<ConsoleCompletion>
-
+const actionSchema = rootSchema.definitions.Action
 export type Log = {
 	level: LogLevel
 	message: string
-}
-export type ConsoleCompletion = {
-	action: string
-	description: string
-	args: any
 }
 
 export type ConsoleExtras = {
@@ -59,15 +45,15 @@ export type ConsoleExtras = {
 
 export function toLogLevel(level: LogLevelString) {
 	switch (level) {
-		case 'Trace':
+		case 'trace':
 			return LogLevel.Trace
-		case 'Debug':
+		case 'debug':
 			return LogLevel.Debug
-		case 'Info':
+		case 'info':
 			return LogLevel.Info
-		case 'Warn':
+		case 'warn':
 			return LogLevel.Warn
-		case 'Error':
+		case 'error':
 			return LogLevel.Error
 		default:
 			return 0
@@ -75,15 +61,10 @@ export function toLogLevel(level: LogLevelString) {
 }
 
 export enum LogLevel {
-	/** Development use only */
 	Trace = 1 << 0,
-	/** User won't need to know unless they need to */
 	Debug = 1 << 1,
-	/** Something the user ought to know */
 	Info = 1 << 2,
-	/** Should be corrected, but the execution can continue */
 	Warn = 1 << 3,
-	/** Execution had to halt */
 	Error = 1 << 4,
 	/** Echo prompt after use submits command. Cannot be filtered. */
 	Echo = 1 << 5
@@ -95,7 +76,7 @@ export const LOG_PREFIX = new Map([
 	[LogLevel.Info, '[info] '],
 	[LogLevel.Warn, '[warn] '],
 	[LogLevel.Error, '[error]'],
-	[LogLevel.Echo, '']
+	[LogLevel.Echo, ' ~ ']
 ])
 
 export const LOG_PREFIX_STYLES = new Map([
@@ -104,80 +85,8 @@ export const LOG_PREFIX_STYLES = new Map([
 	[LogLevel.Info, 'color:  var(--console-info);'],
 	[LogLevel.Warn, 'color:  var(--console-warn);'],
 	[LogLevel.Error, 'color:  var(--console-error);'],
-	[LogLevel.Echo, 'display: none;']
+	[LogLevel.Echo, '']
 ])
-
-/**
- * Generate console completions list based on what text is currently in console.
- * @param consoleCommand text in console
- * @returns
- */
-export function generateCompletions(
-	consoleCommand: string
-): ConsoleCompletion[] {
-	// get command string and args as string
-	const [command, ...args] = consoleCommand.trim().split(/\s+/)
-	if (!command) return []
-	// if command is fully typed, just return that as a completion
-	const foundIndex = CONSOLE_ACTION_NAMES.indexOf(command)
-	if (foundIndex >= 0) {
-		return [CONSOLE_COMPLETIONS[foundIndex]]
-	}
-
-	return CONSOLE_COMPLETIONS.filter((completion) =>
-		completion.action.includes(command)
-	)
-}
-
-/**
- * Essentially a wrapper around pushAction, but also handles book-keeping
- * for the console store, along with argument extraction.
- * @param consoleCommand command string from console
- * @returns void
- */
-export function submitConsoleComand(consoleCommand: string) {
-	const echo = ' ~ ' + consoleCommand
-	// push this command to console history so user may use
-	// arrow keys to quickly redo previous commands
-	wConsoleHistory.update((history) => {
-		const lastCommand = history.pop()
-		if (!lastCommand || lastCommand == consoleCommand)
-			history.push(consoleCommand)
-		else history.push(lastCommand, consoleCommand)
-		return history
-	})
-	// log the users input to the console
-	wConsole.echo(echo)
-	// get command string and args as string
-	const [command, ...args] = consoleCommand.trim().split(/\s+/)
-	if (!command) return
-	// if command is fully typed, just return that as a completion
-
-	const actionIndex = CONSOLE_ACTION_NAMES.indexOf(command)
-	if (actionIndex < 0) {
-		wConsole.error(command + ' not found.')
-		return
-	}
-
-	const argsSchema = CONSOLE_COMPLETIONS[actionIndex].args
-	if (argsSchema) {
-		if ('type' in argsSchema && argsSchema.type == 'string') {
-			const arg = args[0]
-			if (!arg) {
-				wConsole.error(command + ' requires one string argument')
-				return
-			}
-			/** @ts-ignore */
-			pushAction({ ty: command, c: arg })
-		} else if ('$schema' in argsSchema) {
-			toast.push('Commands with more than one argument not supported yet.')
-		}
-	} else {
-		// No arguments to action
-		/** @ts-ignore */
-		pushAction({ ty: command })
-	}
-}
 
 export function initConsoleMethods(console: Writable<Log[]>): ConsoleExtras {
 	function trace(trace: string) {
@@ -235,4 +144,23 @@ export function initConsoleMethods(console: Writable<Log[]>): ConsoleExtras {
 		})
 	}
 	return { trace, debug, info, warn, error, echo }
+}
+
+export function handleClientError(clientError: ClientError) {
+	let fullMessage = `[${clientError.source}] ${clientError.message}`
+	if (clientError.destination == 'console') {
+		if (clientError.severity == 'error') {
+			wConsole.error(fullMessage)
+		} else {
+			wConsole.warn(fullMessage)
+		}
+	} else {
+		toast.push(fullMessage, {
+			dismissable: true,
+			duration: 0,
+			intro: {
+				x: -100
+			}
+		})
+	}
 }

@@ -1,14 +1,6 @@
-import type {
-	Config,
-	DirNodeState,
-	Files,
-	FilteredAction,
-	Layout,
-	UserEditorPrefs,
-	UserGeneralPrefs
-} from '$common'
-import type { Keybinds } from '$core/input'
-import type { RunState } from './runstate'
+import type { Keybinds } from '$core/keys'
+import type { RunState } from '$core/runstate'
+import type { Action, Config, DirNodeState, Files, Layout } from '$gen'
 
 /**
  *              Points to gpu-front (this)
@@ -20,13 +12,63 @@ export const BASE_URL = import.meta.env.VITE_FE_URL + '/'
  */
 export const API_URL = import.meta.env.VITE_API_URL + '/'
 
+export const WASM_CLIENT_URL = BASE_URL + import.meta.env.VITE_MAKE_CLIENT_PATH
+export const WASM_COMMON_URL = BASE_URL + import.meta.env.VITE_MAKE_COMMON_PATH
 export const WASM_ANALYZER_URL =
 	BASE_URL + import.meta.env.VITE_MAKE_ANALYZER_PATH
-export const WASM_CLIENT_URL = BASE_URL + import.meta.env.VITE_MAKE_CLIENT_PATH
 
 export const DEFAULT_RUN_STATE: RunState = {
 	playing: false
 }
+
+const main = `// shader by toto https://www.shadertoy.com/view/wlVGWd
+// converted to wgsl
+
+fn rand(n: vec2<f32>) -> f32 {
+    return fract(sin(dot(n, vec2<f32>(12.9898, 4.1414))) * 43758.5453);
+}
+
+fn noise(p: vec2<f32>) -> f32 {
+    let ip: vec2<f32> = floor(p);
+    var u: vec2<f32> = fract(p);
+    u = u*u*(3.0-(2.0*u));
+
+    let res: f32 = mix(
+        mix(rand(ip),rand(ip+vec2<f32>(1.0,0.0)),u.x),
+        mix(rand(ip+vec2<f32>(0.0,1.0)),rand(ip+vec2<f32>(1.0,1.0)),u.x),u.y);
+    return res*res;
+}
+
+fn fbm(qIn: vec2<f32>) -> f32{
+    let m2: mat2x2<f32> = mat2x2<f32>(vec2<f32>(0.8,-0.6), vec2<f32>(0.6,0.8));
+    var q: vec2<f32> = qIn;
+    var f: f32 = 0.0;
+    f = f + 0.5000*noise( q ); q = m2*q*2.02;
+    f = f + 0.2500*noise( q ); q = m2*q*2.03;
+    f = f + 0.1250*noise( q ); q = m2*q*2.01;
+    f = f + 0.0625*noise( q );
+
+    return f/0.769;
+}
+
+fn pattern(s: vec2<f32> ) -> f32 {
+  let q: vec2<f32> = vec2<f32>(fbm(s + vec2<f32>(0.0,0.0)));
+  var r: vec2<f32> = vec2<f32>(fbm(s + 4.0*q + vec2<f32>(1.7,9.2)));
+  r = r + i.time * p.speed * 0.15;
+  return fbm( s + 1.760*r );
+}
+
+[[stage(fragment)]]
+fn main(in: VertexOutput) -> [[location(0)]] vec4<f32> {
+    
+    let scaled: vec2<f32> = in.uv * 4.5; // Scale UV to make it nicer in that big screen !
+    let displacement: f32 = pattern(scaled);
+    var color: vec4<f32> = vec4<f32>(displacement * 1.2, 0.2, displacement * 5., 1.);
+    color = color * vec4<f32>(p.colorMod, 1.0);
+    return color;
+
+}
+`
 
 /**
  *              Project defaults
@@ -36,17 +78,17 @@ export const DEFAULT_DIR_NODE_STATE: DirNodeState = {
 	isRenaming: false
 }
 export const DEFAULT_LAYOUT: Layout = {
-	fileIndex: 0,
-	workspace: ['/shaders/main.wgsl', '/run.json'] as string[],
+	tabIndex: 0,
+	tabs: ['/shaders/main.wgsl', '/run.json'] as string[],
 	paneSize: {
 		projectPanePx: 185,
 		editorPanePercentage: 40,
-		resourcePanePercentage: 38
+		controlPanePercentage: 38
 	},
 	paneToggled: {
 		projectPane: true,
 		editorPane: true,
-		resourcePane: true
+		controlPane: true
 	},
 	fileTreeState: {
 		'/shaders': {
@@ -60,35 +102,15 @@ export const DEFAULT_LAYOUT: Layout = {
 	}
 } as const
 export const DEFAULT_CONFIG: Config = {
-	runner: '/run.json',
-	logLevel: 'Info'
+	runner: '/run.json'
 } as const
 export const DEFAULT_FILES: Files = {
 	map: {
 		'/shaders/main.wgsl': {
-			data: '...',
+			data: main,
 			dir: 'shaders',
 			fileName: 'main',
 			extension: 'wgsl'
-		},
-		'/shaders/types.wgsl': {
-			data: '...',
-			dir: 'shaders',
-			fileName: 'types',
-			extension: 'wgsl'
-		},
-
-		'/shaders/extras/component.wgsl': {
-			data: '...',
-			dir: 'extras',
-			fileName: 'component',
-			extension: 'wgsl'
-		},
-		'/Readme.md': {
-			data: 'Welcome to this project!',
-			dir: '',
-			fileName: 'Readme',
-			extension: 'md'
 		},
 		'/run.json': {
 			data: '...',
@@ -99,191 +121,75 @@ export const DEFAULT_FILES: Files = {
 	}
 } as const
 
-/**
- *                  User config defaults
- */
-export const DEFAULT_USER_GENERAL_PREFS: UserGeneralPrefs = {
-	projectPanelSize: 12,
-	editorPanelSize: 50,
-	resourcePanelSize: 40,
-	consoleWrap: true
-} as const
-
-export const DEFAULT_USER_EDITOR_PREFS: UserEditorPrefs = {
-	lineNumbers: 'on',
-	fontFamily: 'mono',
-	fontSize: 12,
-	vimMode: false,
-	minimap: false
-} as const
-
 export const DEFAULT_USER_KEYBINDS: Keybinds = {
 	'C-g': {
-		action: { ty: 'toggleConsole' }
+		action: {
+			ty: 'toggleUi',
+			c: 'terminal'
+		}
 	},
-	'C-a': {
-		action: { ty: 'toggleAllPanels' }
+	'A-t': {
+		action: {
+			ty: 'toggleUi',
+			c: 'terminal'
+		}
 	},
 	'C-q': {
 		action: {
-			ty: 'togglePanel',
+			ty: 'toggleUi',
 			c: 'projectPane'
 		}
 	},
 	'C-e': {
 		action: {
-			ty: 'togglePanel',
+			ty: 'toggleUi',
 			c: 'editorPane'
 		}
 	},
 	'C-r': {
 		action: {
-			ty: 'togglePanel',
-			c: 'resourcePane'
-		}
-	},
-	'C-j': {
-		action: {
-			ty: 'previousDocument'
-		}
-	},
-	'C-k': {
-		action: {
-			ty: 'nextDocument'
+			ty: 'toggleUi',
+			c: 'controlPane'
 		}
 	},
 	'C-S-d': {
 		action: {
-			ty: 'toggleDebugPanel'
+			ty: 'toggleUi',
+			c: 'debug'
+		}
+	},
+	'C-a': {
+		action: {
+			ty: 'toggleAllPanes'
+		}
+	},
+	'C-j': {
+		action: {
+			ty: 'prevTab'
+		}
+	},
+	'C-k': {
+		action: {
+			ty: 'nextTab'
 		}
 	},
 	'C-s': {
 		action: {
-			ty: 'saveCurrentFile'
+			ty: 'saveFile'
 		}
 	},
 	'C-u': {
 		action: {
-			ty: 'closeFile'
+			ty: 'closeTab'
 		}
 	},
-	'C-S-f': {
+	'C-.': {
 		action: {
-			ty: 'fork'
-		}
-	},
-	'C-S-g': {
-		action: {
-			ty: 'publish'
-		},
-		condition: 'userLoggedIn'
-	},
-	'A-t': {
-		action: {
-			ty: 'toggleConsole'
+			ty: 'toggleUi',
+			c: 'preferences'
 		}
 	}
 } as const
-
-/**
- *
- * Metadata for auto-generating user config ui
- * Will need upkeep work to stay in sync with gpu-common types
- */
-export const USER_CONFIG_META: ConfigMeta = {
-	general: {
-		projectPanelSize: {
-			type: 'number',
-			description: 'Default width of the project panel.',
-			units: '%',
-			min: 10,
-			max: 50
-		},
-		editorPanelSize: {
-			type: 'number',
-			description: 'Default width of the editor panel.',
-			units: '%',
-			min: 10,
-			max: 90
-		},
-		resourcePanelSize: {
-			type: 'number',
-			description: 'Default height for the resource panel',
-			units: '%',
-			min: 10,
-			max: 90
-		},
-		consoleWrap: {
-			type: 'toggle',
-			description: 'Enable text wrap in the console.'
-		}
-	},
-	editor: {
-		fontSize: {
-			type: 'number',
-			description: 'Font size in code editor',
-			units: 'px',
-			min: 5,
-			max: 32
-		},
-		fontFamily: {
-			type: 'text',
-			description: 'Font in code editor.'
-		},
-		lineNumbers: {
-			type: 'select',
-			description: 'How the code editor will display line numbers.',
-			options: ['on', 'interval', 'relative', 'off'] as Array<string>
-		},
-		vimMode: {
-			type: 'toggle',
-			description: 'Enable vim movements in code editor.'
-		},
-		minimap: {
-			type: 'toggle',
-			description:
-				'Enable minimap in top right of editor that shows an overview of file.'
-		}
-	}
-} as const
-
-export const GENERAL_CONFIG_KEYS: readonly GeneralConfigKey[] = [
-	'projectPanelSize',
-	'editorPanelSize',
-	'resourcePanelSize',
-	'consoleWrap'
-] as const
-
-export const EDITOR_CONFIG_KEYS: readonly EditorConfigKey[] = [
-	'fontFamily',
-	'fontSize',
-	'lineNumbers',
-	'vimMode',
-	'minimap'
-] as const
-
-export type ConfigScope = 'general' | 'editor'
-
-export type ConfigMeta = {
-	readonly general: ConfigCategory<GeneralConfigKey>
-	readonly editor: ConfigCategory<EditorConfigKey>
-}
-export type GeneralConfigKey = keyof UserGeneralPrefs
-export type EditorConfigKey = keyof UserEditorPrefs
-export type ConfigKey = GeneralConfigKey | EditorConfigKey
-export type ConfigCategory<K extends string | number | symbol> = {
-	[key in K]: ConfigItemMeta
-}
-
-export type ConfigItemMeta = {
-	readonly type: string
-	readonly description?: string
-	readonly units?: string
-	readonly min?: number
-	readonly max?: number
-	readonly regex?: RegExp
-	readonly options?: Array<string>
-}
 
 /**
  *                  Nav UI Menu
@@ -292,7 +198,9 @@ export const MENUKEYS = ['file', 'edit', 'project', 'view', 'help'] as const
 export type MenuKey = (typeof MENUKEYS)[number]
 export type MenuEntry = {
 	name: string
-	fAction?: FilteredAction
+	fAction?: {
+		action: Action
+	}
 }
 
 export const MENU_MAP: Record<
@@ -305,7 +213,8 @@ export const MENU_MAP: Record<
 				name: 'New Project',
 				fAction: {
 					action: {
-						ty: 'createNewProject'
+						ty: 'newProject',
+						c: ''
 					}
 				}
 			},
@@ -313,37 +222,38 @@ export const MENU_MAP: Record<
 				name: 'New File',
 				fAction: {
 					action: {
-						ty: 'createNewFile'
+						ty: 'newFile',
+						c: ''
 					}
 				}
 			}
 		],
 		[
 			{
-				name: 'Save to remote',
+				name: 'Commit',
 				fAction: {
 					action: {
-						ty: 'saveProjectToRemote'
-					},
-					condition: 'userLoggedIn'
+						ty: 'commit'
+					}
+					// condition: 'userLoggedIn'
 				}
 			},
 			{
-				name: 'Save as',
+				name: 'Save',
 				fAction: {
 					action: {
-						ty: 'saveAllFiles'
-					},
-					condition: 'filesDirty'
+						ty: 'saveFile'
+					}
+					// condition: 'currentFileDirty'
 				}
 			},
 			{
 				name: 'Save all',
 				fAction: {
 					action: {
-						ty: 'saveCurrentFile'
-					},
-					condition: 'currentFileDirty'
+						ty: 'saveAllFiles'
+					}
+					// condition: 'fileDirty'
 				}
 			}
 		],
@@ -352,7 +262,8 @@ export const MENU_MAP: Record<
 				name: 'Fork',
 				fAction: {
 					action: {
-						ty: 'fork'
+						ty: 'fork',
+						c: ''
 					}
 				}
 			},
@@ -361,8 +272,8 @@ export const MENU_MAP: Record<
 				fAction: {
 					action: {
 						ty: 'publish'
-					},
-					condition: 'userLoggedIn'
+					}
+					// condition: 'userLoggedIn'
 				}
 			}
 		],
@@ -371,7 +282,8 @@ export const MENU_MAP: Record<
 				name: 'Preferences',
 				fAction: {
 					action: {
-						ty: 'toggleUserPreferences'
+						ty: 'toggleUi',
+						c: 'preferences'
 					}
 				}
 			}
@@ -381,7 +293,7 @@ export const MENU_MAP: Record<
 				name: 'Close file',
 				fAction: {
 					action: {
-						ty: 'closeFile'
+						ty: 'closeTab'
 					}
 				}
 			},
@@ -390,7 +302,7 @@ export const MENU_MAP: Record<
 				name: 'Exit',
 				fAction: {
 					action: {
-						ty: 'closeProject'
+						ty: 'exit'
 					}
 				}
 			}
@@ -403,7 +315,7 @@ export const MENU_MAP: Record<
 				name: 'Build',
 				fAction: {
 					action: {
-						ty: 'rebuild'
+						ty: 'build'
 					}
 				}
 			},
@@ -411,7 +323,8 @@ export const MENU_MAP: Record<
 				name: 'Introspect',
 				fAction: {
 					action: {
-						ty: 'toggleConsole'
+						ty: 'toggleUi',
+						c: 'terminal'
 					}
 				}
 			}
@@ -420,55 +333,67 @@ export const MENU_MAP: Record<
 	view: [
 		[
 			{
-				name: 'Toggle Project Panel',
+				name: 'Toggle Project Pane',
 				fAction: {
 					action: {
-						ty: 'togglePanel',
+						ty: 'toggleUi',
 						c: 'projectPane'
 					}
 				}
 			},
 			{
-				name: 'Toggle Editor Panel',
+				name: 'Toggle Editor Pane',
 				fAction: {
 					action: {
-						ty: 'togglePanel',
+						ty: 'toggleUi',
 						c: 'editorPane'
 					}
 				}
 			},
 			{
-				name: 'Toggle Resource Panel',
+				name: 'Toggle Control Pane',
 				fAction: {
 					action: {
-						ty: 'togglePanel',
-						c: 'resourcePane'
+						ty: 'toggleUi',
+						c: 'controlPane'
 					}
 				}
 			}
 		],
 		[
 			{
-				name: 'Toggle Console',
+				name: 'Toggle Terminal',
 				fAction: {
 					action: {
-						ty: 'toggleConsole'
+						ty: 'toggleUi',
+						c: 'terminal'
 					}
 				}
 			},
 			{
-				name: 'Toggle User Preferences',
+				name: 'Toggle Preferences',
 				fAction: {
 					action: {
-						ty: 'toggleUserPreferences'
+						ty: 'toggleUi',
+						c: 'preferences'
 					}
 				}
 			},
 			{
-				name: 'Toggle Debug Panel',
+				name: 'Toggle User Info',
 				fAction: {
 					action: {
-						ty: 'toggleDebugPanel'
+						ty: 'toggleUi',
+						c: 'user'
+					}
+				}
+			},
+			{
+				name: 'Toggle Debug',
+				fAction: {
+					action: {
+						ty: 'toggleUi',
+						c: 'debug'
 					}
 				}
 			}

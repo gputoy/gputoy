@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Dev from '$lib/dev/Dev.svelte'
-	import ProjectSelection from '$lib/dev/ProjectSelection.svelte'
+	import ProjectSelection from '$lib/workspace/ProjectSelection.svelte'
+	import Dev from '$lib/workspace/Workspace.svelte'
 	import { wProjectId } from '$stores'
 </script>
 

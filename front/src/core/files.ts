@@ -1,29 +1,31 @@
-import type { File, Files, SupportedExtension } from '$common'
+import type { File, FilePath, Files, Path, SupportedExtension } from '$gen'
 import { wFiles } from '$stores'
 import { get, type Writable } from 'svelte/store'
 
 export type FilesExtras = {
-	newFile: (file: File) => string
-	getFile: (fileid: string) => File | null
-	writeFile: (fileid: string, data: string) => void
-	updateFileMeta: (fileid: string, meta: Partial<Omit<File, 'data'>>) => void
+	newFile: (file: FileWithId) => FilePath
+	getFile: (fileid: FilePath | Path) => File | null
+	writeFile: (fileid: FilePath | Path, data: string) => void
+	updateFileMeta: (fileid: FilePath, meta: Partial<Omit<File, 'data'>>) => void
 	removeFile: (fileid: string) => File | undefined
+	paths: () => Path[]
+	filePaths: () => FilePath[]
 }
 export function initFilesMethods(files: Writable<Files>): FilesExtras {
-	function newFile(file: File): string {
-		const fileid = `${file.dir}/${file.fileName}.${file.extension}`
+	function newFile(file: FileWithId): FilePath {
+		const { id, ...fileNoId } = file
 		files.update(({ map }) => {
-			map[fileid] = file
+			map[id] = fileNoId
 			return { map }
 		})
-		return fileid
+		return id
 	}
 
-	function getFile(fileid: string): File | null {
+	function getFile(fileid: FilePath | Path): File | null {
 		return get(files).map[fileid] ?? null
 	}
 
-	function writeFile(fileid: string, data: string) {
+	function writeFile(fileid: FilePath | Path, data: string) {
 		files.update(({ map }) => {
 			if (!map[fileid]) return { map }
 			map[fileid] = {
@@ -34,11 +36,11 @@ export function initFilesMethods(files: Writable<Files>): FilesExtras {
 		})
 	}
 
-	function updateFileMeta(fileid: string, meta: Partial<Omit<File, 'data'>>) {
+	function updateFileMeta(fileid: FilePath, meta: Partial<Omit<File, 'data'>>) {
 		const file = getFile(fileid)
 		if (!file) return
 		removeFile(fileid)
-		newFile({ ...file, ...meta })
+		newFile({ id: fileid, ...file, ...meta })
 	}
 
 	function removeFile(fileid: string): File | undefined {
@@ -53,7 +55,31 @@ export function initFilesMethods(files: Writable<Files>): FilesExtras {
 		return removed
 	}
 
-	return { newFile, getFile, writeFile, updateFileMeta, removeFile }
+	function filePaths(): FilePath[] {
+		return Object.keys(get(files).map)
+	}
+
+	function paths(): Path[] {
+		let filePaths = Object.keys(get(files).map)
+		let ret = new Set(filePaths)
+		for (let filePath of filePaths) {
+			while (filePath != '/') {
+				filePath = pathParent(filePath)
+				ret.add(filePath)
+			}
+		}
+		return Array.from(ret)
+	}
+
+	return {
+		newFile,
+		getFile,
+		writeFile,
+		updateFileMeta,
+		removeFile,
+		paths,
+		filePaths
+	}
 }
 
 /**
@@ -93,7 +119,7 @@ export function getChildren(path: string): string[] {
  */
 export function pathParent(path: string): string {
 	const [_, ...paths] = path.split('/')
-	if (paths.length <= 1) return ''
+	if (paths.length <= 1) return '/'
 	paths.pop()
 	return '/' + paths.join('/')
 }
@@ -103,10 +129,7 @@ export function pathParent(path: string): string {
  * @param path i.e. '/some/path/to/file.txt'
  * @returns [fileName, extension, ...dirs]
  */
-export function pathToParts(
-	path: string
-): [string, string, string[]] | undefined {
-	if (!isValidPath(path)) return
+export function pathToParts(path: FilePath): [string, string, string[]] {
 	const [file, ...dirs] = path.trim().split('/').reverse()
 	const [extension, ...fileName] = file.split('.').reverse()
 	return [fileName.join('.'), extension, dirs.filter((s) => s.length > 0)]
@@ -124,15 +147,14 @@ export function getCanonicalName(file: string | File | FileWithId): string {
 
 export function fileWithNewPath(
 	file: File | FileWithId,
-	newPath: string
-): File | undefined {
-	const [fileName, extension, dirs] = pathToParts(newPath) ?? []
-	if (!fileName) return
+	newPath: FilePath
+): File {
+	const [fileName, extension, dirs] = pathToParts(newPath)
 	return {
 		...file,
 		fileName,
 		extension: extension as SupportedExtension,
-		dir: dirs!.pop() ?? ''
+		dir: dirs.pop() ?? ''
 	}
 }
 
@@ -254,7 +276,8 @@ export function validateRename(
 		if (newId != node.id && wFiles.getFile(newId) != null) return 'exists'
 		if (!isValidPath(newId)) return 'invalid'
 	} else {
-		console.log(node.absoluteDir)
+		// TODO:
+		console.log('Not yet implemeneted: ', node.absoluteDir)
 	}
 	return
 }

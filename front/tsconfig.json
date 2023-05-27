@@ -17,13 +17,15 @@
 			"$lib/*": ["src/lib/*"],
 			"$lib": ["src/lib"],
 			"$stores": ["src/core/stores"],
-			"$wasm": ["pkg"],
-			"$wasm/*": ["pkg/*"],
+			"$gen": ["generated"],
+			"$gen/*": ["generated/*"],
 			"$core": ["src/core"],
 			"$core/*": ["src/core/*"],
-			"$common": ["src/core/common"],
+			"$common": ["generated/common"],
 			"$monaco": ["src/monaco"],
-			"$monaco/*": ["src/monaco/*"]
+			"$monaco/*": ["src/monaco/*"],
+			"$wasm": ["src/wasm"],
+			"$wasm/*": ["src/wasm/*"]
 		}
 	}
 }

@@ -16,8 +16,26 @@ pub struct LinkResult {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct LinkerInsertion {
-    pub(crate) _delete: bool,
-    pub(crate) _idx: usize,
-    pub(crate) _len: usize,
+    pub(crate) delete: bool,
+    pub(crate) idx: usize,
+    pub(crate) len: usize,
+}
+
+impl LinkerInsertion {
+    pub fn insertion(idx: usize, len: usize) -> Self {
+        Self {
+            delete: false,
+            idx,
+            len,
+        }
+    }
+    pub fn _deletion(idx: usize, len: usize) -> Self {
+        Self {
+            delete: true,
+            idx,
+            len,
+        }
+    }
 }

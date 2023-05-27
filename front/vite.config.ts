@@ -1,6 +1,7 @@
 // import { nodeResolve } from '@rollup/plugin-node-resolve'
 import { sveltekit } from '@sveltejs/kit/vite'
 import * as path from 'path'
+import Icons from 'unplugin-icons/vite'
 import type { UserConfig } from 'vite'
 
 const config: UserConfig = {
@@ -15,10 +16,15 @@ const config: UserConfig = {
 			'svelte-toast'
 		]
 	},
-	plugins: [sveltekit()],
+	plugins: [
+		sveltekit(),
+		Icons({
+			compiler: 'svelte'
+		})
+	],
 	server: {
 		fs: {
-			allow: ['./pkg/']
+			allow: ['./pkg/', './generated/']
 		},
 		port: 3000,
 		host: true
@@ -27,10 +33,11 @@ const config: UserConfig = {
 		alias: {
 			$lib: path.resolve(__dirname, './src/lib'),
 			$stores: path.resolve(__dirname, './src/core/stores'),
-			$wasm: path.resolve(__dirname, './pkg'),
 			$core: path.resolve(__dirname, './src/core'),
-			$common: path.resolve(__dirname, './src/core/common'),
-			$monaco: path.resolve(__dirname, './src/monaco')
+			$common: path.resolve(__dirname, './generated/common'),
+			$monaco: path.resolve(__dirname, './src/monaco'),
+			$gen: path.resolve(__dirname, './generated'),
+			$wasm: path.resolve(__dirname, './src/wasm')
 		}
 	}
 }

@@ -2,8 +2,8 @@
 // All endpoints are contained in one file to make syncing with
 // gpu-back simpler.
 
-import type * as types from '$common'
 import { API_URL } from '$core/consts'
+import type * as types from '$gen'
 
 export type ResponseError = {
 	message: string

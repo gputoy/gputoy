@@ -12,7 +12,7 @@ pub use model::{Location, Model, ModelKey};
 
 pub type Result<T> = std::result::Result<T, crate::Error>;
 
-use {analyzer::Stage, types::resolver::ModelImport};
+use crate::{analyzer::Stage, types::resolver::ModelImport};
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

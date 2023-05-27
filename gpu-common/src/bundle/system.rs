@@ -23,7 +23,6 @@ pub enum Resources {
     Buffer,
 }
 
-#[cfg(feature = "naga")]
 impl super::Bundle for Bundle {
     const TYPE_DECL: &'static str = TYPE_DECL;
 }
