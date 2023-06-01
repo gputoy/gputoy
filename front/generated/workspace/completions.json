@@ -1,633 +1,659 @@
 [
-	[],
-	[
-		{
-			"insertText": "clear",
-			"name": "Clear",
-			"description": " Clears the console"
-		},
-		{
-			"insertText": "clr",
-			"name": "Clear",
-			"description": " Clears the console"
-		},
-		{
-			"insertText": "ui-show",
-			"name": "Show",
-			"description": " Shows a region in the workspace"
-		},
-		{
-			"insertText": "show",
-			"name": "Show",
-			"description": " Shows a region in the workspace"
-		},
-		{
-			"insertText": "ui-hide",
-			"name": "Hide",
-			"description": " Hides a region in the workspace"
-		},
-		{
-			"insertText": "hide",
-			"name": "Hide",
-			"description": " Hides a region in the workspace"
-		},
-		{
-			"insertText": "ui-toggle",
-			"name": "ToggleUi",
-			"description": " Togges a region in the workspace"
-		},
-		{
-			"insertText": "toggle",
-			"name": "ToggleUi",
-			"description": " Togges a region in the workspace"
-		},
-		{
-			"insertText": "ui-toggle-all",
-			"name": "ToggleAllPanes",
-			"description": " Toggles all panes open and closed"
-		},
-		{
-			"insertText": "toggle-all",
-			"name": "ToggleAllPanes",
-			"description": " Toggles all panes open and closed"
-		},
-		{
-			"insertText": "bind-key",
-			"name": "BindKey",
-			"description": " Bind key"
-		},
-		{
-			"insertText": "bind",
-			"name": "BindKey",
-			"description": " Bind key"
-		},
-		{
-			"insertText": "dbg",
-			"name": "ToggleDebugPanel",
-			"description": " Toggles debug panel"
-		},
-		{
-			"insertText": "debug",
-			"name": "ToggleDebugPanel",
-			"description": " Toggles debug panel"
-		},
-		{
-			"insertText": "open",
-			"name": "OpenTab",
-			"description": " Open document in editor"
-		},
-		{
-			"insertText": "close",
-			"name": "CloseTab",
-			"description": " Closes document in editor"
-		},
-		{
-			"insertText": "next-tab",
-			"name": "NextTab",
-			"description": " Next tab in editor"
-		},
-		{
-			"insertText": "nt",
-			"name": "NextTab",
-			"description": " Next tab in editor"
-		},
-		{
-			"insertText": "prev-tab",
-			"name": "PrevTab",
-			"description": " Previous tab in editor"
-		},
-		{
-			"insertText": "pt",
-			"name": "PrevTab",
-			"description": " Previous tab in editor"
-		},
-		{
-			"insertText": "touch",
-			"name": "NewFile",
-			"description": " Creates new file"
-		},
-		{
-			"insertText": "file",
-			"name": "NewFile",
-			"description": " Creates new file"
-		},
-		{
-			"insertText": "mkdir",
-			"name": "NewDir",
-			"description": " Create new dir"
-		},
-		{
-			"insertText": "dir",
-			"name": "NewDir",
-			"description": " Create new dir"
-		},
-		{
-			"insertText": "move",
-			"name": "Move",
-			"description": " Move file"
-		},
-		{
-			"insertText": "mv",
-			"name": "Move",
-			"description": " Move file"
-		},
-		{
-			"insertText": "copy",
-			"name": "Copy",
-			"description": " Copy file"
-		},
-		{
-			"insertText": "cp",
-			"name": "Copy",
-			"description": " Copy file"
-		},
-		{
-			"insertText": "delete",
-			"name": "Delete",
-			"description": " Delete file"
-		},
-		{
-			"insertText": "rm",
-			"name": "Delete",
-			"description": " Delete file"
-		},
-		{
-			"insertText": "save",
-			"name": "SaveFile",
-			"description": " Save current file"
-		},
-		{
-			"insertText": "w",
-			"name": "SaveFile",
-			"description": " Save current file"
-		},
-		{
-			"insertText": "save-all",
-			"name": "SaveAllFiles",
-			"description": " Save all files"
-		},
-		{
-			"insertText": "wa",
-			"name": "SaveAllFiles",
-			"description": " Save all files"
-		},
-		{
-			"insertText": "new-project",
-			"name": "NewProject",
-			"description": " Creates new project"
-		},
-		{
-			"insertText": "commit",
-			"name": "Commit",
-			"description": " Commit project to remote"
-		},
-		{
-			"insertText": "fork",
-			"name": "Fork",
-			"description": " Fork project"
-		},
-		{
-			"insertText": "publish",
-			"name": "Publish",
-			"description": " Publish project"
-		},
-		{
-			"insertText": "run",
-			"name": "SetRunner",
-			"description": " Sets runner json file"
-		},
-		{
-			"insertText": "play",
-			"name": "PlayPause",
-			"description": " Play/Pause the project"
-		},
-		{
-			"insertText": "pause",
-			"name": "PlayPause",
-			"description": " Play/Pause the project"
-		},
-		{
-			"insertText": "p",
-			"name": "PlayPause",
-			"description": " Play/Pause the project"
-		},
-		{
-			"insertText": "reset",
-			"name": "Reset",
-			"description": " Resets project to default state"
-		},
-		{
-			"insertText": "r",
-			"name": "Reset",
-			"description": " Resets project to default state"
-		},
-		{
-			"insertText": "build",
-			"name": "Build",
-			"description": " Build project"
-		},
-		{
-			"insertText": "exit",
-			"name": "Exit",
-			"description": " Close project"
-		},
-		{
-			"insertText": "quit",
-			"name": "Exit",
-			"description": " Close project"
-		}
-	],
-	[],
-	[],
-	[],
-	[],
-	[
-		{
-			"insertText": "workspace.handle-size",
-			"name": "workspace.handle-size",
-			"description": "preferences"
-		},
-		{
-			"insertText": "workspace.ui-speed",
-			"name": "workspace.ui-speed",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.auto-indent",
-			"name": "editor.auto-indent",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.line-numbers",
-			"name": "editor.line-numbers",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.font",
-			"name": "editor.font",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.font-size",
-			"name": "editor.font-size",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.font-ligatures",
-			"name": "editor.font-ligatures",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.smooth-scrolling",
-			"name": "editor.smooth-scrolling",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.smooth-caret",
-			"name": "editor.smooth-caret",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.cursor-style",
-			"name": "editor.cursor-style",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.cursor-blinking",
-			"name": "editor.cursor-blinking",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.word-wrap",
-			"name": "editor.word-wrap",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.scroll-beyond-last-line",
-			"name": "editor.scroll-beyond-last-line",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.minimap",
-			"name": "editor.minimap",
-			"description": "preferences"
-		},
-		{
-			"insertText": "editor.vim-mode.some-property",
-			"name": "editor.vim-mode.some-property",
-			"description": "preferences"
-		},
-		{
-			"insertText": "console.show-completions",
-			"name": "console.show-completions",
-			"description": "preferences"
-		},
-		{
-			"insertText": "console.wrap",
-			"name": "console.wrap",
-			"description": "preferences"
-		},
-		{
-			"insertText": "console.level",
-			"name": "console.level",
-			"description": "preferences"
-		}
-	],
-	[
-		{
-			"insertText": "project",
-			"name": "ProjectPane",
-			"description": " Left pane with project information"
-		},
-		{
-			"insertText": "p",
-			"name": "ProjectPane",
-			"description": " Left pane with project information"
-		},
-		{
-			"insertText": "control",
-			"name": "ControlPane",
-			"description": " Bottom pane with various controls"
-		},
-		{
-			"insertText": "c",
-			"name": "ControlPane",
-			"description": " Bottom pane with various controls"
-		},
-		{
-			"insertText": "editor",
-			"name": "EditorPane",
-			"description": " Right pane with code editor"
-		},
-		{
-			"insertText": "e",
-			"name": "EditorPane",
-			"description": " Right pane with code editor"
-		},
-		{
-			"insertText": "prefs",
-			"name": "Preferences",
-			"description": " Gear icon in top right"
-		},
-		{
-			"insertText": "preferences",
-			"name": "Preferences",
-			"description": " Gear icon in top right"
-		},
-		{
-			"insertText": "debug",
-			"name": "Debug",
-			"description": " Hidden debug pane"
-		},
-		{
-			"insertText": "d",
-			"name": "Debug",
-			"description": " Hidden debug pane"
-		},
-		{
-			"insertText": "terminal",
-			"name": "Terminal",
-			"description": " Terminal"
-		},
-		{
-			"insertText": "t",
-			"name": "Terminal",
-			"description": " Terminal"
-		},
-		{
-			"insertText": "console",
-			"name": "Terminal",
-			"description": " Terminal"
-		},
-		{
-			"insertText": "cmd",
-			"name": "Terminal",
-			"description": " Terminal"
-		},
-		{
-			"insertText": "user",
-			"name": "User",
-			"description": " User information"
-		},
-		{
-			"insertText": "u",
-			"name": "User",
-			"description": " User information"
-		}
-	],
-	[],
-	[
-		{
-			"insertText": "none",
-			"name": "None",
-			"description": ""
-		},
-		{
-			"insertText": "off",
-			"name": "None",
-			"description": ""
-		},
-		{
-			"insertText": "false",
-			"name": "None",
-			"description": ""
-		},
-		{
-			"insertText": "keep",
-			"name": "Keep",
-			"description": ""
-		},
-		{
-			"insertText": "brackets",
-			"name": "Brackets",
-			"description": ""
-		},
-		{
-			"insertText": "advanced",
-			"name": "Advanced",
-			"description": ""
-		},
-		{
-			"insertText": "on",
-			"name": "Advanced",
-			"description": ""
-		},
-		{
-			"insertText": "full",
-			"name": "Full",
-			"description": ""
-		}
-	],
-	[
-		{
-			"insertText": "blink",
-			"name": "Blink",
-			"description": ""
-		},
-		{
-			"insertText": "smooth",
-			"name": "Smooth",
-			"description": ""
-		},
-		{
-			"insertText": "phase",
-			"name": "Phase",
-			"description": ""
-		},
-		{
-			"insertText": "expand",
-			"name": "Expand",
-			"description": ""
-		},
-		{
-			"insertText": "solid",
-			"name": "Solid",
-			"description": ""
-		}
-	],
-	[
-		{
-			"insertText": "line",
-			"name": "Line",
-			"description": ""
-		},
-		{
-			"insertText": "line-thin",
-			"name": "LineThin",
-			"description": ""
-		},
-		{
-			"insertText": "block",
-			"name": "Block",
-			"description": ""
-		},
-		{
-			"insertText": "block-outline",
-			"name": "BlockOutline",
-			"description": ""
-		},
-		{
-			"insertText": "underline",
-			"name": "Underline",
-			"description": ""
-		},
-		{
-			"insertText": "unerline-thin",
-			"name": "UnderlineThin",
-			"description": ""
-		}
-	],
-	[
-		{
-			"insertText": "on",
-			"name": "On",
-			"description": " Show absolute line numbers"
-		},
-		{
-			"insertText": "true",
-			"name": "On",
-			"description": " Show absolute line numbers"
-		},
-		{
-			"insertText": "interval",
-			"name": "Interval",
-			"description": " Show every 5 line numbers"
-		},
-		{
-			"insertText": "i",
-			"name": "Interval",
-			"description": " Show every 5 line numbers"
-		},
-		{
-			"insertText": "relative",
-			"name": "Relative",
-			"description": " Show relative line numbers"
-		},
-		{
-			"insertText": "r",
-			"name": "Relative",
-			"description": " Show relative line numbers"
-		},
-		{
-			"insertText": "off",
-			"name": "Off",
-			"description": " Hide line numbers"
-		},
-		{
-			"insertText": "false",
-			"name": "Off",
-			"description": " Hide line numbers"
-		}
-	],
-	[
-		{
-			"insertText": "trace",
-			"name": "Trace",
-			"description": ""
-		},
-		{
-			"insertText": "debug",
-			"name": "Debug",
-			"description": ""
-		},
-		{
-			"insertText": "info",
-			"name": "Info",
-			"description": ""
-		},
-		{
-			"insertText": "warn",
-			"name": "Warn",
-			"description": ""
-		},
-		{
-			"insertText": "error",
-			"name": "Error",
-			"description": ""
-		}
-	],
-	[
-		{
-			"insertText": "full",
-			"name": "Full",
-			"description": ""
-		},
-		{
-			"insertText": "suggestions",
-			"name": "Suggestions",
-			"description": ""
-		},
-		{
-			"insertText": "none",
-			"name": "None",
-			"description": ""
-		}
-	],
-	[
-		{
-			"insertText": "instant",
-			"name": "Instant",
-			"description": ""
-		},
-		{
-			"insertText": "snappy",
-			"name": "Snappy",
-			"description": ""
-		},
-		{
-			"insertText": "quick",
-			"name": "Quick",
-			"description": ""
-		},
-		{
-			"insertText": "smooth",
-			"name": "Smooth",
-			"description": ""
-		},
-		{
-			"insertText": "slow",
-			"name": "Slow",
-			"description": ""
-		}
-	]
+  [],
+  [
+    {
+      "matches": [
+        "clear",
+        "clr"
+      ],
+      "snippetText": "Clear",
+      "description": " Clears the console"
+    },
+    {
+      "matches": [
+        "ui-show",
+        "show"
+      ],
+      "snippetText": "Show",
+      "description": " Shows a region in the workspace"
+    },
+    {
+      "matches": [
+        "ui-hide",
+        "hide"
+      ],
+      "snippetText": "Hide",
+      "description": " Hides a region in the workspace"
+    },
+    {
+      "matches": [
+        "ui-toggle",
+        "toggle"
+      ],
+      "snippetText": "ToggleUi",
+      "description": " Togges a region in the workspace"
+    },
+    {
+      "matches": [
+        "ui-toggle-all",
+        "toggle-all"
+      ],
+      "snippetText": "ToggleAllPanes",
+      "description": " Toggles all panes open and closed"
+    },
+    {
+      "matches": [
+        "bind-key",
+        "bind"
+      ],
+      "snippetText": "BindKey",
+      "description": " Bind key"
+    },
+    {
+      "matches": [
+        "dbg",
+        "debug"
+      ],
+      "snippetText": "ToggleDebugPanel",
+      "description": " Toggles debug panel"
+    },
+    {
+      "matches": [
+        "open"
+      ],
+      "snippetText": "OpenTab",
+      "description": " Open document in editor"
+    },
+    {
+      "matches": [
+        "close"
+      ],
+      "snippetText": "CloseTab",
+      "description": " Closes document in editor"
+    },
+    {
+      "matches": [
+        "next-tab",
+        "nt"
+      ],
+      "snippetText": "NextTab",
+      "description": " Next tab in editor"
+    },
+    {
+      "matches": [
+        "prev-tab",
+        "pt"
+      ],
+      "snippetText": "PrevTab",
+      "description": " Previous tab in editor"
+    },
+    {
+      "matches": [
+        "touch",
+        "file"
+      ],
+      "snippetText": "NewFile",
+      "description": " Creates new file"
+    },
+    {
+      "matches": [
+        "mkdir",
+        "dir"
+      ],
+      "snippetText": "NewDir",
+      "description": " Create new dir"
+    },
+    {
+      "matches": [
+        "move",
+        "mv"
+      ],
+      "snippetText": "Move",
+      "description": " Move file"
+    },
+    {
+      "matches": [
+        "copy",
+        "cp"
+      ],
+      "snippetText": "Copy",
+      "description": " Copy file"
+    },
+    {
+      "matches": [
+        "delete",
+        "rm"
+      ],
+      "snippetText": "Delete",
+      "description": " Delete file"
+    },
+    {
+      "matches": [
+        "save",
+        "w"
+      ],
+      "snippetText": "SaveFile",
+      "description": " Save current file"
+    },
+    {
+      "matches": [
+        "save-all",
+        "wa"
+      ],
+      "snippetText": "SaveAllFiles",
+      "description": " Save all files"
+    },
+    {
+      "matches": [
+        "new-project"
+      ],
+      "snippetText": "NewProject",
+      "description": " Creates new project"
+    },
+    {
+      "matches": [
+        "commit"
+      ],
+      "snippetText": "Commit",
+      "description": " Commit project to remote"
+    },
+    {
+      "matches": [
+        "fork"
+      ],
+      "snippetText": "Fork",
+      "description": " Fork project"
+    },
+    {
+      "matches": [
+        "publish"
+      ],
+      "snippetText": "Publish",
+      "description": " Publish project"
+    },
+    {
+      "matches": [
+        "run"
+      ],
+      "snippetText": "SetRunner",
+      "description": " Sets runner json file"
+    },
+    {
+      "matches": [
+        "play",
+        "pause",
+        "p"
+      ],
+      "snippetText": "PlayPause",
+      "description": " Play/Pause the project"
+    },
+    {
+      "matches": [
+        "reset",
+        "r"
+      ],
+      "snippetText": "Reset",
+      "description": " Resets project to default state"
+    },
+    {
+      "matches": [
+        "build"
+      ],
+      "snippetText": "Build",
+      "description": " Build project"
+    },
+    {
+      "matches": [
+        "exit",
+        "quit"
+      ],
+      "snippetText": "Exit",
+      "description": " Close project"
+    }
+  ],
+  [],
+  [],
+  [],
+  [],
+  [
+    {
+      "matches": [
+        "workspace.handle-size"
+      ],
+      "snippetText": "workspace.handle-size",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "workspace.ui-speed"
+      ],
+      "snippetText": "workspace.ui-speed",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.auto-indent"
+      ],
+      "snippetText": "editor.auto-indent",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.line-numbers"
+      ],
+      "snippetText": "editor.line-numbers",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.font"
+      ],
+      "snippetText": "editor.font",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.font-size"
+      ],
+      "snippetText": "editor.font-size",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.font-ligatures"
+      ],
+      "snippetText": "editor.font-ligatures",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.smooth-scrolling"
+      ],
+      "snippetText": "editor.smooth-scrolling",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.smooth-caret"
+      ],
+      "snippetText": "editor.smooth-caret",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.cursor-style"
+      ],
+      "snippetText": "editor.cursor-style",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.cursor-blinking"
+      ],
+      "snippetText": "editor.cursor-blinking",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.word-wrap"
+      ],
+      "snippetText": "editor.word-wrap",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.scroll-beyond-last-line"
+      ],
+      "snippetText": "editor.scroll-beyond-last-line",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.minimap"
+      ],
+      "snippetText": "editor.minimap",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "editor.vim-mode.some-property"
+      ],
+      "snippetText": "editor.vim-mode.some-property",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "console.show-completions"
+      ],
+      "snippetText": "console.show-completions",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "console.wrap"
+      ],
+      "snippetText": "console.wrap",
+      "description": "preferences"
+    },
+    {
+      "matches": [
+        "console.level"
+      ],
+      "snippetText": "console.level",
+      "description": "preferences"
+    }
+  ],
+  [
+    {
+      "matches": [
+        "project",
+        "p"
+      ],
+      "snippetText": "ProjectPane",
+      "description": " Left pane with project information"
+    },
+    {
+      "matches": [
+        "control",
+        "c"
+      ],
+      "snippetText": "ControlPane",
+      "description": " Bottom pane with various controls"
+    },
+    {
+      "matches": [
+        "editor",
+        "e"
+      ],
+      "snippetText": "EditorPane",
+      "description": " Right pane with code editor"
+    },
+    {
+      "matches": [
+        "prefs",
+        "preferences"
+      ],
+      "snippetText": "Preferences",
+      "description": " Gear icon in top right"
+    },
+    {
+      "matches": [
+        "debug",
+        "d"
+      ],
+      "snippetText": "Debug",
+      "description": " Hidden debug pane"
+    },
+    {
+      "matches": [
+        "terminal",
+        "t",
+        "console",
+        "cmd"
+      ],
+      "snippetText": "Terminal",
+      "description": " Terminal"
+    },
+    {
+      "matches": [
+        "user",
+        "u"
+      ],
+      "snippetText": "User",
+      "description": " User information"
+    }
+  ],
+  [],
+  [
+    {
+      "matches": [
+        "none",
+        "off",
+        "false"
+      ],
+      "snippetText": "None",
+      "description": ""
+    },
+    {
+      "matches": [
+        "keep"
+      ],
+      "snippetText": "Keep",
+      "description": ""
+    },
+    {
+      "matches": [
+        "brackets"
+      ],
+      "snippetText": "Brackets",
+      "description": ""
+    },
+    {
+      "matches": [
+        "advanced",
+        "on"
+      ],
+      "snippetText": "Advanced",
+      "description": ""
+    },
+    {
+      "matches": [
+        "full"
+      ],
+      "snippetText": "Full",
+      "description": ""
+    }
+  ],
+  [
+    {
+      "matches": [
+        "blink"
+      ],
+      "snippetText": "Blink",
+      "description": ""
+    },
+    {
+      "matches": [
+        "smooth"
+      ],
+      "snippetText": "Smooth",
+      "description": ""
+    },
+    {
+      "matches": [
+        "phase"
+      ],
+      "snippetText": "Phase",
+      "description": ""
+    },
+    {
+      "matches": [
+        "expand"
+      ],
+      "snippetText": "Expand",
+      "description": ""
+    },
+    {
+      "matches": [
+        "solid"
+      ],
+      "snippetText": "Solid",
+      "description": ""
+    }
+  ],
+  [
+    {
+      "matches": [
+        "line"
+      ],
+      "snippetText": "Line",
+      "description": ""
+    },
+    {
+      "matches": [
+        "line-thin"
+      ],
+      "snippetText": "LineThin",
+      "description": ""
+    },
+    {
+      "matches": [
+        "block"
+      ],
+      "snippetText": "Block",
+      "description": ""
+    },
+    {
+      "matches": [
+        "block-outline"
+      ],
+      "snippetText": "BlockOutline",
+      "description": ""
+    },
+    {
+      "matches": [
+        "underline"
+      ],
+      "snippetText": "Underline",
+      "description": ""
+    },
+    {
+      "matches": [
+        "unerline-thin"
+      ],
+      "snippetText": "UnderlineThin",
+      "description": ""
+    }
+  ],
+  [
+    {
+      "matches": [
+        "on",
+        "true"
+      ],
+      "snippetText": "On",
+      "description": " Show absolute line numbers"
+    },
+    {
+      "matches": [
+        "interval",
+        "i"
+      ],
+      "snippetText": "Interval",
+      "description": " Show every 5 line numbers"
+    },
+    {
+      "matches": [
+        "relative",
+        "r"
+      ],
+      "snippetText": "Relative",
+      "description": " Show relative line numbers"
+    },
+    {
+      "matches": [
+        "off",
+        "false"
+      ],
+      "snippetText": "Off",
+      "description": " Hide line numbers"
+    }
+  ],
+  [
+    {
+      "matches": [
+        "trace"
+      ],
+      "snippetText": "Trace",
+      "description": ""
+    },
+    {
+      "matches": [
+        "debug"
+      ],
+      "snippetText": "Debug",
+      "description": ""
+    },
+    {
+      "matches": [
+        "info"
+      ],
+      "snippetText": "Info",
+      "description": ""
+    },
+    {
+      "matches": [
+        "warn"
+      ],
+      "snippetText": "Warn",
+      "description": ""
+    },
+    {
+      "matches": [
+        "error"
+      ],
+      "snippetText": "Error",
+      "description": ""
+    }
+  ],
+  [
+    {
+      "matches": [
+        "full"
+      ],
+      "snippetText": "Full",
+      "description": ""
+    },
+    {
+      "matches": [
+        "suggestions"
+      ],
+      "snippetText": "Suggestions",
+      "description": ""
+    },
+    {
+      "matches": [
+        "none"
+      ],
+      "snippetText": "None",
+      "description": ""
+    }
+  ],
+  [
+    {
+      "matches": [
+        "instant"
+      ],
+      "snippetText": "Instant",
+      "description": ""
+    },
+    {
+      "matches": [
+        "snappy"
+      ],
+      "snippetText": "Snappy",
+      "description": ""
+    },
+    {
+      "matches": [
+        "quick"
+      ],
+      "snippetText": "Quick",
+      "description": ""
+    },
+    {
+      "matches": [
+        "smooth"
+      ],
+      "snippetText": "Smooth",
+      "description": ""
+    },
+    {
+      "matches": [
+        "slow"
+      ],
+      "snippetText": "Slow",
+      "description": ""
+    }
+  ]
 ]

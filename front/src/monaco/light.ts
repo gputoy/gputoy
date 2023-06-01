@@ -1,4 +1,4 @@
-import { cssVar } from '$core/util'
+import { cssVar } from '$core/theme'
 import type * as monaco from 'monaco-editor'
 
 export default function genLight() {
@@ -144,8 +144,8 @@ export default function genLight() {
 			}
 		],
 		colors: {
-			'editor.foreground': cssVar('--text-color'),
-			'editor.background': cssVar('--background-alt'),
+			'editor.foreground': cssVar('text-color'),
+			'editor.background': cssVar('background-alt'),
 			'editor.selectionBackground': '#00000015',
 			'editor.lineHighlightBackground': '#00000012',
 			'editorCursor.foreground': '#000000',

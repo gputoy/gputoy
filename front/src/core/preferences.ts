@@ -1,11 +1,11 @@
 import { browser } from '$app/environment'
+import { setCssVar } from '$core/theme'
 import { PREFERENCE_KEYS, type PreferenceKey, type Preferences } from '$gen'
 import DEFAULT_PREFERENCES from '$gen/prefs/defaults.json'
 import debounce from 'lodash/debounce'
-import get from 'lodash/get'
+import _get from 'lodash/get'
 import _set from 'lodash/set'
 import { derived, writable, type Readable, type Writable } from 'svelte/store'
-import { setCssVar } from './util'
 
 type PreferenceStore = Record<PreferenceKey, Writable<any>>
 
@@ -16,7 +16,7 @@ type PreferenceStore = Record<PreferenceKey, Writable<any>>
 function initStore(): PreferenceStore {
 	let stores = {} as PreferenceStore
 	for (const key of PREFERENCE_KEYS) {
-		stores[key as PreferenceKey] = writable(get(DEFAULT_PREFERENCES, key))
+		stores[key as PreferenceKey] = writable(_get(DEFAULT_PREFERENCES, key))
 	}
 	return stores
 }
@@ -65,7 +65,7 @@ export function wPref(key: PreferenceKey): Writable<any> {
  * @param key Preference Key
  */
 export function resetPreference(key: PreferenceKey) {
-	_wPreferences[key].set(get(DEFAULT_PREFERENCES, key))
+	_wPreferences[key].set(_get(DEFAULT_PREFERENCES, key))
 }
 
 /**
@@ -74,7 +74,7 @@ export function resetPreference(key: PreferenceKey) {
  * @returns Default value of preference
  */
 export function preferenceDefault(key: PreferenceKey): any {
-	return get(DEFAULT_PREFERENCES, key)
+	return _get(DEFAULT_PREFERENCES, key)
 }
 
 /**
@@ -83,8 +83,8 @@ export function preferenceDefault(key: PreferenceKey): any {
  */
 export function setPreferences(prefs?: Partial<Preferences> | null) {
 	for (const key of PREFERENCE_KEYS) {
-		const userValue = get(prefs, key)
-		const defaultValue = get(DEFAULT_PREFERENCES, key)
+		const userValue = _get(prefs, key)
+		const defaultValue = _get(DEFAULT_PREFERENCES, key)
 		_wPreferences[key].set(userValue ?? defaultValue)
 	}
 }

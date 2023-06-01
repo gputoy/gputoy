@@ -18,43 +18,6 @@ export var wWorkerInternal: WorkerInternalReadable
 
 type WorkerAccessor = (...uris: monaco.Uri[]) => Promise<WgslWorker>
 
-enum Action {
-	A = 0,
-	B = 1,
-	C = 2
-}
-type Num =
-	| {
-			ty: Action.A
-	  }
-	| {
-			ty: Action.B
-			c: string
-	  }
-	| {
-			ty: Action.C
-			c: {
-				path: string
-			}
-	  }
-
-let x: Num = {
-	ty: Action.C,
-	c: {
-		path: 'val'
-	}
-}
-
-function k(n: Num) {
-	switch (n.ty) {
-		case Action.A:
-			break
-		case Action.B:
-		case Action.C:
-			break
-	}
-}
-
 type Label = {
 	/// The style of the label.
 	style: 'Primary' | 'Secondary'

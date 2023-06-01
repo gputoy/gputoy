@@ -1,20 +1,20 @@
 <script lang="ts">
 	// @ts-nocheck
-	import CompletionController from '$core/input'
-	import type { Class } from '$gen'
+	import InputController from '$core/input'
+	import type { ConfigValueClass } from '$gen'
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte'
 
 	const dispatch = createEventDispatcher()
 
 	export let key: string
-	export let inputClass: Class
+	export let inputClass: ConfigValueClass
 	let input: HTMLInputElement
 	export let value: any
-	let useController = inputClass.ty == 'Str' || inputClass.ty == 'Cmd'
+	let useController = inputClass.ty == 'StrClass' || inputClass.ty == 'CmdClass'
 
 	onMount(() => {
 		if (useController) {
-			CompletionController.register({
+			InputController.register({
 				key,
 				class: inputClass,
 				elem: input,
@@ -24,15 +24,14 @@
 	})
 	onDestroy(() => {
 		if (useController) {
-			CompletionController.deregister(key)
+			InputController.deregister(key)
 		}
 	})
-	function handleBlur(event: Event) {
-		if (useController) CompletionController.deattach(key)
+	function handleFocus(_event: Event) {
+		if (useController) InputController.attach(key)
 	}
-
-	function handleFocus(event: Event) {
-		if (useController) CompletionController.attach(key)
+	function handleBlur(_event: Event) {
+		if (useController) InputController.deattach()
 	}
 
 	function handleCompletionChange(value: any) {
@@ -44,10 +43,10 @@
 
 	function inputTy(ty: string) {
 		switch (ty) {
-			case 'Int':
-			case 'Float':
+			case 'IntClass':
+			case 'FloatClass':
 				return 'number'
-			case 'Str':
+			case 'StrClass':
 				return 'text'
 		}
 	}
@@ -56,11 +55,8 @@
 	}
 
 	function handleChange() {
-		console.log('changing? ', { useController })
-
 		if (useController) return
 		const maybeVal = input.value.trim()
-		console.log('handleChange', maybeVal)
 		if (passChecks(maybeVal)) {
 			value = maybeVal
 		}
@@ -68,6 +64,10 @@
 
 	export function focus(preventScroll = false) {
 		input?.focus({ preventScroll })
+	}
+
+	export function clear() {
+		if (input) input.value = ''
 	}
 </script>
 
@@ -83,11 +83,11 @@
 	on:input={handleChange}
 	on:focus={handleFocus}
 	on:blur={handleBlur}
+	class:cmd={inputClass.ty == 'CmdClass'}
 />
 
 <style>
 	input {
-		width: 50px;
 	}
 	input[type='number'] {
 		--webkit-appearance: textfield;
@@ -97,5 +97,10 @@
 	input[type='number']::-webkit-inner-spin-button,
 	input[type='number']::-webkit-outer-spin-button {
 		--webkit-appearance: none;
+	}
+	.cmd {
+		background-color: transparent;
+		font-family: var(--font-mono);
+		font-size: var(--sm);
 	}
 </style>

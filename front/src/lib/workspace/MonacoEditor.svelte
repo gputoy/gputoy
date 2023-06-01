@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { wTheme } from '$stores'
 	import { onMount } from 'svelte'
 	import { get } from 'svelte/store'
 
@@ -7,13 +6,14 @@
 
 	import { dLayout, getLayout } from '$core/layout'
 	import { dPreferences } from '$core/preferences'
+	import { rTheme } from '$core/theme'
 	import * as monaco from '$monaco'
 
 	let divEl: HTMLDivElement
 	let statusEl: HTMLDivElement
 
 	// Store subscriptions
-	wTheme.subscribe(monaco.setTheme)
+	rTheme.subscribe(monaco.setTheme)
 	dPreferences.subscribe(monaco.updateEditorConfig)
 	dLayout.subscribe(monaco.changeFileFromLayout)
 
@@ -21,7 +21,7 @@
 
 	onMount(() =>
 		monaco.initEditor(divEl, statusEl, {
-			theme: get(wTheme),
+			theme: get(rTheme),
 			layout: getLayout(),
 			prefs: get(dPreferences)
 		})

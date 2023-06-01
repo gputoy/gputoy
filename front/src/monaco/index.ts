@@ -1,15 +1,16 @@
 import type { File, Layout, Preferences, SupportedExtension } from '$gen'
 import type * as monaco from 'monaco-editor'
+
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import gputWorker from './wgsl/worker?worker'
 
-import type { Theme } from '$core/util'
+import type { Theme } from '$core/theme'
 import { wFiles } from '$stores'
 import { writable } from 'svelte/store'
-import dark from './dark'
+import genDark from './dark'
 import setJSONSchema from './json'
-import light from './light'
+import genLight from './light'
 import Statusbar from './statusbar'
 
 export const cursorPosition =
@@ -56,8 +57,6 @@ export async function initEditor(divEl: any, statusEl: any, init: EditorInit) {
 	await import('./wgsl')
 	/** @ts-ignore */
 	MonacoVim = await import('monaco-vim')
-	Monaco.editor.defineTheme('dark', dark())
-	Monaco.editor.defineTheme('light', light())
 	setJSONSchema(Monaco)
 
 	_editorInstance = Monaco.editor.create(divEl, {
@@ -78,7 +77,7 @@ export async function initEditor(divEl: any, statusEl: any, init: EditorInit) {
 	})
 
 	// manually set theme and file on init
-	Monaco.editor.setTheme(init.theme)
+	setTheme(init.theme)
 	changeFileFromLayout(init.layout)
 	updateEditorConfig(init.prefs)
 	_editorInstance.onDidChangeCursorPosition(cursorPosition.set)
@@ -92,8 +91,8 @@ export async function initEditor(divEl: any, statusEl: any, init: EditorInit) {
 // Finds which file to display based on layout
 export function changeFileFromLayout(layout: Layout) {
 	if (!Monaco) return
-	if (layout.fileIndex == null) return
-	const fileid = layout.workspace[layout.fileIndex]
+	if (layout.tabIndex == null) return
+	const fileid = layout.tabs[layout.tabIndex]
 	if (!fileid) return
 	const file = wFiles.getFile(fileid)
 	currentExtension.set(file?.extension ?? null)
@@ -165,4 +164,20 @@ export function getAllModels(): monaco.editor.ITextModel[] {
 	return Monaco?.editor.getModels() ?? []
 }
 
-export const setTheme = (newTheme: string) => Monaco?.editor.setTheme(newTheme)
+var definedThemes: { [key: string]: boolean } = {}
+const genThemes: { [key: string]: () => monaco.editor.IStandaloneThemeData } = {
+	'light': genLight,
+	'dark': genDark,
+}
+export const setTheme = (newTheme: string) => {
+	// the store subscription will try setting the theme before monaco is loaded
+	if (!Monaco) return
+	if (!definedThemes[newTheme]) {
+		const gen = genThemes[newTheme]
+		if (!newTheme) return
+		const theme = gen()
+		Monaco?.editor.defineTheme(newTheme, theme)
+		definedThemes[newTheme] = true
+	}
+	Monaco?.editor.setTheme(newTheme)
+}

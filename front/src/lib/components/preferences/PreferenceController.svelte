@@ -8,11 +8,11 @@
 
 	export let schema: ConfigValueSchema
 	export let filter: string
-	$: key = schema.path as PreferenceKey
-	console.log(key)
-	$: value = wPref(key)
+	let key = schema.path as PreferenceKey
+	let value = wPref(key)
 	$: isDefault = $value == preferenceDefault(key)
 	$: show = schema.path.includes(filter)
+	$: console.log({ schema, key, isDefault: isDefault, show: show })
 </script>
 
 <div class="root" class:show>

@@ -1,7 +1,9 @@
 import { isActionEqual, pushAction } from '$core/actions'
-import type { Action } from '$gen'
-import { wLastInputAction, wUserKeybinds } from '$stores'
-import { get } from 'svelte/store'
+import type { Action, BindKey } from '$gen'
+import { sealWritable } from '$stores'
+import { get, writable } from 'svelte/store'
+import { handleClientError } from './console'
+import { DEFAULT_USER_KEYBINDS } from './consts'
 
 /**
  *  Map of keybinds to action
@@ -10,6 +12,31 @@ export type Keybinds = {
 	[key: string]: {
 		action: Action
 	}
+}
+
+const wUserKeybinds = writable<Keybinds>(DEFAULT_USER_KEYBINDS)
+export const rUserKeybinds = sealWritable(wUserKeybinds)
+
+const wLastInputAction = writable<{
+	code: string
+	action?: Action
+} | null>(null)
+export const rLastInputAction = sealWritable(wLastInputAction)
+
+export function bindKey(args: BindKey) {
+	wUserKeybinds.update(binds => {
+		if (binds[args.key]) {
+			handleClientError({
+				message: args.key + ' already bound',
+				destination: 'console',
+				severity: 'warning',
+				source: 'key.ts'
+			})
+		} else {
+			binds[args.key] = { action: args.command }
+		}
+		return binds
+	})
 }
 
 /**

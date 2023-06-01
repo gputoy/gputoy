@@ -1,7 +1,7 @@
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const theme = event.cookies.get('t')
+	const theme = event.cookies.get('theme')
 
 	return await resolve(event, {
 		transformPageChunk: ({ html }) => {

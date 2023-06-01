@@ -18,7 +18,7 @@
 			bind:this={input}
 			class="right-flat sm"
 			placeholder="Search"
-			inputClass={{ ty: 'Str', c: {} }}
+			inputClass={{ ty: 'StrClass', c: {} }}
 			key="pref-search"
 			bind:value
 		/>
@@ -55,6 +55,7 @@
 		opacity: 0;
 		background-color: var(--border-primary);
 		user-select: none;
+		pointer-events: none;
 	}
 	.tray::after {
 		content: '';
@@ -80,6 +81,7 @@
 		top: 0;
 		opacity: 1;
 		user-select: inherit;
+		pointer-events: inherit;
 	}
 	.tray-header {
 		height: var(--md-nav);

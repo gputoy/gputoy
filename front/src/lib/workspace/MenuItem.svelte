@@ -6,9 +6,9 @@
 		type MenuEntry,
 		type MenuKey
 	} from '$core/consts'
-	import { findActionBind } from '$core/keys'
+	import { findActionBind, rUserKeybinds } from '$core/keys'
 	import Key from '$lib/components/Key.svelte'
-	import { wMenuOpen, wUserKeybinds } from '$stores'
+	import { wMenuOpen } from '$stores'
 
 	export let key: MenuKey
 	// When closed, skip the next call to open
@@ -21,7 +21,7 @@
 			.flat()
 			.map((bind) => [
 				bind.name,
-				findActionBind(bind.fAction?.action, $wUserKeybinds)
+				findActionBind(bind.fAction?.action, $rUserKeybinds)
 			])
 	)
 

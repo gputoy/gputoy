@@ -1,9 +1,103 @@
-/* 
-	Defines the default css rules for app elements.
+@import '@fontsource/fira-mono';
+@import '@fontsource/jetbrains-mono';
+@import '@fontsource/inter';
+@import '@fontsource/raleway';
+@import '@fontsource/roboto';
+@import '@fontsource/ibm-plex-mono';
 
-	If trying to find the rule definition for a native browser component or
-	a svelte component with no rules, assume they come from here.
-*/
+@import './split-panes.css';
+@import './themes/dark.css';
+@import './themes/light.css';
+
+body {
+	--font-heading: 'raleway', monospace;
+	--font-body: 'Roboto', sans-serif;
+	--font-button: var(--font-body);
+	--font-mono: 'JetBrains Mono', sfmono-regular, menlo, monaco, consolas,
+		'liberation mono', 'courier new', monospace;
+	--navbar-height: 32px;
+
+	/* 
+		Sizing	
+	*/
+	--xs: 10px;
+	--xs-icon: 10px;
+	--xs-nav: 20px;
+	--xs-input: var(--xs-nav);
+
+	--sm: 12px;
+	--sm-icon: 10px;
+	--sm-nav: 24px;
+	--sm-input: 24px;
+
+	--md: 12px;
+	--md-icon: 14px;
+	--md-nav: 32px;
+	--md-input: 24px;
+
+	--lg: 1.25em;
+	--lg-icon: 32px;
+	--lg-nav: 48px;
+	--lg-input: 40px;
+
+	--xl: 1.4rem;
+	--2xl: 1.55rem;
+
+	--card-shadow: none;
+
+	--z-splitter: 1;
+	--z-tray: 10;
+	--z-modal: 20;
+	--z-completion: 30;
+	--z-menu: 40;
+
+	--handle-size: 4px;
+	--half-handle-size: calc(var(--handle-size) / 2);
+
+	--nav-height: 32px;
+	--nav-gap: 4px;
+
+	--gap: 1px;
+	--gap2: calc(var(--gap) * 2);
+	--gap4: calc(var(--gap) * 4);
+	--gap6: calc(var(--gap) * 6);
+	--gap8: calc(var(--gap) * 8);
+
+	--border-primary-width: var(--gap);
+	--border-double-width: calc(--gap2);
+	--border-secondary-width: var(--gap);
+
+	--pane-radius: 4px;
+	--button-radius: var(--pane-radius);
+
+	--toastContainerTop: auto;
+	--toastContainerLeft: auto;
+	--toastContainerBottom: 1rem;
+	--toastContainerRight: 1rem;
+	--toastBarBackground: var(--accent-color);
+	--toastBarHeight: 2px;
+
+	--nodeColor: var(--text-color);
+	--leafDefaultBackground: var(--glass-high);
+
+	--console-trace: white;
+	--console-debug: grey;
+	--console-info: blue;
+	--console-warn: orange;
+	--console-error: red;
+
+	--color-invalid: red;
+
+	--transition-instant: 0s;
+	--transition-snappy: 25ms;
+	--transition-quick: 50ms;
+	--transition-smooth: 100ms;
+	--transition-slow: 150ms;
+
+	--ui-speed: var(--transition-smooth);
+
+	--splitpanes-transition-duration: 0ms;
+}
 
 body {
 	display: flex;
@@ -111,9 +205,18 @@ button {
 	box-sizing: border-box;
 }
 
-/* button:disabled {
-	background-color: red;
-} */
+button:disabled {
+	cursor: default;
+	/* background-color: red !important; */
+}
+
+button:disabled svg {
+	stroke: var(--text-low);
+}
+
+button:disabled:hover svg {
+	stroke: var(--text-low);
+}
 
 svg {
 	fill: none;
@@ -425,7 +528,7 @@ label {
 }
 
 /* vim editor mode */
-#vim-status-root > span:nth-child(1) {
+#vim-status-root>span:nth-child(1) {
 	font-family: var(--font-mono);
 	color: var(--text-accent-color);
 	font-weight: bold;
@@ -440,13 +543,13 @@ label {
 }
 
 /* vim editor key helper */
-#vim-status-root > span:nth-child(4) {
+#vim-status-root>span:nth-child(4) {
 	font-family: var(--font-mono);
 	text-transform: lowercase;
 	justify-self: right;
 }
 
 /* Vim edtior regexp message */
-#vim-status-root > span:nth-child(2) > span:nth-child(2) {
+#vim-status-root>span:nth-child(2)>span:nth-child(2) {
 	display: none;
 }

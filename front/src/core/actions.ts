@@ -10,17 +10,22 @@ import type {
 import { getAllModels, getModel } from '$monaco'
 import { wWorkerInternal } from '$monaco/wgsl/wgslMode'
 import {
+	wBuildDirty,
 	wConfig,
 	wConsole,
 	wFileDirty,
 	wFiles,
 	wModelDirty,
+	wPrebuildDirty,
 	wRunState,
 	wWorkerData
 } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
 import isEqual from 'lodash/isEqual'
+import { get } from 'svelte/store'
+import context from './context'
 import { fileWithNewPath, getChildren, pathToParts } from './files'
+import { bindKey } from './keys'
 
 /**
  * Determines if two Actions are equal by value
@@ -120,6 +125,9 @@ export function pushAction(action: Action) {
 		case 'exit':
 			exit()
 			break
+		case 'bindKey':
+			bindKey(action.c)
+			break
 
 		/** @ts-ignore */
 		// There may be a case in the future where a new variant is added
@@ -133,32 +141,32 @@ export function pushAction(action: Action) {
  *  TODO: create action reversal system
  * @param action
  */
-export function reverseAction(action: Action) {}
+export function reverseAction(action: Action) { }
 
 /// ------------------- Action execution ----------------------
 
 async function playPause() {
-	// if (get(wPrebuildDirty)) {
-	//     context.prebuild()
-	// }
+	if (get(wPrebuildDirty)) {
+		context.prebuild()
+	}
 
-	// if (get(wBuildDirty)) {
-	//     context.build()
-	// }
+	if (get(wBuildDirty)) {
+		context.build()
+	}
 	wWorkerInternal.tryBuild()
 	wWorkerData.set(await wWorkerInternal.poll())
 	wRunState.playPause()
 }
 
-function rebuildProject() {}
+function rebuildProject() { }
 
-function resetProject() {}
+function resetProject() { }
 
 function clearConsole() {
 	wConsole.set([])
 }
 
-function focusPane(c: string) {}
+function focusPane(c: string) { }
 
 function exit() {
 	clearProject()

@@ -1,9 +1,9 @@
-import { cssVar } from '$core/util'
+import { cssVar } from '$core/theme'
 import type * as monaco from 'monaco-editor'
 
 // TODO: use as reference https://github.com/Microsoft/vscode/blob/93028e44ea7752bd53e2471051acbe6362e157e9/src/vs/editor/standalone/common/themes.ts#L13
-export default () =>
-	({
+export default function genDark() {
+	return {
 		base: 'vs-dark',
 		inherit: true,
 		rules: [
@@ -20,8 +20,8 @@ export default () =>
 			{ token: 'params', foreground: '#FFFF00' }
 		],
 		colors: {
-			'editor.foreground': cssVar('--text-color'),
-			'editor.background': cssVar('--background-alt'),
+			'editor.foreground': cssVar('text-color'),
+			'editor.background': cssVar('background-alt'),
 			'editorCursor.foreground': '#a5a5a5',
 			'editor.lineHighlightBackground': '#FFFFFF10',
 			'editorLineNumber.foreground': '#FFFFFF30',
@@ -43,4 +43,5 @@ export default () =>
 			'input.border': 'none', // Input box border.
 			'editorIndentGuide.background': '#FFFFFF20'
 		}
-	} as monaco.editor.IStandaloneThemeData)
+	} as monaco.editor.IStandaloneThemeData
+}

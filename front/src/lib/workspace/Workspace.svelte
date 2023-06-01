@@ -13,7 +13,6 @@
 	import ViewportPane from '$lib/workspace/panes/ViewportPane.svelte'
 	import { onMount } from 'svelte'
 	import { Pane, Splitpanes } from 'svelte-splitpanes'
-	import CompletionProvider from './completions/CompletionProvider.svelte'
 	import ControlPane from './panes/ControlPane.svelte'
 
 	$: clazz = $wUpdatingWindowSize ? 'no-transition' : undefined
@@ -62,7 +61,6 @@
 		</Pane>
 	</Splitpanes>
 	<PreferenceTray />
-	<CompletionProvider />
 </div>
 
 <style global lang="scss">

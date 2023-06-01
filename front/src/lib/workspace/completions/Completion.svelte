@@ -2,12 +2,14 @@
 	import { ICONS } from '$core/completions'
 	import type { CompletionEntry } from '$gen'
 	export let expanded = false
+	export let completionIndex: number
 	export let completion: CompletionEntry
+	let elem: HTMLDivElement
 </script>
 
-<div class="root" class:expanded>
+<div class="root" class:expanded bind:this={elem}>
 	<div class="insert-text">
-		<svelte:component this={ICONS[1]} class="completionIcon" />
+		<svelte:component this={ICONS[completionIndex]} class="completionIcon" />
 		{completion.insertText}
 	</div>
 	<span class="description" class:visible={expanded}>
@@ -20,6 +22,7 @@
 		display: flex;
 		justify-content: space-between;
 		padding-inline: var(--gap4);
+		padding-block: 1px;
 		gap: var(--gap8);
 		justify-content: space-between;
 		align-items: center;
@@ -28,7 +31,7 @@
 	}
 	.expanded {
 		background-color: var(--glass-med);
-		font-weight: bold;
+		/* font-weight: bold; */
 	}
 	.insert-text {
 		font-family: var(--font-mono);
@@ -44,7 +47,6 @@
 		font-size: smaller;
 		visibility: hidden;
 	}
-
 	.visible {
 		visibility: visible;
 	}

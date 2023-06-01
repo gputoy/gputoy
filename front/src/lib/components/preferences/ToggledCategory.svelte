@@ -4,12 +4,20 @@
 
 	export let schema: ConfigValueSchema
 	$: children = schema.class.c as CategoryClass
+
+	$: console.log('schema: ', schema)
+
+	// const checkboxSchema: ConfigValueSchema = {
+	// 	class: 'BoolClass',
+	// 	description: 'Enable ' + schema.name,
+	// 	name: schema.name,
+	// 	path: schema.path + '.enabled'
+	// }
 </script>
 
 <div class="root">
-	<!-- <PreferenceController {metadata} description={metadata.description}>
-		<input type="checkbox" />
-	</ControllerHeader> -->
+	<!-- <PreferenceEntry schema={{ class: '' }} /> -->
+
 	<ul>
 		{#each Object.values(children) as child}
 			<PreferenceEntry schema={child} />

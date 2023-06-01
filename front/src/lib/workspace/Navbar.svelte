@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { pushAction } from '$core/actions'
 	import { MENUKEYS } from '$core/consts'
+	import { rLastInputAction } from '$core/keys'
 	import { saveProject } from '$core/project'
-	import { toggleTheme } from '$core/util'
+	import { rTheme, toggleTheme } from '$core/theme'
 	import Icon from '$lib/components/Icon.svelte'
 	import Key from '$lib/components/Key.svelte'
 	import Logo from '$lib/components/Logo.svelte'
 	import MenuItem from '$lib/workspace/MenuItem.svelte'
-	import { wLastInputAction, wProjectMeta, wTheme, wUser } from '$stores'
+	import { wProjectMeta, wUser } from '$stores'
 
 	function toggleUserModal() {
 		pushAction({ ty: 'toggleUi', c: 'user' })
@@ -32,12 +33,12 @@
 	</div>
 
 	<div class="nav-end">
-		{#if $wLastInputAction}
+		{#if $rLastInputAction}
 			<div class="input-helper">
-				<Key keycode={$wLastInputAction.code} />
-				{#if $wLastInputAction.action?.ty}
+				<Key keycode={$rLastInputAction.code} />
+				{#if $rLastInputAction.action?.ty}
 					<code style="color: var(--text-accent-color);"
-						>{$wLastInputAction.action.ty}</code
+						>{$rLastInputAction.action.ty}</code
 					>
 				{/if}
 			</div>
@@ -58,7 +59,7 @@
 		</div>
 
 		<button on:click={toggleTheme}>
-			{#if $wTheme == 'dark'}
+			{#if $rTheme == 'dark'}
 				<Icon name="sun" stroked thick />
 			{:else}
 				<Icon name="moon" stroked thick />

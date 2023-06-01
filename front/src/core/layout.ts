@@ -114,22 +114,22 @@ export const dPaneSizes = derived(
 			get(wPaneSize)
 
 		let projectPanePct = (projectPanePx / (width ?? 1000)) * 100
-		if (toggle.projectPane)
-			forceUpdateRawPaneSize('projectPane', { size: projectPanePct })
-		projectPanePct = toggle.projectPane ? projectPanePct : 0
+		if (toggle["project-pane"])
+			forceUpdateRawPaneSize('project-pane', { size: projectPanePct })
+		projectPanePct = toggle["project-pane"] ? projectPanePct : 0
 
-		let editorPanePct = toggle.editorPane ? editorPanePercentage : 0
-		if (toggle.editorPane)
-			forceUpdateRawPaneSize('editorPane', { size: editorPanePct })
+		let editorPanePct = toggle["editor-pane"] ? editorPanePercentage : 0
+		if (toggle["editor-pane"])
+			forceUpdateRawPaneSize('editor-pane', { size: editorPanePct })
 		let centerPanePct = 100 - projectPanePct - editorPanePct
 
 		let controlBarMinSize: number =
 			(CONTROL_BAR_HEIGHT / (height ?? 1000)) * 100
-		let controlPanePct = toggle.controlPane
+		let controlPanePct = toggle["control-pane"]
 			? controlPanePercentage
 			: controlBarMinSize
-		if (toggle.controlPane)
-			forceUpdateRawPaneSize('controlPane', { size: controlPanePct })
+		if (toggle["control-pane"])
+			forceUpdateRawPaneSize('control-pane', { size: controlPanePct })
 		let viewportPanePct = 100 - controlPanePct
 
 		const ret = {
@@ -243,9 +243,9 @@ export function applySplitpaneEvent(event: CustomEvent<IPaneSizingEvent[]>) {
 export function toggleRegionVisibility(region: Region) {
 	const BIAS_PERCENT = 5
 	if (
-		region == 'projectPane' ||
-		region == 'controlPane' ||
-		region == 'editorPane'
+		region == 'project-pane' ||
+		region == 'control-pane' ||
+		region == 'editor-pane'
 	) {
 		const toggle = () =>
 			wPaneToggle.update((toggle) => {
@@ -269,7 +269,7 @@ export function toggleRegionVisibility(region: Region) {
 		const toggle = (val: boolean) => {
 			return !val
 		}
-		;({
+		({
 			preferences: () => {
 				wUserPrefsOpen.update(toggle)
 			},
@@ -287,16 +287,16 @@ export function toggleRegionVisibility(region: Region) {
 }
 export function setRegionVisibility(region: Region, visibility: boolean) {
 	if (
-		region == 'projectPane' ||
-		region == 'controlPane' ||
-		region == 'editorPane'
+		region == 'project-pane' ||
+		region == 'control-pane' ||
+		region == 'editor-pane'
 	) {
 		wPaneToggle.update((toggle) => {
 			toggle[region] = visibility
 			return toggle
 		})
 	} else {
-		;({
+		; ({
 			preferences: () => {
 				wUserPrefsOpen.set(visibility)
 			},
@@ -314,18 +314,18 @@ export function setRegionVisibility(region: Region, visibility: boolean) {
 }
 
 export function toggleAllPanes() {
-	let { editorPane, projectPane, controlPane } = get(wPaneToggle)
-	if (editorPane || projectPane || controlPane)
+	let { "editor-pane": e, "project-pane": p, "control-pane": c } = get(wPaneToggle)
+	if (e || p || c)
 		wPaneToggle.set({
-			editorPane: false,
-			projectPane: false,
-			controlPane: false
+			"editor-pane": false,
+			"project-pane": false,
+			"control-pane": false
 		})
 	else
 		wPaneToggle.set({
-			editorPane: true,
-			projectPane: true,
-			controlPane: true
+			"editor-pane": true,
+			"project-pane": true,
+			"control-pane": true
 		})
 }
 

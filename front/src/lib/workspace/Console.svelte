@@ -1,25 +1,19 @@
 <script lang="ts">
-	import { pushAction } from '$core/actions'
-	import {
-		handleClientError,
-		LOG_PREFIX,
-		LOG_PREFIX_STYLES,
-		toLogLevel
-	} from '$core/console'
+	import { LOG_PREFIX, LOG_PREFIX_STYLES, toLogLevel } from '$core/console'
 	import { rTerminalOpen } from '$core/layout'
 	import { rPref } from '$core/preferences'
+	import type { ConfigValueClass } from '$gen'
 	import Input from '$lib/components/input/Input.svelte'
 	import { wConsole } from '$stores'
-	import { action } from '$wasm/common'
 
 	let value = ''
 	let input: Input
 	$: inputClass = {
-		ty: 'Cmd',
+		ty: 'CmdClass',
 		c: {
 			completions: $showCompletions
 		}
-	}
+	} as ConfigValueClass
 
 	let showCompletions = rPref('console.show-completions')
 	let consoleLevel = rPref('console.level')
@@ -30,30 +24,24 @@
 		return log.level >= toLogLevel($consoleLevel)
 	})
 
-	function handleCommand(event: CustomEvent<string>) {
-		const consoleCommand = event.detail
-		wConsole.echo(consoleCommand)
-		let result = action(consoleCommand)
-		if ('message' in result) {
-			handleClientError(result)
-		} else {
-			pushAction(result)
-		}
-	}
+	// function handleCommand(event: CustomEvent<string>) {
+	// 	const consoleCommand = event.detail
+	// 	wConsole.echo(consoleCommand)
+	// 	input.clear()
+	// 	let result = action(consoleCommand)
+	// 	if ('message' in result) {
+	// 		handleClientError(result)
+	// 	} else {
+	// 		pushAction(result)
+	// 	}
+	// }
 </script>
 
 <div class="container" class:show={$rTerminalOpen}>
 	<div class="prompt-container" class:wrap={$consoleWrap}>
 		<div class="prompt-line">
-			<span style="user-select: none;" class="prefix">~&nbsp;</span>
-			<Input
-				bind:this={input}
-				bind:value
-				{inputClass}
-				key="cmd"
-				class="med"
-				on:value={handleCommand}
-			/>
+			<span style="user-select: none;" class="prefix">~</span>
+			<Input bind:this={input} bind:value {inputClass} key="cmd" class="med" />
 		</div>
 	</div>
 	<div class="log-container">
@@ -89,11 +77,12 @@
 		position: relative;
 		flex-direction: row;
 		align-items: center;
-		padding-inline: var(--nav-gap);
-		background-color: var(--glass-med);
+		padding-inline: var(--padding);
+		/* background-color: var(--glass-med); */
 		border-radius: var(--pane-radius);
 		height: 100%;
-		padding-block: 2px;
+		font-size: var(--sm);
+		/* padding-block: 2px; */
 	}
 	.prompt-line {
 		display: flex;
@@ -101,7 +90,7 @@
 	}
 	.prompt-line span {
 		flex: 0 0 auto;
-		font-weight: bold;
+		margin-right: var(--gap2);
 	}
 
 	.log-container {
@@ -119,7 +108,8 @@
 		font-weight: bold;
 		font-size: var(--xs);
 	}
-	.active-completion {
-		background-color: var(--glass-med);
+
+	.prompt-container:global(*) {
+		background-color: red !important;
 	}
 </style>

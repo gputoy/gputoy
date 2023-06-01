@@ -1,20 +1,14 @@
-import { browser } from '$app/environment'
 import { initConsoleMethods, type ConsoleExtras, type Log } from '$core/console'
 import {
 	DEFAULT_CONFIG,
 	DEFAULT_FILES,
-	DEFAULT_RUN_STATE,
-	DEFAULT_USER_KEYBINDS,
-	type MenuKey
+	DEFAULT_RUN_STATE, type MenuKey
 } from '$core/consts'
 import { initFilesMethods, treeFromFiles, type FilesExtras } from '$core/files'
-import type { Keybinds } from '$core/keys'
 import { dLayout } from '$core/layout'
 import { writeToProjectLocalStorage, type ProjectMeta } from '$core/project'
 import { initUserMethods, type UserExtras } from '$core/user'
-import type { Theme } from '$core/util'
 import type {
-	Action,
 	CompileError,
 	Config,
 	FileDependencyInfo,
@@ -24,14 +18,11 @@ import type {
 	ProjectResponse,
 	UserInfoResponse
 } from '$gen'
-import Cookies from 'js-cookie'
 import {
 	derived,
 	get,
 	writable,
-	type Readable,
-	type StartStopNotifier,
-	type Writable
+	type Readable, type Writable
 } from 'svelte/store'
 import {
 	initRunStateMethods,
@@ -218,10 +209,6 @@ export const wUser = makeEnhanced<UserInfoResponse | null, UserExtras>(
 /**
  *                  Misc stores
  */
-export const wLastInputAction = writable<{
-	code: string
-	action?: Action
-} | null>(null)
 export const wUserRenaming = writable<string | null>(null)
 export const wUserDeleting = writable<string | null>(null)
 
@@ -233,17 +220,6 @@ export const wMenuOpen = writable<Record<MenuKey, boolean>>({
 	project: false
 })
 
-const initTheme: StartStopNotifier<Theme> = (set) => {
-	if (!browser) return
-	const theme = Cookies.get('t')
-	if (theme) {
-		set(theme as Theme)
-	}
-}
-export const wTheme = writable<Theme>('dark', initTheme)
-
-export const wUserKeybinds = writable<Keybinds>(DEFAULT_USER_KEYBINDS)
-export const wUserTheme = writable<any>({})
 
 // TODO: type this up
 export const wWorkerData = writable(null)

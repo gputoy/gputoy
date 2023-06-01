@@ -22,10 +22,10 @@
 				Loading...
 			{:then list}
 				{#each list as project}
-					<div class="project-item" on:click={() => onSetProject(project)}>
+					<button class="project-item" on:click={() => onSetProject(project)}>
 						<span class="project-title">{project.title}</span>
 						<span class="project-date" />
-					</div>
+					</button>
 				{/each}
 			{/await}
 		</div>
