@@ -61,13 +61,6 @@ export async function initEditor(divEl: any, statusEl: any, init: EditorInit) {
 
 	_editorInstance = Monaco.editor.create(divEl, {
 		automaticLayout: true,
-		guides: {
-			highlightActiveBracketPair: true,
-			bracketPairs: true,
-			indentation: true,
-			highlightActiveIndentation: true,
-			bracketPairsHorizontal: true
-		},
 		overviewRulerBorder: false,
 		padding: {
 			bottom: 20,
@@ -139,6 +132,16 @@ export function updateEditorConfig(preferences: Preferences) {
 		scrollBeyondLastLine: preferences.editor['scroll-beyond-last-line'],
 		minimap: {
 			enabled: preferences.editor.minimap
+		},
+		guides: {
+			highlightActiveBracketPair:
+				preferences.editor.guides['highlight-active-bracket-pair'],
+			bracketPairs: preferences.editor.guides['bracket-pairs'],
+			indentation: preferences.editor.guides.indentation,
+			highlightActiveIndentation:
+				preferences.editor.guides['highlight-active-indentation'],
+			bracketPairsHorizontal:
+				preferences.editor.guides['bracket-pairs-horizontal']
 		}
 	}
 	_editorInstance?.updateOptions(options)
@@ -166,8 +169,8 @@ export function getAllModels(): monaco.editor.ITextModel[] {
 
 var definedThemes: { [key: string]: boolean } = {}
 const genThemes: { [key: string]: () => monaco.editor.IStandaloneThemeData } = {
-	'light': genLight,
-	'dark': genDark,
+	light: genLight,
+	dark: genDark
 }
 export const setTheme = (newTheme: string) => {
 	// the store subscription will try setting the theme before monaco is loaded

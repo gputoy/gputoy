@@ -78,17 +78,17 @@ export const DEFAULT_DIR_NODE_STATE: DirNodeState = {
 	isRenaming: false
 }
 export const DEFAULT_LAYOUT: Layout = {
-	tabIndex: 0,
 	tabs: ['/shaders/main.wgsl', '/run.json'] as string[],
+	tabIndex: 0,
 	paneSize: {
 		projectPanePx: 185,
 		editorPanePercentage: 40,
 		controlPanePercentage: 38
 	},
 	paneToggled: {
-		projectPane: true,
-		editorPane: true,
-		controlPane: true
+		'project-pane': true,
+		'editor-pane': true,
+		'control-pane': true
 	},
 	fileTreeState: {
 		'/shaders': {
@@ -137,19 +137,19 @@ export const DEFAULT_USER_KEYBINDS: Keybinds = {
 	'C-q': {
 		action: {
 			ty: 'toggleUi',
-			c: 'projectPane'
+			c: 'project-pane'
 		}
 	},
 	'C-e': {
 		action: {
 			ty: 'toggleUi',
-			c: 'editorPane'
+			c: 'editor-pane'
 		}
 	},
 	'C-r': {
 		action: {
 			ty: 'toggleUi',
-			c: 'controlPane'
+			c: 'control-pane'
 		}
 	},
 	'C-S-d': {
@@ -158,7 +158,7 @@ export const DEFAULT_USER_KEYBINDS: Keybinds = {
 			c: 'debug'
 		}
 	},
-	'C-a': {
+	'C-S-a': {
 		action: {
 			ty: 'toggleAllPanes'
 		}
@@ -337,7 +337,7 @@ export const MENU_MAP: Record<
 				fAction: {
 					action: {
 						ty: 'toggleUi',
-						c: 'projectPane'
+						c: 'project-pane'
 					}
 				}
 			},
@@ -346,7 +346,7 @@ export const MENU_MAP: Record<
 				fAction: {
 					action: {
 						ty: 'toggleUi',
-						c: 'editorPane'
+						c: 'editor-pane'
 					}
 				}
 			},
@@ -355,7 +355,17 @@ export const MENU_MAP: Record<
 				fAction: {
 					action: {
 						ty: 'toggleUi',
-						c: 'controlPane'
+						c: 'control-pane'
+					}
+				}
+			}
+		],
+		[
+			{
+				name: 'Toggle All Panes',
+				fAction: {
+					action: {
+						ty: 'toggleAllPanes'
 					}
 				}
 			}

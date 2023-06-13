@@ -6,7 +6,7 @@ crate::config_category! {
         /// False: Console messages overflow past the size of the viewport.
         wrap: {
             Self = bool,
-            class = BoolClass,
+            class = Bool,
         },
         level: LogLevel,
     }

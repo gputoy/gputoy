@@ -13,9 +13,8 @@ impl Parse for AttributeList {
     }
 }
 
-pub fn extract_doc_comment(item: AttributeList) -> TokenStream {
-    let doc_comments: Vec<String> = item
-        .0
+pub fn generate_tokens(AttributeList(list): AttributeList) -> TokenStream {
+    let doc_comments: Vec<String> = list
         .iter()
         .filter_map(|attr| {
             if let Ok(meta) = attr.parse_meta() {

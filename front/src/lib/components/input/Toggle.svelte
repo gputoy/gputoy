@@ -1,13 +1,8 @@
 <script lang="ts">
-	// import { createEventDispatcher } from 'svelte'
-
 	export let value: any
-
-	// const dispatch = createEventDispatcher()
 
 	function handleClick() {
 		value = !value
-		console.log('here', value)
 	}
 	function handleKeypress() {}
 </script>

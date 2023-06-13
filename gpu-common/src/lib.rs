@@ -37,9 +37,11 @@ pub mod schema;
 
 mod macros;
 
-pub use proc_macro::extract_doc_comment;
 #[cfg(feature = "bindgen")]
 pub use proc_macro::gen_ts;
+
+pub use proc_macro::extract_doc_comment;
+pub use proc_macro::to_case;
 
 #[cfg(feature = "bindgen")]
 pub fn bindgen(config: crate::bindgen::Config) -> crate::bindgen::Result<()> {

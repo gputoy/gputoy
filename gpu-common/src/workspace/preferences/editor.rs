@@ -3,53 +3,36 @@ crate::config_category! {
     struct Editor {
         auto_indent: AutoIndent,
         line_numbers: LineNumbers,
+        guides: Guides,
         /// Font to use in the editor.
         ///
         /// Comma-delimited list like "FiraMono,mono"
         font: {
             Self = String,
-            class = StrClass,
+            class = Str,
         },
         /// Font size of code in the editor.
         font_size: {
             Self = u8,
-            class = IntClass,
+            class = Int,
             min = 5,
             max = 64,
             postfix = "px",
         },
         /// Render font ligatures in the code editor.
-        font_ligatures: {
-            Self = bool,
-            class = BoolClass,
-        },
+        font_ligatures: bool,
         /// Animate smooth scrolling in the editor.
-        smooth_scrolling: {
-            Self = bool,
-            class = BoolClass,
-        },
+        smooth_scrolling: bool,
         /// Enable smooth caret movement animations.
-        smooth_caret: {
-            Self = bool,
-            class = BoolClass,
-        },
+        smooth_caret: bool,
         cursor_style: CursorStyle,
         cursor_blinking: CursorBlinking,
         /// Whether to wrap lines in the code editor.
-        word_wrap: {
-            Self = bool,
-            class = BoolClass,
-        },
+        word_wrap: bool,
         /// Enable scrolling to go one screen size past the last line.
-        scroll_beyond_last_line: {
-            Self = bool,
-            class = BoolClass,
-        },
+        scroll_beyond_last_line: bool,
         /// Whether to show a minimap in the top-right of the code editor.
-        minimap: {
-            Self = bool,
-            class = BoolClass,
-        },
+        minimap: bool,
         vim_mode: VimMode,
     }
 }
@@ -66,6 +49,7 @@ impl Default for Editor {
             scroll_beyond_last_line: false,
             word_wrap: false,
             cursor_style: Default::default(),
+            guides: Default::default(),
             cursor_blinking: Default::default(),
             auto_indent: Default::default(),
             line_numbers: Default::default(),
@@ -76,21 +60,39 @@ impl Default for Editor {
 
 crate::config_category! {
     /// Enable vim movements in code editor.
-    struct VimMode<Toggle: bool> {
-        some_property: {
-            Self = i32,
-            class = IntClass,
-            min = 0,
-            step = 10,
+    #[derive(Default)]
+    struct VimMode {
+        enabled: {
+            Self = bool,
+            class = Bool,
         },
     }
 }
 
-impl Default for VimMode {
+crate::config_category! {
+    /// Visual guides in the code editor
+    struct Guides {
+        /// Enable rendering of bracket pair guides.
+        bracket_pairs: bool,
+        /// Enable rendering of vertical bracket pair guides.
+        bracket_pairs_horizontal: bool,
+        /// Enable highlighting of the active bracket pair.
+        highlight_active_bracket_pair: bool,
+        /// Enable rendering of indent guides.
+        indentation: bool,
+        /// Enable highlighting of the active indent guide.
+        highlight_active_indentation: bool,
+   }
+}
+
+impl Default for Guides {
     fn default() -> Self {
         Self {
-            enabled: false,
-            some_property: 2,
+            bracket_pairs: true,
+            bracket_pairs_horizontal: true,
+            highlight_active_bracket_pair: true,
+            indentation: true,
+            highlight_active_indentation: true,
         }
     }
 }

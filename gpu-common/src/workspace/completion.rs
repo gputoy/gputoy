@@ -1,23 +1,45 @@
+/// A completion.
+///
+/// Completions are generated from gpu-common types as part of the bindgen,
+/// but also at runtime for completions that cannot be known statically
+/// (i.e. file paths, resources).
 #[cfg(feature = "bindgen")]
 #[derive(Debug, Clone, schemars::JsonSchema, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CompletionEntry {
-    insert_text: String,
-    name: String,
+    /// A list of aliases this completion will match on.
+    /// It will always insert the first alias in the vector.
+    matches: Vec<String>,
+    /// The snippet information on the right side of a completion.
+    snippet_text: String,
+    /// A long description of this completion.
     description: String,
 }
 
 #[cfg(feature = "bindgen")]
 impl CompletionEntry {
-    pub fn new<T, N, D>(insert_text: T, name: N, description: D) -> Self
+    pub fn new_single<M, N, D>(insert_match: M, snippet_text: N, description: D) -> Self
     where
-        T: Into<String>,
+        M: Into<String>,
         N: Into<String>,
         D: Into<String>,
     {
         Self {
-            insert_text: insert_text.into(),
-            name: name.into(),
+            matches: vec![insert_match.into()],
+            snippet_text: snippet_text.into(),
+            description: description.into(),
+        }
+    }
+    pub fn new_aliased<M, S, D>(matches: M, snippet_text: S, description: D) -> Self
+    where
+        M: IntoIterator,
+        M::Item: Into<String>,
+        S: Into<String>,
+        D: Into<String>,
+    {
+        Self {
+            matches: matches.into_iter().map(Into::into).collect(),
+            snippet_text: snippet_text.into(),
             description: description.into(),
         }
     }
@@ -63,6 +85,11 @@ crate::completions! {
     ///
     /// At the moment does nothing, but could be useful to distinguish in the future.
     Key,
+
+    /// Store key
+    ///
+    /// Generated at runtime on store initialization
+    StoreKey,
 
     // Auto-generated enum variants
     AutoIndent: crate::preferences::editor::AutoIndent,

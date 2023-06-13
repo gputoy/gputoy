@@ -90,6 +90,7 @@
 
 <button
 	class={clazz}
+	class:root={true}
 	on:click={makeClickHandler(node)}
 	class:active={'id' in node && node.id == $dActiveFile}
 	transition:slide={{ duration: 50 }}
@@ -137,6 +138,9 @@
 </button>
 
 <style>
+	.root:hover {
+		background-color: transparent;
+	}
 	.active::before {
 		background-color: var(--glass-high);
 	}

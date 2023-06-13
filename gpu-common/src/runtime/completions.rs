@@ -23,8 +23,18 @@ mod tests {
 
     fn test_completion_key(command: &str, cursor_position: usize, expected_key: CompletionKey) {
         let completion_info = Completions::arg_info::<Action>(command, cursor_position);
-        let completion_key =
-            completion_info.arg_descriptors[completion_info.cursor_word_index].completion_key;
+        let completion_key = if let Some(word_index) = completion_info.cursor_word_index {
+            completion_info
+                .arg_descriptors
+                .get(word_index)
+                .expect(&format!(
+                    "Cursor index bounds: '{command}'@{cursor_position}"
+                ))
+                .completion_key
+        } else {
+            Empty
+        };
+
         assert_eq!(
             completion_key,
             expected_key,
@@ -36,18 +46,25 @@ mod tests {
     #[test]
     fn test_simple_actions() {
         test_completion_key("p", 0, ActionKey);
-        test_completion_key("save", 0, ActionKey);
-        test_completion_key("publish", 0, ActionKey);
-        test_completion_key("    p    ", 0, ActionKey);
-        test_completion_key("w        ", 0, ActionKey);
-        test_completion_key("    publish", 0, ActionKey);
+        test_completion_key(" p ", 0, Empty);
+        test_completion_key(" p ", 1, ActionKey);
+        test_completion_key(" p ", 2, ActionKey);
+        test_completion_key(" p  ", 3, Empty);
+        test_completion_key(" p k", 3, Empty);
     }
 
     #[test]
     fn test_one_arg_actions() {
-        test_completion_key("show editor", 6, Region);
-        test_completion_key("file /run.json", 8, FilePath);
-        test_completion_key("open //run.json", 14, FilePath);
+        test_completion_key("show editor", 0, ActionKey);
+        test_completion_key(" show editor", 0, Empty);
+        test_completion_key(" show editor", 1, ActionKey);
+        test_completion_key(" show editor", 5, ActionKey);
+        test_completion_key(" show editor", 6, Region);
+        test_completion_key(" show  editor", 6, Empty);
+        test_completion_key(" show  editor", 7, Region);
+        test_completion_key(" show  editor", 12, Region);
+        test_completion_key(" show  editor ", 13, Region);
+        test_completion_key(" show  editor  ", 14, Empty);
     }
 
     #[test]
@@ -61,12 +78,16 @@ mod tests {
     #[test]
     fn test_completion_boundaries() {
         test_completion_key("bind C-a toggle editor", 0, ActionKey);
-        test_completion_key("bind C-a toggle editor", 5, ActionKey);
-        test_completion_key("bind C-a toggle editor", 6, Key);
-        test_completion_key("bind C-a toggle editor", 9, Key);
-        test_completion_key("bind C-a toggle editor", 10, ActionKey);
-        test_completion_key("bind C-a toggle editor", 16, ActionKey);
-        test_completion_key("bind C-a toggle editor", 17, Region);
-        test_completion_key("bind C-a toggle editor", 22, Region);
+        test_completion_key("bind C-a toggle editor", 4, ActionKey);
+        test_completion_key("bind C-a toggle editor", 5, Key);
+        test_completion_key("bind C-a toggle editor", 8, Key);
+        test_completion_key("bind C-a toggle editor", 9, ActionKey);
+        test_completion_key("bind C-a toggle editor", 15, ActionKey);
+        test_completion_key("bind C-a toggle editor", 16, Region);
+        test_completion_key("bind C-a toggle editor", 21, Region);
+        test_completion_key(" bind C-a toggle editor", 0, Empty);
+        test_completion_key(" bind C-a toggle editor", 1, ActionKey);
+        test_completion_key("bind C-a toggle editor ", 22, Region);
+        test_completion_key("bind C-a toggle editor ", 23, Empty);
     }
 }

@@ -1,20 +1,82 @@
 #![cfg(feature = "bindgen")]
 
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub trait ConfigValue: Default {
-    fn metadata(prefix: &str) -> ConfigValueSchema;
-    fn keys(prefix: &str) -> Vec<String>;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
+pub trait Schema: Default {
+    fn _schema_impl(builder: Builder) -> Builder;
+    fn schema() -> HashMap<String, SchemaEntry> {
+        Self::_schema_impl(Builder::default()).into_inner()
+    }
+    fn keys() -> Vec<String> {
+        let mut keys: Vec<_> = Self::schema().into_keys().collect();
+        keys.sort();
+        keys
+    }
+}
+
+impl Schema for bool {
+    fn _schema_impl(builder: Builder) -> Builder {
+        builder.push_config_class(ConfigClass::Bool(Bool {}))
+    }
+}
+
+#[derive(Default, Debug)]
+pub struct Builder {
+    namespace: Vec<&'static str>,
+    description: Option<&'static str>,
+    config_class: Option<ConfigClass>,
+    map: HashMap<String, SchemaEntry>,
+}
+
+impl Builder {
+    pub fn push_name(mut self, name: &'static str) -> Self {
+        self.namespace.push(name);
+        self
+    }
+
+    pub fn push_description(mut self, description: &'static str) -> Self {
+        self.description = Some(description);
+        self
+    }
+
+    pub fn push_config_class(mut self, config_class: ConfigClass) -> Self {
+        self.config_class = Some(config_class);
+        self
+    }
+
+    pub fn pop(mut self) -> Self {
+        if let (Some(description), Some(config_class)) =
+            (self.description.take(), self.config_class.take())
+        {
+            let name = self.namespace.last().expect("Namespace length > 0");
+            let path = self.namespace.join(".");
+            let entry = SchemaEntry {
+                name: name.to_string(),
+                description: description.to_owned(),
+                config_class,
+            };
+            if let Some(duplicate) = self.map.insert(path.clone(), entry) {
+                log::error!("Duplicate config schema entry at path '{path}': {duplicate:?}");
+            }
+        }
+        self.namespace.pop();
+        self
+    }
+
+    fn into_inner(self) -> HashMap<String, SchemaEntry> {
+        self.map
+    }
 }
 
 #[derive(Debug, Clone, JsonSchema, Serialize, Deserialize)]
-pub struct ConfigValueSchema {
+#[serde(rename_all = "camelCase")]
+pub struct SchemaEntry {
     pub name: String,
     pub description: String,
-    pub path: String,
-    pub class: ConfigValueClass,
+    pub config_class: ConfigClass,
 }
 
 /// Describes the various classes of user interactables
@@ -23,24 +85,22 @@ pub struct ConfigValueSchema {
 /// on how these input classes are implemented in the frontend.
 #[derive(Debug, Clone, JsonSchema, Serialize, Deserialize)]
 #[serde(tag = "ty", content = "c")]
-pub enum ConfigValueClass {
+pub enum ConfigClass {
     /// <input type='number'/> with no fractional values
-    IntClass(IntClass),
+    #[serde(rename = "IntClass")]
+    Int(Int),
     /// <input type='number'/> with fractional values
-    FloatClass(FloatClass),
+    #[serde(rename = "FloatClass")]
+    Float(Float),
     /// <input/> plain string value
-    StrClass(StrClass),
+    #[serde(rename = "StrClass")]
+    Str(Str),
     /// <select/> with list of values as options
-    EnumClass(EnumClass),
+    #[serde(rename = "EnumClass")]
+    Enum(Enum),
     /// <input type='checkbox'/>
-    BoolClass(BoolClass),
-    /// category of interactables mapped by the children's identifiers
-    CategoryClass(CategoryClass),
-    /// category with an inserted `enabled` field which can be used to
-    /// toggle the entire feature on and off
-    ToggledCategoryClass(CategoryClass),
-    /// command input
-    CmdClass(CmdClass),
+    #[serde(rename = "BoolClass")]
+    Bool(Bool),
 }
 
 /// ### Int
@@ -49,7 +109,7 @@ pub enum ConfigValueClass {
 /// Used to generate html markup for changing fields
 /// of config structs.
 #[derive(Debug, Clone, JsonSchema, Serialize, Deserialize)]
-pub struct IntClass {
+pub struct Int {
     /// The minimum value this input can be
     pub min: Option<i32>,
     /// The maximum value this input can be
@@ -60,7 +120,7 @@ pub struct IntClass {
     pub postfix: Option<String>,
 }
 
-impl IntClass {
+impl Int {
     pub fn min(mut self, val: i32) -> Self {
         self.min = Some(val);
         self
@@ -79,7 +139,7 @@ impl IntClass {
     }
 }
 
-impl Default for IntClass {
+impl Default for Int {
     fn default() -> Self {
         Self {
             min: None,
@@ -96,7 +156,7 @@ impl Default for IntClass {
 /// Used to generate html markup for changing fields
 /// of config structs.
 #[derive(Debug, Clone, JsonSchema, Serialize, Deserialize)]
-pub struct FloatClass {
+pub struct Float {
     /// The minimum value this input can be
     pub min: Option<f32>,
     /// The maximum value this input can be
@@ -109,7 +169,7 @@ pub struct FloatClass {
     pub scale: i8,
 }
 
-impl FloatClass {
+impl Float {
     pub fn min(mut self, val: f32) -> Self {
         self.min = Some(val);
         self
@@ -132,7 +192,7 @@ impl FloatClass {
     }
 }
 
-impl Default for FloatClass {
+impl Default for Float {
     fn default() -> Self {
         Self {
             min: None,
@@ -145,12 +205,11 @@ impl Default for FloatClass {
 }
 
 #[derive(Default, Debug, Clone, JsonSchema, Serialize, Deserialize)]
-pub struct StrClass {
+pub struct Str {
     pub regex: Option<String>,
 }
 
-#[cfg(feature = "bindgen")]
-impl StrClass {
+impl Str {
     pub fn regex(mut self, val: String) -> Self {
         self.regex = Some(val);
         self
@@ -158,21 +217,9 @@ impl StrClass {
 }
 
 #[derive(Default, Debug, Clone, JsonSchema, Serialize, Deserialize)]
-pub struct BoolClass {}
+pub struct Bool {}
 
 #[derive(Default, Debug, Clone, JsonSchema, Serialize, Deserialize)]
-pub struct EnumClass {
+pub struct Enum {
     pub variants: Vec<String>,
-}
-
-#[derive(Default, Debug, Clone, JsonSchema, Serialize, Deserialize)]
-pub struct CategoryClass {
-    #[serde(flatten)]
-    pub inner: HashMap<String, ConfigValueSchema>,
-}
-
-#[derive(Debug, Clone, JsonSchema, Serialize, Deserialize)]
-#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
-pub struct CmdClass {
-    completions: bool,
 }

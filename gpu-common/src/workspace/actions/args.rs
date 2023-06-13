@@ -143,3 +143,39 @@ impl Parse<'_> for Key {
 lazy_static::lazy_static! {
     static ref RE_VALID_KEY: Regex = Regex::new(r#"^(C\-)?(S\-)?(A\-)?[a-z1-9]$"#).unwrap();
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "schema", derive(JsonSchema))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
+pub struct StoreKey(String);
+
+impl FromStr for StoreKey {
+    type Err = RootError;
+
+    fn from_str(store_key: &str) -> Result<Self, Self::Err> {
+        // Can't validate the store key from rust as its variants are generated
+        // by the front-end at startup. So just do some basic checks at the very least.
+        if !store_key.starts_with('$') || store_key.len() == 1 {
+            Err(Self::Err::InvalidValue("store-key", store_key.to_owned()))
+        } else {
+            Ok(StoreKey(store_key.to_owned()))
+        }
+    }
+}
+
+impl Describe<'_> for StoreKey {
+    fn describe(manifest: &mut Manifest) {
+        manifest
+            .with_name("store-key")
+            .with_completion(CompletionKey::StoreKey)
+            .with_description("A system runtime value")
+            .finish_arg();
+    }
+}
+
+impl Parse<'_> for StoreKey {
+    fn parse(args: &mut ParseArgs<'_>) -> Result<Self, Self::Error> {
+        args.next_arg().and_then(Self::from_str)
+    }
+}

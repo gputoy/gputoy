@@ -1,19 +1,47 @@
 <script lang="ts">
-	import { ICONS } from '$core/completions'
-	import type { CompletionEntry } from '$gen'
+	import type { CompletionEntryMatch } from '$core/completions'
+	import { COMPLETION_ICONS } from '$core/icon'
+	import { createEventDispatcher } from 'svelte'
 	export let expanded = false
 	export let completionIndex: number
-	export let completion: CompletionEntry
+	export let completion: CompletionEntryMatch
 	let elem: HTMLDivElement
+
+	const dispatcher = createEventDispatcher()
+
+	$: if (expanded) {
+		elem.scrollIntoView()
+	}
 </script>
 
-<div class="root" class:expanded bind:this={elem}>
+<div
+	class="root"
+	class:expanded
+	bind:this={elem}
+	on:click={() => dispatcher('click', {})}
+	on:keydown={() => {}}
+>
 	<div class="insert-text">
-		<svelte:component this={ICONS[completionIndex]} class="completionIcon" />
-		{completion.insertText}
+		<svelte:component
+			this={COMPLETION_ICONS[completionIndex]}
+			class="completionIcon"
+		/>
+		<div class="completion-text">
+			{completion.matchParts[0]}
+			<span class="highlighted">
+				{completion.matchParts[1]}
+			</span>
+			{completion.matchParts[2]}
+		</div>
 	</div>
 	<span class="description" class:visible={expanded}>
-		{completion.name}
+		{#if completion.alias}
+			<span>
+				{completion.insertText}
+			</span>
+		{:else}
+			{completion.snippetText}
+		{/if}
 	</span>
 </div>
 
@@ -28,6 +56,9 @@
 		align-items: center;
 		min-width: max-content;
 		font-size: var(--sm);
+	}
+	.root:hover {
+		background-color: var(--glass-low);
 	}
 	.expanded {
 		background-color: var(--glass-med);
@@ -49,5 +80,10 @@
 	}
 	.visible {
 		visibility: visible;
+	}
+	.completion-text {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
 	}
 </style>

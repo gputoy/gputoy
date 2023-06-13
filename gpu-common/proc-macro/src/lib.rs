@@ -1,3 +1,4 @@
+mod case;
 mod doc_comment;
 mod method;
 mod ts;
@@ -23,5 +24,11 @@ pub fn gen_ts(tokens: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn extract_doc_comment(tokens: TokenStream) -> TokenStream {
     let item = syn::parse_macro_input!(tokens as doc_comment::AttributeList);
-    doc_comment::extract_doc_comment(item)
+    doc_comment::generate_tokens(item)
+}
+
+#[proc_macro]
+pub fn to_case(tokens: TokenStream) -> TokenStream {
+    let item = syn::parse_macro_input!(tokens as case::Input);
+    case::generate_tokens(item)
 }

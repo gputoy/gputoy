@@ -55,7 +55,7 @@ pub struct PaneSize {
 #[derive(Debug)]
 #[cfg_attr(feature = "schema", derive(JsonSchema))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
+#[cfg_attr(feature = "serde", serde(rename_all = "kebab-case"))]
 pub struct PaneToggled {
     /// Whether the project pane is open
     project_pane: bool,

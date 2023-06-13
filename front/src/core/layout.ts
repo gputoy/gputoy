@@ -25,12 +25,15 @@ const wTabIndex = writable<(typeof L)['tabIndex']>(DEFAULT['tabIndex'])
 /**
  * Public readable atomic stores of the Layout struct
  */
-export const rAccordianOpen = sealWritable(wAccordianOpen)
-export const rFileTreeState = sealWritable(wFileTreeState)
-export const rPaneSize = sealWritable(wPaneSize)
-export const rPaneToggle = sealWritable(wPaneToggle)
-export const rTabs = sealWritable(wTabs)
-export const rTabIndex = sealWritable(wTabIndex)
+export const rAccordianOpen = sealWritable(
+	wAccordianOpen,
+	'layout.accordian-open'
+)
+export const rFileTreeState = sealWritable(wFileTreeState, 'layout.file-tree')
+export const rPaneSize = sealWritable(wPaneSize, 'layout.pane-size')
+export const rPaneToggle = sealWritable(wPaneToggle, 'layout.pane-toggle')
+export const rTabs = sealWritable(wTabs, 'layout.tabs')
+export const rTabIndex = sealWritable(wTabIndex, 'layout.tab-index')
 
 // whether the window size is currently being updated
 export const wUpdatingWindowSize = writable(false)
@@ -46,10 +49,16 @@ const wUserPrefsOpen = writable(false)
 const wTerminalOpen = writable(false)
 const wDebugOpen = writable(false)
 
-export const rUserModalOpen = sealWritable(wUserModalOpen)
-export const rUserPrefsOpen = sealWritable(wUserPrefsOpen)
-export const rTerminalOpen = sealWritable(wTerminalOpen)
-export const rDebugOpen = sealWritable(wDebugOpen)
+export const rUserModalOpen = sealWritable(
+	wUserModalOpen,
+	'layout.user-modal-open'
+)
+export const rUserPrefsOpen = sealWritable(
+	wUserPrefsOpen,
+	'layout.user-prefs-open'
+)
+export const rTerminalOpen = sealWritable(wTerminalOpen, 'layout.terminal-open')
+export const rDebugOpen = sealWritable(wDebugOpen, 'layout.debug-open')
 
 // Raw pane sizes, tracked by on:resize via the svelte component
 // and the forceUpdateRawPaneSize function below
@@ -114,21 +123,21 @@ export const dPaneSizes = derived(
 			get(wPaneSize)
 
 		let projectPanePct = (projectPanePx / (width ?? 1000)) * 100
-		if (toggle["project-pane"])
+		if (toggle['project-pane'])
 			forceUpdateRawPaneSize('project-pane', { size: projectPanePct })
-		projectPanePct = toggle["project-pane"] ? projectPanePct : 0
+		projectPanePct = toggle['project-pane'] ? projectPanePct : 0
 
-		let editorPanePct = toggle["editor-pane"] ? editorPanePercentage : 0
-		if (toggle["editor-pane"])
+		let editorPanePct = toggle['editor-pane'] ? editorPanePercentage : 0
+		if (toggle['editor-pane'])
 			forceUpdateRawPaneSize('editor-pane', { size: editorPanePct })
 		let centerPanePct = 100 - projectPanePct - editorPanePct
 
 		let controlBarMinSize: number =
 			(CONTROL_BAR_HEIGHT / (height ?? 1000)) * 100
-		let controlPanePct = toggle["control-pane"]
+		let controlPanePct = toggle['control-pane']
 			? controlPanePercentage
 			: controlBarMinSize
-		if (toggle["control-pane"])
+		if (toggle['control-pane'])
 			forceUpdateRawPaneSize('control-pane', { size: controlPanePct })
 		let viewportPanePct = 100 - controlPanePct
 
@@ -269,7 +278,7 @@ export function toggleRegionVisibility(region: Region) {
 		const toggle = (val: boolean) => {
 			return !val
 		}
-		({
+		;({
 			preferences: () => {
 				wUserPrefsOpen.update(toggle)
 			},
@@ -296,7 +305,7 @@ export function setRegionVisibility(region: Region, visibility: boolean) {
 			return toggle
 		})
 	} else {
-		; ({
+		;({
 			preferences: () => {
 				wUserPrefsOpen.set(visibility)
 			},
@@ -314,18 +323,22 @@ export function setRegionVisibility(region: Region, visibility: boolean) {
 }
 
 export function toggleAllPanes() {
-	let { "editor-pane": e, "project-pane": p, "control-pane": c } = get(wPaneToggle)
+	let {
+		'editor-pane': e,
+		'project-pane': p,
+		'control-pane': c
+	} = get(wPaneToggle)
 	if (e || p || c)
 		wPaneToggle.set({
-			"editor-pane": false,
-			"project-pane": false,
-			"control-pane": false
+			'editor-pane': false,
+			'project-pane': false,
+			'control-pane': false
 		})
 	else
 		wPaneToggle.set({
-			"editor-pane": true,
-			"project-pane": true,
-			"control-pane": true
+			'editor-pane': true,
+			'project-pane': true,
+			'control-pane': true
 		})
 }
 

@@ -1,283 +1,250 @@
 {
-  "name": "preferences",
-  "description": " User preferences",
-  "path": "",
-  "class": {
-    "ty": "CategoryClass",
-    "c": {
-      "workspace": {
-        "name": "workspace",
-        "description": "",
-        "path": "",
-        "class": {
-          "ty": "CategoryClass",
-          "c": {
-            "handle-size": {
-              "name": "handle-size",
-              "description": " The size of the pane drag handle.",
-              "path": "workspace.handle-size",
-              "class": {
-                "ty": "IntClass",
-                "c": {
-                  "min": 0,
-                  "max": 12,
-                  "step": 1,
-                  "postfix": "px"
-                }
-              }
-            },
-            "ui-speed": {
-              "name": "ui-speed",
-              "description": " The speed of ui transitions.",
-              "path": "workspace.ui-speed",
-              "class": {
-                "ty": "EnumClass",
-                "c": {
-                  "variants": [
-                    "instant",
-                    "snappy",
-                    "quick",
-                    "smooth",
-                    "slow"
-                  ]
-                }
-              }
-            }
-          }
-        }
-      },
-      "editor": {
-        "name": "editor",
-        "description": " User editor preferences",
-        "path": "",
-        "class": {
-          "ty": "CategoryClass",
-          "c": {
-            "smooth-caret": {
-              "name": "smooth-caret",
-              "description": " Enable smooth caret movement animations.",
-              "path": "editor.smooth-caret",
-              "class": {
-                "ty": "BoolClass",
-                "c": {}
-              }
-            },
-            "auto-indent": {
-              "name": "auto-indent",
-              "description": " Controls whether the editor should automatically\n adjust the indentation when users type, paste, move or indent lines.",
-              "path": "editor.auto-indent",
-              "class": {
-                "ty": "EnumClass",
-                "c": {
-                  "variants": [
-                    "none",
-                    "keep",
-                    "brackets",
-                    "advanced",
-                    "full"
-                  ]
-                }
-              }
-            },
-            "cursor-blinking": {
-              "name": "cursor-blinking",
-              "description": " Controls the cursor animation style in the code editor.",
-              "path": "editor.cursor-blinking",
-              "class": {
-                "ty": "EnumClass",
-                "c": {
-                  "variants": [
-                    "blink",
-                    "smooth",
-                    "phase",
-                    "expand",
-                    "solid"
-                  ]
-                }
-              }
-            },
-            "word-wrap": {
-              "name": "word-wrap",
-              "description": " Whether to wrap lines in the code editor.",
-              "path": "editor.word-wrap",
-              "class": {
-                "ty": "BoolClass",
-                "c": {}
-              }
-            },
-            "font": {
-              "name": "font",
-              "description": " Font to use in the editor.\n\n Comma-delimited list like \"FiraMono,mono\"",
-              "path": "editor.font",
-              "class": {
-                "ty": "StrClass",
-                "c": {
-                  "regex": null
-                }
-              }
-            },
-            "scroll-beyond-last-line": {
-              "name": "scroll-beyond-last-line",
-              "description": " Enable scrolling to go one screen size past the last line.",
-              "path": "editor.scroll-beyond-last-line",
-              "class": {
-                "ty": "BoolClass",
-                "c": {}
-              }
-            },
-            "smooth-scrolling": {
-              "name": "smooth-scrolling",
-              "description": " Animate smooth scrolling in the editor.",
-              "path": "editor.smooth-scrolling",
-              "class": {
-                "ty": "BoolClass",
-                "c": {}
-              }
-            },
-            "cursor-style": {
-              "name": "cursor-style",
-              "description": " Style of the cursor in the code editor.",
-              "path": "editor.cursor-style",
-              "class": {
-                "ty": "EnumClass",
-                "c": {
-                  "variants": [
-                    "line",
-                    "line-thin",
-                    "block",
-                    "block-outline",
-                    "underline",
-                    "underline-thin"
-                  ]
-                }
-              }
-            },
-            "minimap": {
-              "name": "minimap",
-              "description": " Whether to show a minimap in the top-right of the code editor.",
-              "path": "editor.minimap",
-              "class": {
-                "ty": "BoolClass",
-                "c": {}
-              }
-            },
-            "font-ligatures": {
-              "name": "font-ligatures",
-              "description": " Render font ligatures in the code editor.",
-              "path": "editor.font-ligatures",
-              "class": {
-                "ty": "BoolClass",
-                "c": {}
-              }
-            },
-            "vim-mode": {
-              "name": "vim-mode",
-              "description": " Enable vim movements in code editor.",
-              "path": "",
-              "class": {
-                "ty": "ToggledCategoryClass",
-                "c": {
-                  "some-property": {
-                    "name": "some-property",
-                    "description": "",
-                    "path": "editor.vim-mode.some-property",
-                    "class": {
-                      "ty": "IntClass",
-                      "c": {
-                        "min": 0,
-                        "max": null,
-                        "step": 10,
-                        "postfix": null
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "line-numbers": {
-              "name": "line-numbers",
-              "description": " How line numbers appear in the code editor.",
-              "path": "editor.line-numbers",
-              "class": {
-                "ty": "EnumClass",
-                "c": {
-                  "variants": [
-                    "on",
-                    "interval",
-                    "relative",
-                    "off"
-                  ]
-                }
-              }
-            },
-            "font-size": {
-              "name": "font-size",
-              "description": " Font size of code in the editor.",
-              "path": "editor.font-size",
-              "class": {
-                "ty": "IntClass",
-                "c": {
-                  "min": 5,
-                  "max": 64,
-                  "step": 1,
-                  "postfix": "px"
-                }
-              }
-            }
-          }
-        }
-      },
-      "console": {
-        "name": "console",
-        "description": "",
-        "path": "",
-        "class": {
-          "ty": "CategoryClass",
-          "c": {
-            "level": {
-              "name": "log-level",
-              "description": " Log level of the console.",
-              "path": "console.level",
-              "class": {
-                "ty": "EnumClass",
-                "c": {
-                  "variants": [
-                    "trace",
-                    "debug",
-                    "info",
-                    "warn",
-                    "error"
-                  ]
-                }
-              }
-            },
-            "show-completions": {
-              "name": "show-completions",
-              "description": " How much detail should completions provide.",
-              "path": "console.show-completions",
-              "class": {
-                "ty": "EnumClass",
-                "c": {
-                  "variants": [
-                    "full",
-                    "suggestions",
-                    "none"
-                  ]
-                }
-              }
-            },
-            "wrap": {
-              "name": "wrap",
-              "description": " True: Wrap console messages. May scramble certain error messages.\n False: Console messages overflow past the size of the viewport.",
-              "path": "console.wrap",
-              "class": {
-                "ty": "BoolClass",
-                "c": {}
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+	"name": "preferences",
+	"description": " User preferences",
+	"path": "",
+	"class": {
+		"ty": "CategoryClass",
+		"c": {
+			"editor": {
+				"name": "editor",
+				"description": " User editor preferences",
+				"path": "",
+				"class": {
+					"ty": "CategoryClass",
+					"c": {
+						"vim-mode": {
+							"name": "vim-mode",
+							"description": " Enable vim movements in code editor.",
+							"path": "",
+							"class": {
+								"ty": "ToggledCategoryClass",
+								"c": {
+									"some-property": {
+										"name": "some-property",
+										"description": "",
+										"path": "editor.vim-mode.some-property",
+										"class": {
+											"ty": "IntClass",
+											"c": {
+												"min": 0,
+												"max": null,
+												"step": 10,
+												"postfix": null
+											}
+										}
+									}
+								}
+							}
+						},
+						"font-ligatures": {
+							"name": "font-ligatures",
+							"description": " Render font ligatures in the code editor.",
+							"path": "editor.font-ligatures",
+							"class": {
+								"ty": "BoolClass",
+								"c": {}
+							}
+						},
+						"smooth-scrolling": {
+							"name": "smooth-scrolling",
+							"description": " Animate smooth scrolling in the editor.",
+							"path": "editor.smooth-scrolling",
+							"class": {
+								"ty": "BoolClass",
+								"c": {}
+							}
+						},
+						"auto-indent": {
+							"name": "auto-indent",
+							"description": " Controls whether the editor should automatically\n adjust the indentation when users type, paste, move or indent lines.",
+							"path": "editor.auto-indent",
+							"class": {
+								"ty": "EnumClass",
+								"c": {
+									"variants": ["none", "keep", "brackets", "advanced", "full"]
+								}
+							}
+						},
+						"cursor-style": {
+							"name": "cursor-style",
+							"description": " Style of the cursor in the code editor.",
+							"path": "editor.cursor-style",
+							"class": {
+								"ty": "EnumClass",
+								"c": {
+									"variants": [
+										"line",
+										"line-thin",
+										"block",
+										"block-outline",
+										"underline",
+										"underline-thin"
+									]
+								}
+							}
+						},
+						"cursor-blinking": {
+							"name": "cursor-blinking",
+							"description": " Controls the cursor animation style in the code editor.",
+							"path": "editor.cursor-blinking",
+							"class": {
+								"ty": "EnumClass",
+								"c": {
+									"variants": ["blink", "smooth", "phase", "expand", "solid"]
+								}
+							}
+						},
+						"font": {
+							"name": "font",
+							"description": " Font to use in the editor.\n\n Comma-delimited list like \"FiraMono,mono\"",
+							"path": "editor.font",
+							"class": {
+								"ty": "StrClass",
+								"c": {
+									"regex": null
+								}
+							}
+						},
+						"line-numbers": {
+							"name": "line-numbers",
+							"description": " How line numbers appear in the code editor.",
+							"path": "editor.line-numbers",
+							"class": {
+								"ty": "EnumClass",
+								"c": {
+									"variants": ["on", "interval", "relative", "off"]
+								}
+							}
+						},
+						"scroll-beyond-last-line": {
+							"name": "scroll-beyond-last-line",
+							"description": " Enable scrolling to go one screen size past the last line.",
+							"path": "editor.scroll-beyond-last-line",
+							"class": {
+								"ty": "BoolClass",
+								"c": {}
+							}
+						},
+						"font-size": {
+							"name": "font-size",
+							"description": " Font size of code in the editor.",
+							"path": "editor.font-size",
+							"class": {
+								"ty": "IntClass",
+								"c": {
+									"min": 5,
+									"max": 64,
+									"step": 1,
+									"postfix": "px"
+								}
+							}
+						},
+						"smooth-caret": {
+							"name": "smooth-caret",
+							"description": " Enable smooth caret movement animations.",
+							"path": "editor.smooth-caret",
+							"class": {
+								"ty": "BoolClass",
+								"c": {}
+							}
+						},
+						"minimap": {
+							"name": "minimap",
+							"description": " Whether to show a minimap in the top-right of the code editor.",
+							"path": "editor.minimap",
+							"class": {
+								"ty": "BoolClass",
+								"c": {}
+							}
+						},
+						"word-wrap": {
+							"name": "word-wrap",
+							"description": " Whether to wrap lines in the code editor.",
+							"path": "editor.word-wrap",
+							"class": {
+								"ty": "BoolClass",
+								"c": {}
+							}
+						}
+					}
+				}
+			},
+			"workspace": {
+				"name": "workspace",
+				"description": "",
+				"path": "",
+				"class": {
+					"ty": "CategoryClass",
+					"c": {
+						"handle-size": {
+							"name": "handle-size",
+							"description": " The size of the pane drag handle.",
+							"path": "workspace.handle-size",
+							"class": {
+								"ty": "IntClass",
+								"c": {
+									"min": 0,
+									"max": 12,
+									"step": 1,
+									"postfix": "px"
+								}
+							}
+						},
+						"ui-speed": {
+							"name": "ui-speed",
+							"description": " The speed of ui transitions.",
+							"path": "workspace.ui-speed",
+							"class": {
+								"ty": "EnumClass",
+								"c": {
+									"variants": ["instant", "snappy", "quick", "smooth", "slow"]
+								}
+							}
+						}
+					}
+				}
+			},
+			"console": {
+				"name": "console",
+				"description": "",
+				"path": "",
+				"class": {
+					"ty": "CategoryClass",
+					"c": {
+						"level": {
+							"name": "log-level",
+							"description": " Log level of the console.",
+							"path": "console.level",
+							"class": {
+								"ty": "EnumClass",
+								"c": {
+									"variants": ["trace", "debug", "info", "warn", "error"]
+								}
+							}
+						},
+						"show-completions": {
+							"name": "show-completions",
+							"description": " How much detail should completions provide.",
+							"path": "console.show-completions",
+							"class": {
+								"ty": "EnumClass",
+								"c": {
+									"variants": ["full", "suggestions", "none"]
+								}
+							}
+						},
+						"wrap": {
+							"name": "wrap",
+							"description": " True: Wrap console messages. May scramble certain error messages.\n False: Console messages overflow past the size of the viewport.",
+							"path": "console.wrap",
+							"class": {
+								"ty": "BoolClass",
+								"c": {}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

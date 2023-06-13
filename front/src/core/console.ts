@@ -1,8 +1,9 @@
 import type { ClientError, LogLevel as LogLevelString } from '$gen'
-import rootSchema from '$gen/root-schema.json'
 import { wConsole } from '$stores'
+import * as wasm from '$wasm/common'
 import { toast } from '@zerodevx/svelte-toast'
 import type { Writable } from 'svelte/store'
+import { pushAction } from './actions'
 
 // Add private logging methods to window so wasm modules can use it
 // without having to import anything from /front.
@@ -28,7 +29,6 @@ if (typeof window !== 'undefined') {
 	})
 }
 
-const actionSchema = rootSchema.definitions.Action
 export type Log = {
 	level: LogLevel
 	message: string
@@ -41,6 +41,7 @@ export type ConsoleExtras = {
 	warn: (warn: string) => void
 	error: (error: string) => void
 	echo: (echo: string) => void
+	out: (out: string) => void
 }
 
 export function toLogLevel(level: LogLevelString) {
@@ -67,7 +68,9 @@ export enum LogLevel {
 	Warn = 1 << 3,
 	Error = 1 << 4,
 	/** Echo prompt after use submits command. Cannot be filtered. */
-	Echo = 1 << 5
+	Echo = 1 << 5,
+	/** Just print the content with no prefix. Cannot be filtered */
+	Out = 1 << 6
 }
 
 export const LOG_PREFIX = new Map([
@@ -76,7 +79,8 @@ export const LOG_PREFIX = new Map([
 	[LogLevel.Info, '[info] '],
 	[LogLevel.Warn, '[warn] '],
 	[LogLevel.Error, '[error]'],
-	[LogLevel.Echo, ' ~ ']
+	[LogLevel.Echo, ' ~ '],
+	[LogLevel.Out, '']
 ])
 
 export const LOG_PREFIX_STYLES = new Map([
@@ -85,7 +89,8 @@ export const LOG_PREFIX_STYLES = new Map([
 	[LogLevel.Info, 'color:  var(--console-info);'],
 	[LogLevel.Warn, 'color:  var(--console-warn);'],
 	[LogLevel.Error, 'color:  var(--console-error);'],
-	[LogLevel.Echo, '']
+	[LogLevel.Echo, ''],
+	[LogLevel.Out, '']
 ])
 
 export function initConsoleMethods(console: Writable<Log[]>): ConsoleExtras {
@@ -143,7 +148,26 @@ export function initConsoleMethods(console: Writable<Log[]>): ConsoleExtras {
 			return console
 		})
 	}
-	return { trace, debug, info, warn, error, echo }
+	function out(out: string) {
+		console.update((console) => {
+			console.push({
+				level: LogLevel.Out,
+				message: out
+			})
+			return console
+		})
+	}
+	return { trace, debug, info, warn, error, echo, out }
+}
+
+export function submitCommand(command: string) {
+	wConsole.echo(command)
+	let result = wasm.action(command)
+	if ('severity' in result) {
+		handleClientError(result)
+	} else {
+		pushAction(result)
+	}
 }
 
 export function handleClientError(clientError: ClientError) {
@@ -163,4 +187,33 @@ export function handleClientError(clientError: ClientError) {
 			}
 		})
 	}
+}
+
+export function prettyPrintJson(obj: any): string {
+	const replacer = (
+		_match: string,
+		pIndent: any,
+		pKey: any,
+		pStrKey: any,
+		pVal: any,
+		pEnd: any
+	) => {
+		var key = '<span class=json-key>'
+		var strKey = '<span class=json-key-str>'
+		var val = '<span class=json-value>'
+		var str = '<span class=json-string>'
+		var r = pIndent || ''
+		if (pKey) r = r + key + pKey.replace(/[": ]/g, '') + '</span>: '
+		else if (pStrKey) r = r + strKey + pStrKey + '</span>: '
+		if (pVal) r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>'
+		return r + (pEnd || '')
+	}
+	var jsonLine = /^( *)("[\w]+")?("[^"]+")?: ("[^"]*"|[\w.+-]*)?([,[{])?$/gm
+	var value = JSON.stringify(obj, null, 4)
+		.replace(/&/g, '&amp;')
+		.replace(/\\"/g, '&quot;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(jsonLine, replacer)
+	return '<pre>' + value + '</pre>'
 }

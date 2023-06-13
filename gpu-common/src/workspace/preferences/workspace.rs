@@ -3,7 +3,7 @@ crate::config_category! {
         /// The size of the pane drag handle.
         handle_size: {
             Self = u8,
-            class = IntClass,
+            class = Int,
             min = 0,
             max = 12,
             postfix = "px",

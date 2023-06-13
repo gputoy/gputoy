@@ -2,22 +2,20 @@ pub mod args;
 
 use crate::{layout::Region, FilePath, Path};
 
+use self::args::StoreKey;
+
 crate::actions! {
     // Ui
     /// Clears the console
     ["clear", "clr"] => Clear,
     /// Shows a region in the workspace
-    ["ui-show", "show"] => Show(Region),
+    ["show"] => Show(Region),
     /// Hides a region in the workspace
-    ["ui-hide", "hide"] => Hide(Region),
+    ["hide"] => Hide(Region),
     /// Togges a region in the workspace
-    ["ui-toggle", "toggle"] => ToggleUi(Region),
+    ["toggle"] => ToggleUi(Region),
     /// Toggles all panes open and closed
-    ["ui-toggle-all", "toggle-all"] => ToggleAllPanes,
-    /// Bind key
-    ["bind-key", "bind"] => BindKey(args::BindKey),
-    /// Toggles debug panel
-    ["dbg", "debug"] => ToggleDebugPanel,
+    ["theater"] => ToggleAllPanes,
 
     // Editor
     /// Open document in editor
@@ -64,6 +62,10 @@ crate::actions! {
     ["reset", "r"] => Reset,
     /// Build project
     ["build"] => Build,
+    /// Bind key
+    ["bind"] => BindKey(args::BindKey),
+    /// Dump a store's contents
+    ["dump"] => Dump(StoreKey),
     /// Close project
     ["exit", "quit"] => Exit,
 }

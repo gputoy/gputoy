@@ -4,8 +4,8 @@ use crate::{
         UpdateUserInfoArgs, UserInfoResponse,
     },
     completion::CompletionEntry,
-    config_value::ConfigValueSchema,
     describe::CompletionInfo,
+    preferences::schema::SchemaEntry,
     Action, ClientError, Config, PrebuildResult, Preferences, Project, Runner,
 };
 
@@ -39,7 +39,7 @@ root_schema!(
     Runner,
     ClientError,
     Preferences,
-    ConfigValueSchema,
+    SchemaEntry,
     CompletionInfo: 'all,
     CompletionEntry,
 );

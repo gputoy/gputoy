@@ -2,7 +2,8 @@ import { initConsoleMethods, type ConsoleExtras, type Log } from '$core/console'
 import {
 	DEFAULT_CONFIG,
 	DEFAULT_FILES,
-	DEFAULT_RUN_STATE, type MenuKey
+	DEFAULT_RUN_STATE,
+	type MenuKey
 } from '$core/consts'
 import { initFilesMethods, treeFromFiles, type FilesExtras } from '$core/files'
 import { dLayout } from '$core/layout'
@@ -22,18 +23,45 @@ import {
 	derived,
 	get,
 	writable,
-	type Readable, type Writable
+	type Readable,
+	type Writable
 } from 'svelte/store'
+import {
+	rCompletionIndex,
+	rCompletions,
+	rCompletionsPosition
+} from './completions'
 import {
 	initRunStateMethods,
 	type RunState,
 	type RunStateExtras
 } from './runstate'
 
-export function sealWritable<T>(writable: Writable<T>): Readable<T> {
-	return {
+var SEAL_MAP: Record<string, Readable<any>>
+export function sealWritable<T>(
+	writable: Writable<T>,
+	indentifier: string
+): Readable<T> {
+	if (SEAL_MAP === undefined) SEAL_MAP = {}
+	const readable = {
 		subscribe: writable.subscribe
 	}
+	SEAL_MAP[indentifier] = readable
+	return readable
+}
+export function getSealedStoreKeys(): string[] {
+	if (SEAL_MAP === undefined) return []
+	return Object.keys(SEAL_MAP)
+}
+export function getStore(storeKey: string): Readable<any> | null {
+	return SEAL_MAP === undefined ? null : SEAL_MAP[storeKey] ?? null
+}
+export function getStores(): any {
+	let obj: { [key: string]: any } = {}
+	for (let [key, val] of Object.entries(SEAL_MAP)) {
+		obj[key] = get(val)
+	}
+	return obj
 }
 
 // TODO: move this to seperate file
@@ -171,8 +199,6 @@ export const wFiles = makeEnhanced<Files, FilesExtras>(
 	initFilesMethods
 )()
 export const dFileTree = derived([wFiles], ([files]) => {
-	console.log('in dFileTree', files.map)
-
 	return treeFromFiles(files)
 })
 export const wModelDirty = makeSet()
@@ -220,7 +246,6 @@ export const wMenuOpen = writable<Record<MenuKey, boolean>>({
 	project: false
 })
 
-
 // TODO: type this up
 export const wWorkerData = writable(null)
 
@@ -258,3 +283,9 @@ export const dProject = derived(
 dProject.subscribe((p) => {
 	if (p != null) writeToProjectLocalStorage(p)
 })
+
+const storeMap: Record<string, Readable<any>> = {
+	'completions.matches': rCompletions,
+	'completions.index': rCompletionIndex,
+	'completions.position': rCompletionsPosition
+}

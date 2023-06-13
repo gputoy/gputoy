@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 use crate::completion::CompletionKey;
 
 use super::parse::ParseArgs;
@@ -52,7 +54,7 @@ pub struct Manifest<'val> {
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct CompletionInfo<'cmd> {
     pub arg_descriptors: Vec<ArgDescriptor<'cmd>>,
-    pub cursor_word_index: usize,
+    pub cursor_word_index: Option<usize>,
 }
 
 impl<'val> Manifest<'val> {
@@ -77,8 +79,9 @@ impl<'val> Manifest<'val> {
         ParseArgs::new(self.args, self.arg_descriptors)
     }
     pub fn to_completion_info(self, cursor_char_index: usize) -> CompletionInfo<'val> {
-        let cursor_word_index = get_num_words_until_char(self.value, cursor_char_index);
-        // assert!(cursor_word_index < self.arg_descriptors.len());
+        let cursor_word_index = get_cursor_word_index(self.value, cursor_char_index)
+            .filter(|&idx| idx < self.arg_descriptors.len());
+
         CompletionInfo {
             arg_descriptors: self.arg_descriptors,
             cursor_word_index,
@@ -113,7 +116,7 @@ impl Manifest<'_> {
         self
     }
     pub fn finish_arg(&mut self) {
-        // TODO: come up with something better than magic values
+        // TODO: come up with something better
         let arg_descriptor = ArgDescriptor {
             value: self.args.get(self.word_index).unwrap_or(&""),
             name: self.arg_name.take().unwrap_or("[UNNAMED]"),
@@ -125,17 +128,22 @@ impl Manifest<'_> {
     }
 }
 
-fn get_num_words_until_char(value: &str, char_pos: usize) -> usize {
-    let mut last_whitespace = false;
-    let mut cursor_word_pos = 0;
-    for char in value.chars().take(char_pos) {
-        let is_whitespace = char.is_whitespace();
-        if last_whitespace && !is_whitespace {
-            cursor_word_pos += 1;
-            last_whitespace = false;
-        } else if !last_whitespace && is_whitespace {
-            last_whitespace = true;
-        }
+fn get_cursor_word_index(value: &str, char_pos: usize) -> Option<usize> {
+    let mut boundaries = std::iter::once(' ')
+        .chain(value.chars())
+        .chain(std::iter::once(' '))
+        .enumerate()
+        .tuple_windows()
+        .filter(|((_, a), (_, b))| a.is_whitespace() ^ b.is_whitespace())
+        .map(|(_, (right, _))| right - 1)
+        .tuples::<(_, _)>();
+
+    if let Some((word_idx, _)) = boundaries
+        .by_ref()
+        .find_position(|&(start, end)| char_pos >= start && char_pos <= end)
+    {
+        Some(word_idx)
+    } else {
+        None
     }
-    cursor_word_pos
 }

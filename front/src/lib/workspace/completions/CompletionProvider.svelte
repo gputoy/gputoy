@@ -1,20 +1,24 @@
 <script lang="ts">
-	import InputController from '$core/input'
+	import {
+		rCompletionIndex,
+		rCompletions,
+		rCompletionsPosition,
+		setCompletionIndex
+	} from '$core/completions'
 	import { COMPLETION_KEY_TO_INDEX } from '$gen'
 	import Completion from './Completion.svelte'
 
-	let completions = InputController.completions()
-	let completionsIndex = InputController.completionsIndex()
-	let location = InputController.completionsLocation()
 	let completionsHeight: number
-	let left = 200
-	let top = 200
 
-	$: completionIndex = COMPLETION_KEY_TO_INDEX[$completions.arg?.ty ?? 'Empty']
-	$: hide = $completions.completions.length == 0
-	$: console.log($location)
-	$: x = ($location?.x ?? -300) - 19
-	$: y = ($location?.y ?? 0) - completionsHeight
+	// TODO: move this logic to completions module
+	$: completionIndex =
+		COMPLETION_KEY_TO_INDEX[$rCompletions.argInfo?.ty ?? 'Empty']
+	$: hide = $rCompletions.matches.length == 0
+	$: above = ($rCompletionsPosition?.top ?? 0) > 150
+	$: x = ($rCompletionsPosition?.x ?? -300) - 19
+	$: y = above
+		? ($rCompletionsPosition?.top ?? 0) - completionsHeight
+		: $rCompletionsPosition?.bottom ?? 0
 </script>
 
 <div
@@ -22,19 +26,17 @@
 	class="completions-container"
 	style={`left: ${x}px; top: ${y}px;`}
 	class:hide
+	class:reverse={!above}
 >
-	<!-- <div>
-		<div>
-			{$completions.arg?.name}: {$completions.arg?.ty}
-		</div>
-		{$completions.arg?.description}
-	</div> -->
 	<div class="completion-list">
-		{#each $completions.completions as completion, i}
+		{#each $rCompletions.matches as completion, i}
 			<Completion
 				{completion}
 				{completionIndex}
-				expanded={i == $completionsIndex}
+				on:click={() => {
+					setCompletionIndex(i)
+				}}
+				expanded={i == $rCompletionIndex}
 			/>
 		{/each}
 	</div>
@@ -59,6 +61,9 @@
 		width: 100%;
 		overflow-y: scroll;
 		flex-direction: column-reverse;
+	}
+	.reverse {
+		flex-direction: column;
 	}
 	.hide {
 		visibility: hidden;

@@ -15,16 +15,19 @@ export type Keybinds = {
 }
 
 const wUserKeybinds = writable<Keybinds>(DEFAULT_USER_KEYBINDS)
-export const rUserKeybinds = sealWritable(wUserKeybinds)
+export const rUserKeybinds = sealWritable(wUserKeybinds, 'keys.binds')
 
 const wLastInputAction = writable<{
 	code: string
 	action?: Action
 } | null>(null)
-export const rLastInputAction = sealWritable(wLastInputAction)
+export const rLastInputAction = sealWritable(
+	wLastInputAction,
+	'keys.last-input'
+)
 
 export function bindKey(args: BindKey) {
-	wUserKeybinds.update(binds => {
+	wUserKeybinds.update((binds) => {
 		if (binds[args.key]) {
 			handleClientError({
 				message: args.key + ' already bound',

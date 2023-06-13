@@ -2,34 +2,43 @@
 	import { rUserPrefsOpen } from '$core/layout'
 	import Icon from '../Icon.svelte'
 	import Input from '../input/Input.svelte'
-	import Preferences from './Preferences.svelte'
+
+	import SearchRounded from '~icons/material-symbols/search-rounded'
+	import PreferenceList from './PreferenceList.svelte'
 
 	let input: Input
-	$: value = ''
-
+	$: searchParam = ''
 	$: {
 		if ($rUserPrefsOpen) input?.focus()
+	}
+	function handleSearchChange(event: CustomEvent<string>) {
+		searchParam = event.detail
 	}
 </script>
 
 <div class="tray" class:show={$rUserPrefsOpen}>
 	<div class="tray-header">
-		<Input
-			bind:this={input}
-			class="right-flat sm"
-			placeholder="Search"
-			inputClass={{ ty: 'StrClass', c: {} }}
-			key="pref-search"
-			bind:value
-		/>
-		<select class="sm left-flat">
+		<div class="search round">
+			<SearchRounded height={18} />
+			<Input
+				bind:this={input}
+				value={searchParam}
+				class="sm"
+				placeholder="Search"
+				inputClass={{ ty: 'StrClass', c: {} }}
+				key="pref-search"
+				completionKey="Empty"
+				on:change={handleSearchChange}
+			/>
+		</div>
+		<select class="sm">
 			<option>Preferences</option>
 			<option>Keymap</option>
 			<option>Theme</option>
 		</select>
 		<button class="md"><Icon name="arrow-up" /></button>
 	</div>
-	<Preferences filter={value} />
+	<PreferenceList filter={searchParam} />
 </div>
 
 <style>
@@ -84,9 +93,19 @@
 		pointer-events: inherit;
 	}
 	.tray-header {
+		gap: var(--gap4);
 		height: var(--md-nav);
 		min-height: var(--md-nav);
 		display: flex;
 		align-items: center;
+	}
+	.search {
+		background-color: var(--input-color);
+		height: var(--md-input);
+		display: flex;
+		flex-direction: row;
+		flex: 1 1 auto;
+		align-items: center;
+		padding-left: var(--gap2);
 	}
 </style>

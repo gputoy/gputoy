@@ -15,7 +15,7 @@ macro_rules! parseable_enum {
         #[derive(Debug, PartialEq, Eq, Clone, Copy)]
         #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-        #[cfg_attr(feature = "serde", serde(rename_all = "camelCase"))]
+        #[cfg_attr(feature = "serde", serde(rename_all = "kebab-case"))]
         pub enum $enum {
             $(
                 $(#[$($prop_attrs)*])*
@@ -42,11 +42,9 @@ macro_rules! parseable_enum {
         impl $crate::describe::Describe<'_> for $enum {
             fn describe(manifest: &mut $crate::describe::Manifest) {
                 manifest
-                    .with_name($crate::kebab_case!(static $enum))
+                    .with_name($crate::to_case!("kebab-case", $enum))
                     .with_description(
-                        $crate::extract_top_doc_comment_str!(
-                            $(#[$($attrs)*])*
-                        )
+                        $crate::extract_doc_comment!($(#[$($attrs)*])*)
                     )
                     .with_completion($crate::completion::CompletionKey::$enum)
                     .finish_arg()
@@ -67,33 +65,30 @@ macro_rules! parseable_enum {
                         {
                             let name = stringify!($variant);
                             let description =
-                                $crate::extract_top_doc_comment_str!($(#[$($prop_attrs)*])*);
+                                $crate::extract_doc_comment!($(#[$($prop_attrs)*])*);
                             $crate::parseable_enum!(entry name description $variant $($pat),+)
                         }
                     ),*
                 ]
-                    .into_iter()
-                    .flatten()
-                    .collect::<::std::vec::Vec<_>>()
             }
         }
     };
-    (entry $name:ident $description:ident $_id:ident $($pat:expr),*) => {
-        vec![
-            $(
-                $crate::completion::CompletionEntry::new(
+    (entry $snippet_text:ident $description:ident $_id:ident $($pat:expr),*) => {
+        $crate::completion::CompletionEntry::new_aliased(
+            [
+                $(
                     $pat,
-                    $name,
-                    $description,
-                ),
-            )*
-        ]
+                )+
+            ],
+            $snippet_text,
+            $description,
+        )
     };
-    (entry $name:ident $description:ident $id:ident) => {
+    (entry $snippet_text:ident $description:ident $id:ident) => {
         vec![
             $crate::completion::CompletionEntry::new(
                 stringify!($id),
-                $name,
+                $snippet_text,
                 $description,
             )
         ]
@@ -123,33 +118,19 @@ macro_rules! config_enum {
             }
         }
         #[cfg(feature = "bindgen")]
-        impl $crate::config_value::ConfigValue for $pref_name {
-            fn metadata(
-                prefix: &str,
-            ) -> $crate::config_value::ConfigValueSchema {
-                let name = $crate::kebab_case!($pref_name);
-                #[allow(unused_mut)]
-                let description = $crate::extract_doc_comment!($(#[$($attrs)*])*)
-                    .to_owned();
-                let metadata = $crate::config_value::ConfigValueSchema {
-                    name,
-                    description,
-                    path: prefix.to_owned(),
-                    class: $crate::config_value::ConfigValueClass::EnumClass(
-                        $crate::config_value::EnumClass {
-                            variants: vec![
-                                $(
-                                    $crate::kebab_case!($variant),
-                                )*
-                            ]
-                        }
-                    ),
-                };
-
-                metadata
-            }
-            fn keys(prefix: &str) -> Vec<String> {
-                vec![prefix.to_owned()]
+        impl $crate::preferences::schema::Schema for $pref_name {
+            fn _schema_impl(
+                builder: $crate::preferences::schema::Builder
+            ) -> $crate::preferences::schema::Builder {
+                let description = $crate::extract_doc_comment!($(#[$($attrs)*])*);
+                let class = $crate::preferences::schema::ConfigClass::Enum(
+                    $crate::preferences::schema::Enum {
+                        variants: vec![$($crate::to_case!("kebab-case", $variant).to_owned(),)*],
+                    }
+                );
+                builder
+                    .push_description(description)
+                    .push_config_class(class)
             }
         }
     }

@@ -1485,6 +1485,7 @@ dependencies = [
  "chrono",
  "convert_case 0.6.0",
  "displaydoc",
+ "itertools",
  "js-sys",
  "lazy_static",
  "log",
@@ -2587,6 +2588,7 @@ dependencies = [
 name = "proc-macro"
 version = "0.1.0"
 dependencies = [
+ "convert_case 0.6.0",
  "macro_state",
  "quote",
  "serde",

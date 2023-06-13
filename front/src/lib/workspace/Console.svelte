@@ -1,19 +1,18 @@
 <script lang="ts">
-	import { LOG_PREFIX, LOG_PREFIX_STYLES, toLogLevel } from '$core/console'
+	import {
+		LOG_PREFIX,
+		LOG_PREFIX_STYLES,
+		submitCommand,
+		toLogLevel
+	} from '$core/console'
 	import { rTerminalOpen } from '$core/layout'
 	import { rPref } from '$core/preferences'
-	import type { ConfigValueClass } from '$gen'
 	import Input from '$lib/components/input/Input.svelte'
 	import { wConsole } from '$stores'
 
+	let logsEl: HTMLDivElement
 	let value = ''
 	let input: Input
-	$: inputClass = {
-		ty: 'CmdClass',
-		c: {
-			completions: $showCompletions
-		}
-	} as ConfigValueClass
 
 	let showCompletions = rPref('console.show-completions')
 	let consoleLevel = rPref('console.level')
@@ -35,22 +34,38 @@
 	// 		pushAction(result)
 	// 	}
 	// }
+	function handleSubmit(event: CustomEvent<string>) {
+		submitCommand(event.detail)
+		input.clear()
+		setTimeout(() => {
+			logsEl.scrollTo({ behavior: 'auto', top: logsEl.scrollHeight })
+		}, 10)
+	}
 </script>
 
 <div class="container" class:show={$rTerminalOpen}>
 	<div class="prompt-container" class:wrap={$consoleWrap}>
 		<div class="prompt-line">
 			<span style="user-select: none;" class="prefix">~</span>
-			<Input bind:this={input} bind:value {inputClass} key="cmd" class="med" />
+			<Input
+				bind:this={input}
+				bind:value
+				key="cmd"
+				class="med"
+				on:submit={handleSubmit}
+				completionKey={null}
+				inputClass={null}
+			/>
 		</div>
 	</div>
-	<div class="log-container">
+	<div class="log-container" bind:this={logsEl}>
 		{#each filteredConsole as log}
 			<span class="log">
 				<span class="prefix" style={LOG_PREFIX_STYLES.get(log.level)}
 					>{LOG_PREFIX.get(log.level)}</span
 				>
-				{log.message}
+				{@html log.message}
+				<!-- {@html '<code style="background-color:var(--accent-color-transparent);">here is code</code>'} -->
 			</span>
 		{/each}
 	</div>
@@ -107,9 +122,5 @@
 	.prefix {
 		font-weight: bold;
 		font-size: var(--xs);
-	}
-
-	.prompt-container:global(*) {
-		background-color: red !important;
 	}
 </style>

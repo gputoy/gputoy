@@ -18,37 +18,42 @@ crate::config_category! {
 pub struct PreferenceKey;
 
 #[cfg(feature = "bindgen")]
-impl crate::complete::Complete for PreferenceKey {
-    fn static_completions() -> Vec<crate::completion::CompletionEntry> {
-        use crate::{completion::CompletionEntry, config_value::ConfigValue};
-
-        Preferences::keys("")
-            .into_iter()
-            .map(|key| CompletionEntry::new(&key, &key, "preferences"))
-            .collect()
-    }
-}
-
+pub mod schema;
 #[cfg(feature = "bindgen")]
-pub fn bindgen(builder: crate::bindgen::Builder) -> crate::bindgen::Result<()> {
-    use crate::config_value::ConfigValue;
+pub use bindgen::bindgen;
+#[cfg(feature = "bindgen")]
+mod bindgen {
+    use super::schema::Schema;
+    use super::{PreferenceKey, Preferences};
+    use crate::completion::CompletionEntry;
 
-    builder
-        .file("defaults.json")
-        .containing_default::<Preferences>()?;
+    impl crate::complete::Complete for PreferenceKey {
+        fn static_completions() -> Vec<CompletionEntry> {
+            Preferences::keys()
+                .into_iter()
+                .map(|key| CompletionEntry::new_single(key, "preferences", "preferences"))
+                .collect()
+        }
+    }
 
-    builder
-        .file("ui-tree.json")
-        .containing_value(&Preferences::metadata(""))?;
+    pub fn bindgen(builder: crate::bindgen::Builder) -> crate::bindgen::Result<()> {
+        builder
+            .file("defaults.json")
+            .containing_default::<Preferences>()?;
 
-    crate::append_ts! {
-        builder,
-        "export const PREFERENCE_KEYS = ["
-        for k in Preferences::keys("").iter()
-        "    '{k}',"
-        "] as const"
-        "export type PreferenceKey = typeof PREFERENCE_KEYS[number]"
-    };
+        builder
+            .file("schema.json")
+            .containing_value(&Preferences::schema())?;
 
-    Ok(())
+        crate::append_ts! {
+            builder,
+            "export const PREFERENCE_KEYS = ["
+            for k in Preferences::keys().iter()
+            "    '{k}',"
+            "] as const"
+            "export type PreferenceKey = typeof PREFERENCE_KEYS[number]"
+        };
+
+        Ok(())
+    }
 }

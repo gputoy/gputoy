@@ -65,6 +65,10 @@ WASM_FLAGS = RUSTFLAGS=--cfg=web_sys_unstable_apis
 # Opt flags to pass to wasm-pack in dev
 WASM_OPT_FLAG<dev> = --dev
 
+THEME_JSON_OUT = $(BINDGEN_OUT)/themes.json
+CSS_TO_JSON_SCRIPT = $(FRONT_DIR)/css-to-json.js
+_css-themes := $(shell find $(FRONT_DIR)/src/styles/themes -name "*")
+
 # Crates
 
 GPU_COMMON = gpu-common
@@ -124,11 +128,13 @@ bindgen:
 api: api-build
 	RUST_LOG=$(RUST_LOG<$(target)>) ./target/$(RUST_TARGET<$(target)>)/gpu-back
 
-# Run forntend -- do `make start target=prod` to run productin build
+# Run frontend -- do `make start target=prod` to run productin build
 start: front-build
 ifeq ($(target),dev)
-	$(FRONT_NODE_ENV) npm run dev --prefix $(FRONT_DIR)
+	@echo "Starting svelte server in dev mode"
+	@$(FRONT_NODE_ENV) npm run dev --prefix $(FRONT_DIR)
 else
+	@echo "Starting svelte server in production mode"
 	$(FRONT_NODE_ENV) node ./dist/index.js
 endif
 
@@ -172,7 +178,7 @@ $(WASM_OUT)/$(target)/%.wasm: $(_gpu-log) $(_gpu-common) $$(_gpu-$$*) $$(_gpu-wa
 
 # Build deps and maybe build node server depending on if 
 # its running in dev or prod
-front-build: $(FRONT_DIR)/node_modules $(BINDGEN_OUT)/common.ts wasm-build $(if $(findstring $(target),prod),$(FRONT_OUT))
+front-build: $(FRONT_DIR)/node_modules $(BINDGEN_OUT)/common.ts wasm-build $(THEME_JSON_OUT) $(if $(findstring $(target),prod),$(FRONT_OUT))
 
 # Build nodejs server for frontend
 $(FRONT_OUT):
@@ -190,7 +196,7 @@ nix-build-%:
 # -------------------------- Misc --------------------------
 # Make json schemas from types defined in gpu-common
 $(BINDGEN_OUT)/common.ts: $(_gpu-common) $(_gpu_bindgen) $(BINDGEN_CONFIG_PATH)
-	RUST_LOG=INFO cargo run --package $(GPU_BINDGEN) 
+	@RUST_LOG=INFO cargo run --package $(GPU_BINDGEN) 
 
 $(BINDGEN_CONFIG_PATH): $(BINDGEN_CONFIG_TMPL)
 	cat $(BINDGEN_CONFIG_TMPL) | envsubst > $(BINDGEN_CONFIG_PATH)
@@ -199,3 +205,5 @@ $(BINDGEN_CONFIG_PATH): $(BINDGEN_CONFIG_TMPL)
 $(FRONT_DIR)/node_modules: $(FRONT_DIR)/package.json
 	npm i --prefix $(FRONT_DIR)
 
+$(THEME_JSON_OUT): $(_css-themes)
+	@node $(CSS_TO_JSON_SCRIPT) $(THEME_JSON_OUT)

@@ -1,7 +1,5 @@
 pub mod actions;
 pub mod completion;
-#[cfg(feature = "bindgen")]
-pub mod config_value;
 pub mod layout;
 pub mod preferences;
 
