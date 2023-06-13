@@ -23,6 +23,7 @@ pub struct Context {
 
 impl Context {
     pub async fn new() -> Result<Context, Error> {
+        gpu_log::error!("test");
         let system = crate::system::System::new().await?;
         let resources = Rc::new(RefCell::new(resource::ResourceCache::default()));
         let bundles = Rc::new(RefCell::new(bundle::BundleCache::new(resources.clone())));

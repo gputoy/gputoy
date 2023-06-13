@@ -1,4 +1,4 @@
-import { Context as WasmContext } from '$gen/client/gpu_wasm_client'
+import * as wasm from '$gen/client/gpu_wasm_client'
 import { wConfig, wFiles, wPrebuildDirty, wPrebuildResult } from '$stores'
 import {
 	get,
@@ -18,7 +18,7 @@ export type ContextState = {
  */
 class ClientContext implements Readable<ContextState> {
 	private _store: Writable<ContextState>
-	private _context?: WasmContext
+	private _context?: wasm.Context
 	constructor() {
 		this._store = writable({ ready: false })
 	}
@@ -26,9 +26,9 @@ class ClientContext implements Readable<ContextState> {
 		return this._store.subscribe(run, invalidate)
 	}
 	async init(this: ClientContext) {
-		// await init_client()
+		await wasm.default()
 		try {
-			this._context = await new WasmContext()
+			this._context = await new wasm.Context()
 		} catch (e) {
 			console.error('error in context:init: ', e)
 			return
@@ -75,7 +75,7 @@ class ClientContext implements Readable<ContextState> {
 	}
 	reset() {
 		this._context?.free()
-		this._context = new WasmContext()
+		this._context = new wasm.Context()
 	}
 	destroy() {
 		this._context?.free()
@@ -88,3 +88,4 @@ class ClientContext implements Readable<ContextState> {
 
 const context: ClientContext = new ClientContext()
 export default context
+

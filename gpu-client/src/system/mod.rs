@@ -39,6 +39,7 @@ impl System {
             features,
             limits,
         };
+        gpu_log::info!("Requesting device");
         let (device, queue) = adapter.request_device(&desc, None).await?;
 
         Ok(Self {
