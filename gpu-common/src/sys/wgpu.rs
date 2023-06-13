@@ -1,5 +1,8 @@
 #[cfg(feature = "schema")]
-use schemars::JsonSchema;
+use schemars::{
+    schema::{Schema, SchemaObject},
+    JsonSchema,
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +12,7 @@ pub use wgpu_ext::*;
 use super::common::{ImageDimension, TextureFormat};
 
 bitflags::bitflags! {
-    #[cfg_attr(feature = "schema", derive(JsonSchema))]
+    #[derive(Debug, Clone, Copy)]
     pub struct BufferUsages: u32 {
         const MAP_READ= 1 << 0;
         const MAP_WRITE= 1 << 1;
@@ -22,13 +25,41 @@ bitflags::bitflags! {
         const INDIRECT = 1 << 8;
     }
 
-    #[cfg_attr(feature = "schema", derive(JsonSchema))]
+    #[derive(Debug, Clone, Copy)]
     pub struct TextureUsages: u32 {
         const COPY_SRC = 1 << 0;
         const COPY_DST = 1 << 1;
         const TEXTURE_BINDING = 1 << 2;
         const STORAGE_BINDING = 1 << 3;
         const RENDER_ATTACHMENT = 1 << 4;
+    }
+}
+
+#[cfg(feature = "schema")]
+impl JsonSchema for BufferUsages {
+    fn json_schema(_: &mut schemars::gen::SchemaGenerator) -> Schema {
+        let mut schema = SchemaObject::default();
+        schema.instance_type = Some(schemars::schema::SingleOrVec::Single(Box::new(
+            schemars::schema::InstanceType::Number,
+        )));
+        Schema::Object(schema)
+    }
+    fn schema_name() -> String {
+        "BufferUsages".to_owned()
+    }
+}
+
+#[cfg(feature = "schema")]
+impl JsonSchema for TextureUsages {
+    fn json_schema(_: &mut schemars::gen::SchemaGenerator) -> Schema {
+        let mut schema = SchemaObject::default();
+        schema.instance_type = Some(schemars::schema::SingleOrVec::Single(Box::new(
+            schemars::schema::InstanceType::Number,
+        )));
+        Schema::Object(schema)
+    }
+    fn schema_name() -> String {
+        "TextureUsages".to_owned()
     }
 }
 
@@ -142,7 +173,7 @@ mod wgpu_ext {
 
     impl From<BufferUsages> for wgpu::BufferUsages {
         fn from(usages: BufferUsages) -> Self {
-            wgpu::BufferUsages::from_bits_truncate(usages.bits)
+            wgpu::BufferUsages::from_bits_truncate(usages.bits())
         }
     }
 
@@ -206,7 +237,7 @@ mod wgpu_ext {
 
     impl From<TextureUsages> for wgpu::TextureUsages {
         fn from(usages: TextureUsages) -> Self {
-            wgpu::TextureUsages::from_bits_truncate(usages.bits)
+            wgpu::TextureUsages::from_bits_truncate(usages.bits())
         }
     }
 

@@ -1,36 +1,24 @@
+import { initConsoleMethods, type ConsoleExtras, type Log } from '$core/console'
+import {
+	DEFAULT_CONFIG,
+	DEFAULT_FILES,
+	DEFAULT_RUN_STATE,
+	type MenuKey
+} from '$core/consts'
+import { initFilesMethods, treeFromFiles, type FilesExtras } from '$core/files'
+import { dLayout } from '$core/layout'
+import { writeToProjectLocalStorage, type ProjectMeta } from '$core/project'
+import { initUserMethods, type UserExtras } from '$core/user'
 import type {
-	Action,
 	CompileError,
 	Config,
 	FileDependencyInfo,
 	FilePrebuildResult,
 	Files,
-	Layout,
 	PrebuildResult,
 	ProjectResponse,
-	UserEditorPrefs,
-	UserGeneralPrefs,
-	UserInfoResponse,
-	UserPrefs
-} from '$common'
-import { initConsoleMethods, type ConsoleExtras, type Log } from '$core/console'
-import {
-	DEFAULT_CONFIG,
-	DEFAULT_FILES,
-	DEFAULT_LAYOUT,
-	DEFAULT_RUN_STATE,
-	DEFAULT_USER_EDITOR_PREFS,
-	DEFAULT_USER_GENERAL_PREFS,
-	DEFAULT_USER_KEYBINDS,
-	type MenuKey
-} from '$core/consts'
-import { initFilesMethods, type FilesExtras } from '$core/files'
-import type { Keybinds } from '$core/input'
-import { initLayoutMethods, type LayoutExtras } from '$core/layout'
-import { writeToLocalStorage } from '$core/preferences'
-import { writeToProjectLocalStorage, type ProjectMeta } from '$core/project'
-import { initUserMethods, type UserExtras } from '$core/user'
-import { initTheme, type Theme } from '$core/util'
+	UserInfoResponse
+} from '$gen'
 import {
 	derived,
 	get,
@@ -39,10 +27,42 @@ import {
 	type Writable
 } from 'svelte/store'
 import {
+	rCompletionIndex,
+	rCompletions,
+	rCompletionsPosition
+} from './completions'
+import {
 	initRunStateMethods,
 	type RunState,
 	type RunStateExtras
 } from './runstate'
+
+var SEAL_MAP: Record<string, Readable<any>>
+export function sealWritable<T>(
+	writable: Writable<T>,
+	indentifier: string
+): Readable<T> {
+	if (SEAL_MAP === undefined) SEAL_MAP = {}
+	const readable = {
+		subscribe: writable.subscribe
+	}
+	SEAL_MAP[indentifier] = readable
+	return readable
+}
+export function getSealedStoreKeys(): string[] {
+	if (SEAL_MAP === undefined) return []
+	return Object.keys(SEAL_MAP)
+}
+export function getStore(storeKey: string): Readable<any> | null {
+	return SEAL_MAP === undefined ? null : SEAL_MAP[storeKey] ?? null
+}
+export function getStores(): any {
+	let obj: { [key: string]: any } = {}
+	for (let [key, val] of Object.entries(SEAL_MAP)) {
+		obj[key] = get(val)
+	}
+	return obj
+}
 
 // TODO: move this to seperate file
 export type PrebuildResultExtras = {
@@ -178,14 +198,14 @@ export const wFiles = makeEnhanced<Files, FilesExtras>(
 	DEFAULT_FILES,
 	initFilesMethods
 )()
+export const dFileTree = derived([wFiles], ([files]) => {
+	return treeFromFiles(files)
+})
 export const wModelDirty = makeSet()
 export const wFileDirty = makeSet()
 
 export const wConfig = makeEnhanced<Config, {}>(DEFAULT_CONFIG, () => ({}))()
-export const wLayout = makeEnhanced<Layout, LayoutExtras>(
-	DEFAULT_LAYOUT,
-	initLayoutMethods
-)()
+
 export const wProjectMeta = writable<ProjectMeta>({
 	title: 'New Project',
 	description: 'This is a new project',
@@ -200,7 +220,6 @@ export const wConsole = makeEnhanced<Log[], ConsoleExtras>(
 	[],
 	initConsoleMethods
 )()
-export const wConsoleOpen = writable(false)
 export const wConsoleHistory = writable<string[]>([])
 export const wConsoleHistoryIndex = writable(0)
 export const wConsoleCompletionIndex = writable(0)
@@ -216,12 +235,8 @@ export const wUser = makeEnhanced<UserInfoResponse | null, UserExtras>(
 /**
  *                  Misc stores
  */
-export const wLastInputAction = writable<{
-	code: string
-	action?: Action
-} | null>(null)
-export const wUserModalOpen = writable(false)
-export const wUserPrefsOpen = writable(false)
+export const wUserRenaming = writable<string | null>(null)
+export const wUserDeleting = writable<string | null>(null)
 
 export const wMenuOpen = writable<Record<MenuKey, boolean>>({
 	file: false,
@@ -231,39 +246,8 @@ export const wMenuOpen = writable<Record<MenuKey, boolean>>({
 	project: false
 })
 
-export const wDebugPanel = writable(false)
-export const wTheme = writable<Theme>('dark', initTheme)
-
-/**
- *                  User preferences
- */
-export const wUserGeneralPrefs = writable<UserGeneralPrefs>(
-	DEFAULT_USER_GENERAL_PREFS
-)
-export const wUserEditorPrefs = writable<UserEditorPrefs>(
-	DEFAULT_USER_EDITOR_PREFS
-)
-export const wUserKeybinds = writable<Keybinds>(DEFAULT_USER_KEYBINDS)
-export const wUserTheme = writable<any>({})
-
 // TODO: type this up
 export const wWorkerData = writable(null)
-
-/**
- *                  Derives stores
- */
-export const dUserPrefs = derived(
-	[wUserGeneralPrefs, wUserEditorPrefs, wUserKeybinds, wUserTheme],
-	([$general, $editor, $keybinds, $theme]): UserPrefs => {
-		return {
-			general: $general,
-			editor: $editor,
-			keybinds: $keybinds,
-			theme: $theme
-		}
-	}
-)
-dUserPrefs.subscribe(writeToLocalStorage)
 
 /**
  *  Reactive var which indicates if user can modify current project
@@ -278,7 +262,7 @@ export const dCanModifyProject = derived(
  * Reactive var for subscribing local storage save
  */
 export const dProject = derived(
-	[wFiles, wConfig, wLayout, wProjectId, wProjectMeta],
+	[wFiles, wConfig, dLayout, wProjectId, wProjectMeta],
 	([files, config, layout, id, meta]): ProjectResponse | null => {
 		if (!id) return null
 		return {
@@ -299,3 +283,9 @@ export const dProject = derived(
 dProject.subscribe((p) => {
 	if (p != null) writeToProjectLocalStorage(p)
 })
+
+const storeMap: Record<string, Readable<any>> = {
+	'completions.matches': rCompletions,
+	'completions.index': rCompletionIndex,
+	'completions.position': rCompletionsPosition
+}

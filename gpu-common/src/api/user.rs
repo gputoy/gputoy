@@ -1,4 +1,4 @@
-use crate::preferences::UserPrefs;
+use crate::preferences::Preferences;
 use chrono::NaiveDateTime;
 #[cfg(feature = "schema")]
 use schemars::JsonSchema;
@@ -50,7 +50,7 @@ pub struct UserInfoResponse {
     pub image: Option<String>,
     pub email_verified: bool,
     #[cfg_attr(feature = "serialize", serde(skip_serializing_if = "Option::is_none"))]
-    pub config: Option<UserPrefs>,
+    pub preferences: Option<Preferences>,
     pub active: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -68,7 +68,7 @@ pub struct UpdateUserInfoArgs {
     #[cfg_attr(feature = "serialize", serde(skip_serializing_if = "Option::is_none"))]
     pub image: Option<String>,
     #[cfg_attr(feature = "serialize", serde(skip_serializing_if = "Option::is_none"))]
-    pub config: Option<UserPrefs>,
+    pub preferences: Option<Preferences>,
 }
 
 #[derive(Debug)]

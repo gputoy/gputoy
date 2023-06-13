@@ -1,7 +1,7 @@
-import type { UpdateUserInfoArgs, UserInfoResponse } from '$common'
 import * as api from '$core/api'
-import { setUserPrefs } from '$core/preferences'
-import { dUserPrefs } from '$stores'
+// import { rPreferences, setPreferences } from '$core/preferences'
+import { setPreferences } from '$core/preferences'
+import type { UpdateUserInfoArgs, UserInfoResponse } from '$gen'
 import { toast } from '@zerodevx/svelte-toast'
 import Cookies from 'js-cookie'
 import { get, type Writable } from 'svelte/store'
@@ -43,20 +43,20 @@ export function initUserMethods(
 
 		if (!response || 'message' in response) {
 			const configString = localStorage?.getItem('config')
-			const config = configString ? JSON.parse(configString) : undefined
-			setUserPrefs(config)
+			const prefs = configString ? JSON.parse(configString) : undefined
+			setPreferences(prefs)
 			return
 		}
 		user.set(response)
-		setUserPrefs(response.config ?? undefined)
+		setPreferences(response.preferences)
 	}
 
 	async function updateUser() {
 		const userInner = get(user)
-		const config = get(dUserPrefs)
+		// const preferences = get(rPreferences)
 		const args: UpdateUserInfoArgs = {
-			...userInner,
-			config
+			...userInner
+			// preferences,
 		}
 		const response = await api.updateUser(args)
 		if ('message' in response) {
@@ -67,7 +67,7 @@ export function initUserMethods(
 			return
 		}
 		user.set(response)
-		setUserPrefs(response.config ?? undefined)
+		setPreferences(response.preferences ?? undefined)
 	}
 	return { login, logout, getSession, updateUser }
 }

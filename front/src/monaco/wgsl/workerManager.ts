@@ -72,7 +72,7 @@ export default class WorkerManager {
 					initFiles: get(wFiles)
 				},
 				host: {
-					postBackHere: (arg: string) => { }
+					postBackHere: (arg: string) => {}
 				}
 			})
 

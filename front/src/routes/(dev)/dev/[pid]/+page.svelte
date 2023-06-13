@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { ProjectResponse } from '$common'
 	import { clearProject, setProject } from '$core/project'
-	import Dev from '$lib/dev/Dev.svelte'
+	import type { ProjectResponse } from '$gen'
+	import Dev from '$lib/workspace/Workspace.svelte'
 	import { onMount } from 'svelte'
 	export let data: ProjectResponse
 	onMount(() => {

@@ -14,36 +14,18 @@
 		"strict": true,
 		"baseUrl": ".",
 		"paths": {
-			"$lib/*": [
-				"src/lib/*"
-			],
-			"$lib": [
-				"src/lib"
-			],
-			"$stores": [
-				"src/core/stores"
-			],
-			"$wasm": [
-				"pkg"
-			],
-			"$wasm/*": [
-				"pkg/*"
-			],
-			"$core": [
-				"src/core"
-			],
-			"$core/*": [
-				"src/core/*"
-			],
-			"$common": [
-				"src/core/common"
-			],
-			"$monaco": [
-				"src/monaco"
-			],
-			"$monaco/*": [
-				"src/monaco/*"
-			]
+			"$lib/*": ["src/lib/*"],
+			"$lib": ["src/lib"],
+			"$stores": ["src/core/stores"],
+			"$gen": ["generated"],
+			"$gen/*": ["generated/*"],
+			"$core": ["src/core"],
+			"$core/*": ["src/core/*"],
+			"$common": ["generated/common"],
+			"$monaco": ["src/monaco"],
+			"$monaco/*": ["src/monaco/*"],
+			"$wasm": ["src/wasm"],
+			"$wasm/*": ["src/wasm/*"]
 		}
 	}
 }

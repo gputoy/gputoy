@@ -1,0 +1,2567 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "RootSchema",
+	"type": "object",
+	"required": [
+		"action",
+		"clienterror",
+		"completionentry",
+		"completioninfo",
+		"config",
+		"credentials",
+		"loginresponse",
+		"newuser",
+		"newuserresponse",
+		"prebuildresult",
+		"preferences",
+		"project",
+		"projectresponse",
+		"projectupsert",
+		"runner",
+		"schemaentry",
+		"updateuserinfoargs",
+		"userinforesponse"
+	],
+	"properties": {
+		"project": {
+			"$ref": "#/definitions/Project"
+		},
+		"config": {
+			"$ref": "#/definitions/Config"
+		},
+		"projectupsert": {
+			"$ref": "#/definitions/ProjectUpsert"
+		},
+		"projectresponse": {
+			"$ref": "#/definitions/ProjectResponse"
+		},
+		"newuser": {
+			"$ref": "#/definitions/NewUser"
+		},
+		"newuserresponse": {
+			"$ref": "#/definitions/NewUserResponse"
+		},
+		"credentials": {
+			"$ref": "#/definitions/Credentials"
+		},
+		"loginresponse": {
+			"$ref": "#/definitions/LoginResponse"
+		},
+		"userinforesponse": {
+			"$ref": "#/definitions/UserInfoResponse"
+		},
+		"updateuserinfoargs": {
+			"$ref": "#/definitions/UpdateUserInfoArgs"
+		},
+		"action": {
+			"$ref": "#/definitions/Action"
+		},
+		"prebuildresult": {
+			"$ref": "#/definitions/PrebuildResult"
+		},
+		"runner": {
+			"$ref": "#/definitions/Runner"
+		},
+		"clienterror": {
+			"$ref": "#/definitions/ClientError"
+		},
+		"preferences": {
+			"$ref": "#/definitions/Preferences"
+		},
+		"schemaentry": {
+			"$ref": "#/definitions/SchemaEntry"
+		},
+		"completioninfo": {
+			"$ref": "#/definitions/CompletionInfo"
+		},
+		"completionentry": {
+			"$ref": "#/definitions/CompletionEntry"
+		}
+	},
+	"definitions": {
+		"Project": {
+			"type": "object",
+			"required": ["files"],
+			"properties": {
+				"files": {
+					"$ref": "#/definitions/Files"
+				},
+				"layout": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Layout"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"config": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Config"
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"Files": {
+			"description": "Gputoy virtual directory. Each file in the map has its path from root as key, including file name and extension\n\nexample: ```ts map: { \"/shaders/main.wgsl\": { \"data\": \"...\", \"dir\": \"shaders/\", \"fileName\": \"main\", \"extension\": \"wgsl\", } } ```",
+			"type": "object",
+			"required": ["map"],
+			"properties": {
+				"map": {
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/File"
+					}
+				}
+			}
+		},
+		"File": {
+			"description": "Encapsulates all data needed to emulate a file in gputoy virtual directory structure.",
+			"type": "object",
+			"required": ["data", "dir", "extension", "fileName"],
+			"properties": {
+				"data": {
+					"description": "Contents of file in plain text",
+					"type": "string"
+				},
+				"dir": {
+					"description": "File path starting at / (project root)",
+					"type": "string"
+				},
+				"fileName": {
+					"description": "Name of file",
+					"type": "string"
+				},
+				"extension": {
+					"description": "File extension",
+					"allOf": [
+						{
+							"$ref": "#/definitions/SupportedExtension"
+						}
+					]
+				},
+				"fetch": {
+					"description": "Fetch url. If exists, then contents will be fetched from remote URL on project load",
+					"type": ["string", "null"]
+				}
+			}
+		},
+		"SupportedExtension": {
+			"type": "string",
+			"enum": ["wgsl", "glsl", "txt", "md", "json", "csv", "png", "jpeg", "mp3"]
+		},
+		"Layout": {
+			"type": "object",
+			"required": [
+				"accordianOpen",
+				"fileTreeState",
+				"paneSize",
+				"paneToggled",
+				"tabs"
+			],
+			"properties": {
+				"tabs": {
+					"description": "List of files which is open in editor. Order of identifiers in vec is the order it is listed in the editor.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"tabIndex": {
+					"description": "Currently opened tab within workspace",
+					"type": ["integer", "null"],
+					"format": "uint",
+					"minimum": 0.0
+				},
+				"paneToggled": {
+					"description": "Pane toggle data",
+					"allOf": [
+						{
+							"$ref": "#/definitions/PaneToggled"
+						}
+					]
+				},
+				"paneSize": {
+					"description": "Pane size data",
+					"allOf": [
+						{
+							"$ref": "#/definitions/PaneSize"
+						}
+					]
+				},
+				"fileTreeState": {
+					"description": "State of file tree",
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/DirNodeState"
+					}
+				},
+				"accordianOpen": {
+					"description": "State of project panel accordians",
+					"type": "object",
+					"additionalProperties": {
+						"type": "boolean"
+					}
+				}
+			}
+		},
+		"PaneToggled": {
+			"description": "Pane layout information.",
+			"type": "object",
+			"required": ["control-pane", "editor-pane", "project-pane"],
+			"properties": {
+				"project-pane": {
+					"description": "Whether the project pane is open",
+					"type": "boolean"
+				},
+				"editor-pane": {
+					"description": "Whether the editor pane is open",
+					"type": "boolean"
+				},
+				"control-pane": {
+					"description": "Whether the control pane is open",
+					"type": "boolean"
+				}
+			}
+		},
+		"PaneSize": {
+			"description": "Pane size information.\n\nPersistent layout data needed to give 'preferred size' to panes.",
+			"type": "object",
+			"required": [
+				"controlPanePercentage",
+				"editorPanePercentage",
+				"projectPanePx"
+			],
+			"properties": {
+				"projectPanePx": {
+					"description": "How many pixels wide the project pane should be.\n\nWill change its percentage share of the window if window width changes.",
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				},
+				"editorPanePercentage": {
+					"description": "What percentage of total window width the editor pane takes up.\n\nIt is assumed the viewport/resource pane will take up the remaining space left behind by the project and editor pane.",
+					"type": "number",
+					"format": "float"
+				},
+				"controlPanePercentage": {
+					"description": "What percentage of total window height the control pane takes up.",
+					"type": "number",
+					"format": "float"
+				}
+			}
+		},
+		"DirNodeState": {
+			"type": "object",
+			"required": ["isRenaming", "open"],
+			"properties": {
+				"open": {
+					"type": "boolean"
+				},
+				"isRenaming": {
+					"type": "boolean"
+				}
+			}
+		},
+		"Config": {
+			"type": "object",
+			"properties": {
+				"perfLevel": {
+					"default": null,
+					"anyOf": [
+						{
+							"$ref": "#/definitions/PerformanceLevel"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"limitFps": {
+					"default": 0,
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				},
+				"runner": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/FilePath"
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"PerformanceLevel": {
+			"type": "string",
+			"enum": ["Default", "PowerSaver"]
+		},
+		"FilePath": {
+			"type": "string",
+			"pattern": "^\\s*/([.]?[_]*[\\w_-]+/)*([.]?[_]*[\\w_-]*[.][a-z]+)\\s*$"
+		},
+		"ProjectUpsert": {
+			"type": "object",
+			"required": ["files", "published", "title"],
+			"properties": {
+				"id": {
+					"type": ["string", "null"]
+				},
+				"title": {
+					"type": "string",
+					"maxLength": 50,
+					"minLength": 3
+				},
+				"description": {
+					"type": ["string", "null"]
+				},
+				"files": {
+					"$ref": "#/definitions/Files"
+				},
+				"layout": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Layout"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"config": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Config"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"published": {
+					"type": "boolean"
+				}
+			}
+		},
+		"ProjectResponse": {
+			"type": "object",
+			"required": [
+				"createdAt",
+				"files",
+				"id",
+				"published",
+				"title",
+				"updatedAt"
+			],
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"title": {
+					"type": "string"
+				},
+				"description": {
+					"type": ["string", "null"]
+				},
+				"files": {
+					"$ref": "#/definitions/Files"
+				},
+				"layout": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Layout"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"config": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Config"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"published": {
+					"type": "boolean"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "partial-date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "partial-date-time"
+				},
+				"authorId": {
+					"type": ["string", "null"]
+				},
+				"forkedFromId": {
+					"type": ["string", "null"]
+				}
+			}
+		},
+		"NewUser": {
+			"type": "object",
+			"required": ["email", "password", "username"],
+			"properties": {
+				"username": {
+					"type": "string",
+					"maxLength": 31,
+					"minLength": 3
+				},
+				"email": {
+					"type": "string",
+					"format": "email"
+				},
+				"password": {
+					"type": "string",
+					"maxLength": 40,
+					"minLength": 8
+				}
+			}
+		},
+		"NewUserResponse": {
+			"type": "object",
+			"required": ["id"],
+			"properties": {
+				"id": {
+					"type": "string"
+				}
+			}
+		},
+		"Credentials": {
+			"type": "object",
+			"required": ["password", "usernameOrEmail"],
+			"properties": {
+				"usernameOrEmail": {
+					"type": "string"
+				},
+				"password": {
+					"type": "string"
+				}
+			}
+		},
+		"LoginResponse": {
+			"type": "object",
+			"required": ["userId"],
+			"properties": {
+				"userId": {
+					"type": "string"
+				}
+			}
+		},
+		"UserInfoResponse": {
+			"type": "object",
+			"required": [
+				"active",
+				"createdAt",
+				"email",
+				"emailVerified",
+				"id",
+				"updatedAt",
+				"username"
+			],
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"username": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"fullName": {
+					"type": ["string", "null"]
+				},
+				"bio": {
+					"type": ["string", "null"]
+				},
+				"image": {
+					"type": ["string", "null"]
+				},
+				"emailVerified": {
+					"type": "boolean"
+				},
+				"preferences": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Preferences"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"active": {
+					"type": "boolean"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "partial-date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "partial-date-time"
+				}
+			}
+		},
+		"Preferences": {
+			"description": "User preferences",
+			"type": "object",
+			"required": ["console", "editor", "workspace"],
+			"properties": {
+				"workspace": {
+					"description": "Workspace preferences",
+					"allOf": [
+						{
+							"$ref": "#/definitions/Workspace"
+						}
+					]
+				},
+				"editor": {
+					"description": "Code editor preferences",
+					"allOf": [
+						{
+							"$ref": "#/definitions/Editor"
+						}
+					]
+				},
+				"console": {
+					"description": "Console preferences",
+					"allOf": [
+						{
+							"$ref": "#/definitions/Console"
+						}
+					]
+				}
+			}
+		},
+		"Workspace": {
+			"type": "object",
+			"required": ["handle-size", "ui-speed"],
+			"properties": {
+				"handle-size": {
+					"description": "The size of the pane drag handle.",
+					"type": "integer",
+					"format": "uint8",
+					"minimum": 0.0
+				},
+				"ui-speed": {
+					"$ref": "#/definitions/UiSpeed"
+				}
+			}
+		},
+		"UiSpeed": {
+			"description": "The speed of ui transitions.",
+			"type": "string",
+			"enum": ["instant", "snappy", "quick", "smooth", "slow"]
+		},
+		"Editor": {
+			"description": "User editor preferences",
+			"type": "object",
+			"required": [
+				"auto-indent",
+				"cursor-blinking",
+				"cursor-style",
+				"font",
+				"font-ligatures",
+				"font-size",
+				"guides",
+				"line-numbers",
+				"minimap",
+				"scroll-beyond-last-line",
+				"smooth-caret",
+				"smooth-scrolling",
+				"vim-mode",
+				"word-wrap"
+			],
+			"properties": {
+				"auto-indent": {
+					"$ref": "#/definitions/AutoIndent"
+				},
+				"line-numbers": {
+					"$ref": "#/definitions/LineNumbers"
+				},
+				"guides": {
+					"$ref": "#/definitions/Guides"
+				},
+				"font": {
+					"description": "Font to use in the editor.\n\nComma-delimited list like \"FiraMono,mono\"",
+					"type": "string"
+				},
+				"font-size": {
+					"description": "Font size of code in the editor.",
+					"type": "integer",
+					"format": "uint8",
+					"minimum": 0.0
+				},
+				"font-ligatures": {
+					"description": "Render font ligatures in the code editor.",
+					"type": "boolean"
+				},
+				"smooth-scrolling": {
+					"description": "Animate smooth scrolling in the editor.",
+					"type": "boolean"
+				},
+				"smooth-caret": {
+					"description": "Enable smooth caret movement animations.",
+					"type": "boolean"
+				},
+				"cursor-style": {
+					"$ref": "#/definitions/CursorStyle"
+				},
+				"cursor-blinking": {
+					"$ref": "#/definitions/CursorBlinking"
+				},
+				"word-wrap": {
+					"description": "Whether to wrap lines in the code editor.",
+					"type": "boolean"
+				},
+				"scroll-beyond-last-line": {
+					"description": "Enable scrolling to go one screen size past the last line.",
+					"type": "boolean"
+				},
+				"minimap": {
+					"description": "Whether to show a minimap in the top-right of the code editor.",
+					"type": "boolean"
+				},
+				"vim-mode": {
+					"$ref": "#/definitions/VimMode"
+				}
+			}
+		},
+		"AutoIndent": {
+			"description": "Controls whether the editor should automatically adjust the indentation when users type, paste, move or indent lines.",
+			"type": "string",
+			"enum": ["none", "keep", "brackets", "advanced", "full"]
+		},
+		"LineNumbers": {
+			"description": "How line numbers appear in the code editor.",
+			"oneOf": [
+				{
+					"description": "Show absolute line numbers",
+					"type": "string",
+					"enum": ["on"]
+				},
+				{
+					"description": "Show every 5 line numbers",
+					"type": "string",
+					"enum": ["interval"]
+				},
+				{
+					"description": "Show relative line numbers",
+					"type": "string",
+					"enum": ["relative"]
+				},
+				{
+					"description": "Hide line numbers",
+					"type": "string",
+					"enum": ["off"]
+				}
+			]
+		},
+		"Guides": {
+			"description": "Visual guides in the code editor",
+			"type": "object",
+			"required": [
+				"bracket-pairs",
+				"bracket-pairs-horizontal",
+				"highlight-active-bracket-pair",
+				"highlight-active-indentation",
+				"indentation"
+			],
+			"properties": {
+				"bracket-pairs": {
+					"description": "Enable rendering of bracket pair guides.",
+					"type": "boolean"
+				},
+				"bracket-pairs-horizontal": {
+					"description": "Enable rendering of vertical bracket pair guides.",
+					"type": "boolean"
+				},
+				"highlight-active-bracket-pair": {
+					"description": "Enable highlighting of the active bracket pair.",
+					"type": "boolean"
+				},
+				"indentation": {
+					"description": "Enable rendering of indent guides.",
+					"type": "boolean"
+				},
+				"highlight-active-indentation": {
+					"description": "Enable highlighting of the active indent guide.",
+					"type": "boolean"
+				}
+			}
+		},
+		"CursorStyle": {
+			"description": "Style of the cursor in the code editor.",
+			"type": "string",
+			"enum": [
+				"line",
+				"line-thin",
+				"block",
+				"block-outline",
+				"underline",
+				"underline-thin"
+			]
+		},
+		"CursorBlinking": {
+			"description": "Controls the cursor animation style in the code editor.",
+			"type": "string",
+			"enum": ["blink", "smooth", "phase", "expand", "solid"]
+		},
+		"VimMode": {
+			"description": "Enable vim movements in code editor.",
+			"type": "object",
+			"required": ["enabled"],
+			"properties": {
+				"enabled": {
+					"type": "boolean"
+				}
+			}
+		},
+		"Console": {
+			"type": "object",
+			"required": ["level", "show-completions", "wrap"],
+			"properties": {
+				"show-completions": {
+					"$ref": "#/definitions/ShowCompletions"
+				},
+				"wrap": {
+					"description": "True: Wrap console messages. May scramble certain error messages. False: Console messages overflow past the size of the viewport.",
+					"type": "boolean"
+				},
+				"level": {
+					"$ref": "#/definitions/LogLevel"
+				}
+			}
+		},
+		"ShowCompletions": {
+			"description": "How much detail should completions provide.",
+			"type": "string",
+			"enum": ["full", "suggestions", "none"]
+		},
+		"LogLevel": {
+			"description": "Log level of the console.",
+			"type": "string",
+			"enum": ["trace", "debug", "info", "warn", "error"]
+		},
+		"UpdateUserInfoArgs": {
+			"type": "object",
+			"properties": {
+				"fullName": {
+					"type": ["string", "null"]
+				},
+				"bio": {
+					"type": ["string", "null"]
+				},
+				"image": {
+					"type": ["string", "null"]
+				},
+				"preferences": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Preferences"
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"Action": {
+			"oneOf": [
+				{
+					"description": "Clears the console",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["clear"]
+						}
+					}
+				},
+				{
+					"description": "Shows a region in the workspace",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["show"]
+						},
+						"c": {
+							"$ref": "#/definitions/Region"
+						}
+					}
+				},
+				{
+					"description": "Hides a region in the workspace",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["hide"]
+						},
+						"c": {
+							"$ref": "#/definitions/Region"
+						}
+					}
+				},
+				{
+					"description": "Togges a region in the workspace",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["toggleUi"]
+						},
+						"c": {
+							"$ref": "#/definitions/Region"
+						}
+					}
+				},
+				{
+					"description": "Toggles all panes open and closed",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["toggleAllPanes"]
+						}
+					}
+				},
+				{
+					"description": "Open document in editor",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["openTab"]
+						},
+						"c": {
+							"$ref": "#/definitions/FilePath"
+						}
+					}
+				},
+				{
+					"description": "Closes document in editor",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["closeTab"]
+						}
+					}
+				},
+				{
+					"description": "Next tab in editor",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["nextTab"]
+						}
+					}
+				},
+				{
+					"description": "Previous tab in editor",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["prevTab"]
+						}
+					}
+				},
+				{
+					"description": "Creates new file",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["newFile"]
+						},
+						"c": {
+							"$ref": "#/definitions/FilePath"
+						}
+					}
+				},
+				{
+					"description": "Create new dir",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["newDir"]
+						},
+						"c": {
+							"$ref": "#/definitions/Path"
+						}
+					}
+				},
+				{
+					"description": "Move file",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["move"]
+						},
+						"c": {
+							"$ref": "#/definitions/CopyMove"
+						}
+					}
+				},
+				{
+					"description": "Copy file",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["copy"]
+						},
+						"c": {
+							"$ref": "#/definitions/CopyMove"
+						}
+					}
+				},
+				{
+					"description": "Delete file",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["delete"]
+						},
+						"c": {
+							"$ref": "#/definitions/Delete"
+						}
+					}
+				},
+				{
+					"description": "Save current file",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["saveFile"]
+						}
+					}
+				},
+				{
+					"description": "Save all files",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["saveAllFiles"]
+						}
+					}
+				},
+				{
+					"description": "Creates new project",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["newProject"]
+						},
+						"c": {
+							"type": ["string", "null"]
+						}
+					}
+				},
+				{
+					"description": "Commit project to remote",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["commit"]
+						}
+					}
+				},
+				{
+					"description": "Fork project",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["fork"]
+						},
+						"c": {
+							"type": ["string", "null"]
+						}
+					}
+				},
+				{
+					"description": "Publish project",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["publish"]
+						}
+					}
+				},
+				{
+					"description": "Sets runner json file",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["setRunner"]
+						},
+						"c": {
+							"$ref": "#/definitions/FilePath"
+						}
+					}
+				},
+				{
+					"description": "Play/Pause the project",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["playPause"]
+						}
+					}
+				},
+				{
+					"description": "Resets project to default state",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["reset"]
+						}
+					}
+				},
+				{
+					"description": "Build project",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["build"]
+						}
+					}
+				},
+				{
+					"description": "Bind key",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["bindKey"]
+						},
+						"c": {
+							"$ref": "#/definitions/BindKey"
+						}
+					}
+				},
+				{
+					"description": "Dump a store's contents",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["dump"]
+						},
+						"c": {
+							"$ref": "#/definitions/StoreKey"
+						}
+					}
+				},
+				{
+					"description": "Close project",
+					"type": "object",
+					"required": ["ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["exit"]
+						}
+					}
+				}
+			]
+		},
+		"Region": {
+			"description": "A UI region within the workspace",
+			"oneOf": [
+				{
+					"description": "Left pane with project information",
+					"type": "string",
+					"enum": ["project-pane"]
+				},
+				{
+					"description": "Bottom pane with various controls",
+					"type": "string",
+					"enum": ["control-pane"]
+				},
+				{
+					"description": "Right pane with code editor",
+					"type": "string",
+					"enum": ["editor-pane"]
+				},
+				{
+					"description": "Gear icon in top right",
+					"type": "string",
+					"enum": ["preferences"]
+				},
+				{
+					"description": "Hidden debug pane",
+					"type": "string",
+					"enum": ["debug"]
+				},
+				{
+					"description": "Terminal",
+					"type": "string",
+					"enum": ["terminal"]
+				},
+				{
+					"description": "User information",
+					"type": "string",
+					"enum": ["user"]
+				}
+			]
+		},
+		"Path": {
+			"type": "string",
+			"pattern": "^\\s*/([.]?[_]*[\\w_-]+/)*([.]?[_]*[\\w_-]*([.][a-z]+)?)\\s*$"
+		},
+		"CopyMove": {
+			"type": "object",
+			"required": ["dest", "isDir", "src"],
+			"properties": {
+				"src": {
+					"$ref": "#/definitions/Path"
+				},
+				"dest": {
+					"$ref": "#/definitions/Path"
+				},
+				"isDir": {
+					"type": "boolean"
+				}
+			}
+		},
+		"Delete": {
+			"type": "object",
+			"required": ["isDir", "path"],
+			"properties": {
+				"path": {
+					"$ref": "#/definitions/Path"
+				},
+				"isDir": {
+					"type": "boolean"
+				}
+			}
+		},
+		"BindKey": {
+			"type": "object",
+			"required": ["command", "key"],
+			"properties": {
+				"key": {
+					"$ref": "#/definitions/Key"
+				},
+				"command": {
+					"$ref": "#/definitions/Action"
+				}
+			}
+		},
+		"Key": {
+			"type": "string"
+		},
+		"StoreKey": {
+			"type": "string"
+		},
+		"PrebuildResult": {
+			"type": "object",
+			"required": ["dependencyInfo", "fileBuilds"],
+			"properties": {
+				"dependencyInfo": {
+					"$ref": "#/definitions/DependencyInfo"
+				},
+				"fileBuilds": {
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/FilePrebuildResult"
+					}
+				}
+			}
+		},
+		"DependencyInfo": {
+			"type": "object",
+			"required": ["deps"],
+			"properties": {
+				"deps": {
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/FileDependencyInfo"
+					}
+				}
+			}
+		},
+		"FileDependencyInfo": {
+			"type": "object",
+			"required": ["fileExports", "imports"],
+			"properties": {
+				"imports": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/Match"
+					}
+				},
+				"fileExports": {
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/Match"
+					}
+				},
+				"errors": {
+					"type": ["array", "null"],
+					"items": {
+						"$ref": "#/definitions/CompileError"
+					}
+				}
+			}
+		},
+		"Match": {
+			"description": "Identical to regex::Match, except the text is owned and it can be serialized. TODO: get refs to work within the analyzer instead of owned strings.",
+			"type": "object",
+			"required": ["end", "start", "text"],
+			"properties": {
+				"text": {
+					"type": "string"
+				},
+				"start": {
+					"type": "integer",
+					"format": "uint",
+					"minimum": 0.0
+				},
+				"end": {
+					"type": "integer",
+					"format": "uint",
+					"minimum": 0.0
+				}
+			}
+		},
+		"CompileError": {
+			"type": "object",
+			"required": ["message"],
+			"properties": {
+				"message": {
+					"type": "string"
+				},
+				"span": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/SourceLocation"
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"SourceLocation": {
+			"type": "object",
+			"required": ["length", "lineNumber", "linePosition", "offset"],
+			"properties": {
+				"lineNumber": {
+					"description": "1-based line number.",
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				},
+				"linePosition": {
+					"description": "1-based column of the start of this span",
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				},
+				"offset": {
+					"description": "0-based Offset in code units (in bytes) of the start of the span.",
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				},
+				"length": {
+					"description": "Length in code units (in bytes) of the span.",
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				}
+			}
+		},
+		"FilePrebuildResult": {
+			"type": "object",
+			"required": ["processedShader"],
+			"properties": {
+				"processedShader": {
+					"$ref": "#/definitions/File"
+				},
+				"rawModule": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Module"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"errors": {
+					"type": ["array", "null"],
+					"items": {
+						"$ref": "#/definitions/CompileError"
+					}
+				}
+			}
+		},
+		"Module": {
+			"type": "object",
+			"required": ["entry_points", "functions", "types"],
+			"properties": {
+				"types": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/Type"
+					}
+				},
+				"functions": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/Function"
+					}
+				},
+				"entry_points": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/EntryPoint"
+					}
+				}
+			}
+		},
+		"Type": {
+			"type": "object",
+			"required": ["inner"],
+			"properties": {
+				"name": {
+					"type": ["string", "null"]
+				},
+				"inner": {
+					"$ref": "#/definitions/TypeInner"
+				}
+			}
+		},
+		"TypeInner": {
+			"oneOf": [
+				{
+					"type": "object",
+					"required": ["Scalar"],
+					"properties": {
+						"Scalar": {
+							"type": "object",
+							"required": ["kind", "width"],
+							"properties": {
+								"kind": {
+									"$ref": "#/definitions/ScalarKind"
+								},
+								"width": {
+									"type": "integer",
+									"format": "uint8",
+									"minimum": 0.0
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Vector"],
+					"properties": {
+						"Vector": {
+							"type": "object",
+							"required": ["kind", "size", "width"],
+							"properties": {
+								"size": {
+									"$ref": "#/definitions/VectorSize"
+								},
+								"kind": {
+									"$ref": "#/definitions/ScalarKind"
+								},
+								"width": {
+									"type": "integer",
+									"format": "uint8",
+									"minimum": 0.0
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Matrix"],
+					"properties": {
+						"Matrix": {
+							"type": "object",
+							"required": ["colums", "rows", "width"],
+							"properties": {
+								"colums": {
+									"$ref": "#/definitions/VectorSize"
+								},
+								"rows": {
+									"$ref": "#/definitions/VectorSize"
+								},
+								"width": {
+									"type": "integer",
+									"format": "uint8",
+									"minimum": 0.0
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Atomic"],
+					"properties": {
+						"Atomic": {
+							"type": "object",
+							"required": ["kind", "width"],
+							"properties": {
+								"kind": {
+									"$ref": "#/definitions/ScalarKind"
+								},
+								"width": {
+									"type": "integer",
+									"format": "uint8",
+									"minimum": 0.0
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Pointer"],
+					"properties": {
+						"Pointer": {
+							"type": "object",
+							"required": ["base", "space"],
+							"properties": {
+								"base": {
+									"type": "integer",
+									"format": "uint",
+									"minimum": 0.0
+								},
+								"space": {
+									"$ref": "#/definitions/AddressSpace"
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["ValuePointer"],
+					"properties": {
+						"ValuePointer": {
+							"type": "object",
+							"required": ["kind", "space", "width"],
+							"properties": {
+								"size": {
+									"anyOf": [
+										{
+											"$ref": "#/definitions/VectorSize"
+										},
+										{
+											"type": "null"
+										}
+									]
+								},
+								"kind": {
+									"$ref": "#/definitions/ScalarKind"
+								},
+								"width": {
+									"type": "integer",
+									"format": "uint8",
+									"minimum": 0.0
+								},
+								"space": {
+									"$ref": "#/definitions/AddressSpace"
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Array"],
+					"properties": {
+						"Array": {
+							"type": "object",
+							"required": ["base", "size", "stride"],
+							"properties": {
+								"base": {
+									"type": "integer",
+									"format": "uint",
+									"minimum": 0.0
+								},
+								"size": {
+									"$ref": "#/definitions/ArraySize"
+								},
+								"stride": {
+									"type": "integer",
+									"format": "uint32",
+									"minimum": 0.0
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Struct"],
+					"properties": {
+						"Struct": {
+							"type": "object",
+							"required": ["members", "span"],
+							"properties": {
+								"members": {
+									"type": "array",
+									"items": {
+										"$ref": "#/definitions/StructMember"
+									}
+								},
+								"span": {
+									"type": "integer",
+									"format": "uint32",
+									"minimum": 0.0
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Image"],
+					"properties": {
+						"Image": {
+							"type": "object",
+							"required": ["arrayed", "class", "dim"],
+							"properties": {
+								"dim": {
+									"$ref": "#/definitions/ImageDimension"
+								},
+								"arrayed": {
+									"type": "boolean"
+								},
+								"class": {
+									"$ref": "#/definitions/ImageClass"
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Sampler"],
+					"properties": {
+						"Sampler": {
+							"type": "object",
+							"required": ["comparison"],
+							"properties": {
+								"comparison": {
+									"type": "boolean"
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["BindingArray"],
+					"properties": {
+						"BindingArray": {
+							"type": "object",
+							"required": ["base", "size"],
+							"properties": {
+								"base": {
+									"type": "integer",
+									"format": "uint",
+									"minimum": 0.0
+								},
+								"size": {
+									"$ref": "#/definitions/ArraySize"
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"ScalarKind": {
+			"type": "string",
+			"enum": ["Sint", "Uint", "Float", "Bool"]
+		},
+		"VectorSize": {
+			"type": "string",
+			"enum": ["Bi", "Tri", "Quad"]
+		},
+		"AddressSpace": {
+			"oneOf": [
+				{
+					"type": "string",
+					"enum": [
+						"Function",
+						"Private",
+						"WorkGroup",
+						"Uniform",
+						"Handle",
+						"PushConstant"
+					]
+				},
+				{
+					"type": "object",
+					"required": ["Storage"],
+					"properties": {
+						"Storage": {
+							"type": "object",
+							"required": ["access"],
+							"properties": {
+								"access": {
+									"type": "integer",
+									"format": "uint32",
+									"minimum": 0.0
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"ArraySize": {
+			"oneOf": [
+				{
+					"type": "string",
+					"enum": ["Dynamic"]
+				},
+				{
+					"type": "object",
+					"required": ["Constant"],
+					"properties": {
+						"Constant": {
+							"type": "integer",
+							"format": "uint32",
+							"minimum": 0.0
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"StructMember": {
+			"type": "object",
+			"required": ["offset", "ty"],
+			"properties": {
+				"name": {
+					"type": ["string", "null"]
+				},
+				"ty": {
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				},
+				"binding": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Binding"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"offset": {
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				}
+			}
+		},
+		"Binding": {
+			"oneOf": [
+				{
+					"type": "object",
+					"required": ["Builtin"],
+					"properties": {
+						"Builtin": {
+							"$ref": "#/definitions/Builtin"
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Location"],
+					"properties": {
+						"Location": {
+							"type": "object",
+							"required": ["location"],
+							"properties": {
+								"location": {
+									"type": "integer",
+									"format": "uint32",
+									"minimum": 0.0
+								},
+								"interpolation": {
+									"anyOf": [
+										{
+											"$ref": "#/definitions/Interpolation"
+										},
+										{
+											"type": "null"
+										}
+									]
+								},
+								"sampling": {
+									"anyOf": [
+										{
+											"$ref": "#/definitions/Sampling"
+										},
+										{
+											"type": "null"
+										}
+									]
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"Builtin": {
+			"oneOf": [
+				{
+					"type": "string",
+					"enum": [
+						"ViewIndex",
+						"BaseInstance",
+						"BaseVertex",
+						"ClipDistance",
+						"CullDistance",
+						"InstanceIndex",
+						"PointSize",
+						"VertexIndex",
+						"FragDepth",
+						"FrontFacing",
+						"PrimitiveIndex",
+						"SampleIndex",
+						"SampleMask",
+						"GlobalInvocationId",
+						"LocalInvocationId",
+						"LocalInvocationIndex",
+						"WorkGroupId",
+						"WorkGroupSize",
+						"NumWorkGroups",
+						"PointCoord"
+					]
+				},
+				{
+					"type": "object",
+					"required": ["Position"],
+					"properties": {
+						"Position": {
+							"type": "object",
+							"required": ["invariant"],
+							"properties": {
+								"invariant": {
+									"type": "boolean"
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"Interpolation": {
+			"type": "string",
+			"enum": ["Perspective", "Linear", "Flat"]
+		},
+		"Sampling": {
+			"type": "string",
+			"enum": ["Center", "Centroid", "Sample"]
+		},
+		"ImageDimension": {
+			"type": "string",
+			"enum": ["1d", "2d", "3d", "cube"]
+		},
+		"ImageClass": {
+			"oneOf": [
+				{
+					"type": "object",
+					"required": ["Sampled"],
+					"properties": {
+						"Sampled": {
+							"type": "object",
+							"required": ["kind", "multi"],
+							"properties": {
+								"kind": {
+									"$ref": "#/definitions/ScalarKind"
+								},
+								"multi": {
+									"type": "boolean"
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Depth"],
+					"properties": {
+						"Depth": {
+							"type": "object",
+							"required": ["multi"],
+							"properties": {
+								"multi": {
+									"type": "boolean"
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"type": "object",
+					"required": ["Storage"],
+					"properties": {
+						"Storage": {
+							"type": "object",
+							"required": ["access", "format"],
+							"properties": {
+								"format": {
+									"$ref": "#/definitions/StorageFormat"
+								},
+								"access": {
+									"type": "integer",
+									"format": "uint32",
+									"minimum": 0.0
+								}
+							}
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"StorageFormat": {
+			"type": "string",
+			"enum": [
+				"R8Unorm",
+				"R8Snorm",
+				"R8Uint",
+				"R8Sint",
+				"R16Uint",
+				"R16Sint",
+				"R16Float",
+				"Rg8Unorm",
+				"Rg8Snorm",
+				"Rg8Uint",
+				"Rg8Sint",
+				"R32Uint",
+				"R32Sint",
+				"R32Float",
+				"Rg16Uint",
+				"Rg16Sint",
+				"Rg16Float",
+				"Rgba8Unorm",
+				"Rgba8Snorm",
+				"Rgba8Uint",
+				"Rgba8Sint",
+				"Rgb10a2Unorm",
+				"Rg11b10Float",
+				"Rg32Uint",
+				"Rg32Sint",
+				"Rg32Float",
+				"Rgba16Uint",
+				"Rgba16Sint",
+				"Rgba16Float",
+				"Rgba32Uint",
+				"Rgba32Sint",
+				"Rgba32Float",
+				"R16Unorm",
+				"R16Snorm",
+				"Rg16Unorm",
+				"Rg16Snorm",
+				"Rgba16Unorm",
+				"Rgba16Snorm"
+			]
+		},
+		"Function": {
+			"type": "object",
+			"required": ["arguments"],
+			"properties": {
+				"name": {
+					"type": ["string", "null"]
+				},
+				"arguments": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/FunctionArgument"
+					}
+				},
+				"result": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/FunctionResult"
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"FunctionArgument": {
+			"type": "object",
+			"required": ["ty"],
+			"properties": {
+				"name": {
+					"type": ["string", "null"]
+				},
+				"ty": {
+					"type": "integer",
+					"format": "uint",
+					"minimum": 0.0
+				},
+				"binding": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Binding"
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"FunctionResult": {
+			"type": "object",
+			"required": ["ty"],
+			"properties": {
+				"ty": {
+					"type": "integer",
+					"format": "uint",
+					"minimum": 0.0
+				},
+				"binding": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Binding"
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"EntryPoint": {
+			"type": "object",
+			"required": ["function", "name", "stage", "workgroup_size"],
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"stage": {
+					"$ref": "#/definitions/ShaderStage"
+				},
+				"workgroup_size": {
+					"type": "array",
+					"items": {
+						"type": "integer",
+						"format": "uint32",
+						"minimum": 0.0
+					},
+					"maxItems": 3,
+					"minItems": 3
+				},
+				"function": {
+					"$ref": "#/definitions/Function"
+				}
+			}
+		},
+		"ShaderStage": {
+			"type": "string",
+			"enum": ["Vertex", "Fragment", "Compute"]
+		},
+		"Runner": {
+			"title": "Runner",
+			"description": "A runner is used to orchestrate shader execution and resource management.\n\nA project can have multiple runners, but will default to /run.json.",
+			"type": "object",
+			"required": ["bundles", "pipelines"],
+			"properties": {
+				"bundles": {
+					"title": "Runner bundles",
+					"description": "Bundles are a collection of Resources surrounding some form of input/ouput that are maintained around a runner's lifecycle (run start, run end, frame start, frame end).\n\nFor example, the Viewport bundle has a 'surface' texture resource which can be written to in fragment shader, a 'mouse' uniform buffer corresponding to mouse position over said viewport, and a 'resolution' uniform buffer that contains the current resolution of the viewport.\n\nIn the pipelines, these resources can be used just like a resource defined by the user. Only instead of 'res::{some_resource_name}', the identifier will be '{some_bundle_name}::{some_resource_within_bundle}'.\n\nFor instance, if you wanted to use the surface of a Viewport bundle named 'view' within a pipeline, you would identiy it like 'view::surface'.",
+					"type": "object",
+					"additionalProperties": {
+						"$ref": "#/definitions/BundleArgs"
+					}
+				},
+				"pipelines": {
+					"title": "Runner pipelines",
+					"description": "A pipeline represents an execution of shader.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/PipelineArgs"
+					}
+				}
+			}
+		},
+		"BundleArgs": {
+			"oneOf": [
+				{
+					"type": "object",
+					"required": ["target", "type"],
+					"properties": {
+						"type": {
+							"type": "string",
+							"enum": ["Viewport"]
+						},
+						"target": {
+							"description": "Target canvas id",
+							"type": "string"
+						}
+					}
+				}
+			]
+		},
+		"PipelineArgs": {
+			"oneOf": [
+				{
+					"title": "Vertex/Fragment pipeline",
+					"description": "Plain rasterizer pipeline with configurable vertex inputs and texture output targets.\n\nNote: While this can be used for fullscreen quad, the easier method would to be to use the built in FullscreenQuad pipeline, which handles the vertex shader automatically.",
+					"type": "object",
+					"required": ["VertexFragement"],
+					"properties": {
+						"VertexFragement": {
+							"$ref": "#/definitions/VertexFragment"
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"title": "Fullscreen quad pipeline",
+					"description": "Fragment shader over rasterized fullscreen quad.\n\nSimilar in function to a 'shadertoy' shader.",
+					"type": "object",
+					"required": ["FullscreenQuad"],
+					"properties": {
+						"FullscreenQuad": {
+							"$ref": "#/definitions/FullscreenQuad"
+						}
+					},
+					"additionalProperties": false
+				},
+				{
+					"title": "Compute pipeline",
+					"description": "Compute pipeline to be ran over the range of some resource.",
+					"type": "object",
+					"required": ["Compute"],
+					"properties": {
+						"Compute": {
+							"$ref": "#/definitions/Compute"
+						}
+					},
+					"additionalProperties": false
+				}
+			]
+		},
+		"VertexFragment": {
+			"type": "object",
+			"required": ["fragment", "targets", "vertex"],
+			"properties": {
+				"vertex": {
+					"title": "Vertex shader",
+					"description": "A path to \"wgsl\" or \"glsl\" shader file that contains a vertex entry point.\n\nNote: this may be the same as fragment shader as long as that file has both vertex and fragment entry points.",
+					"allOf": [
+						{
+							"$ref": "#/definitions/FilePath"
+						}
+					]
+				},
+				"fragment": {
+					"title": "Fragment shader",
+					"description": "A path to \"wgsl\" or \"glsl\" shader file that contains a fragment entry point.\n\nNote: this may be the same as vertex shader as long as that file has both vertex and fragment entry points.",
+					"allOf": [
+						{
+							"$ref": "#/definitions/FilePath"
+						}
+					]
+				},
+				"binds": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Binds"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"targets": {
+					"title": "Fragment shader targets",
+					"description": "Ordered list of texture resources the fragment shader will draw to. Ordering will correspond to location attributes in shader output.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"Binds": {
+			"title": "Pipeline binds",
+			"description": "Describes a map between syned shader variables and resource path.\n\nDuring build, the resource at named sync variable will be bound via bind groups.\n\nResources can be from either project resources or from a bundle. For example, \"resource::particles\" will look for defined resource named \"particles\", and \"view::surface\" will look for the \"surface\" resource from defined bundle called \"view\".",
+			"type": "object"
+		},
+		"FullscreenQuad": {
+			"type": "object",
+			"required": ["fragment", "targets"],
+			"properties": {
+				"fragment": {
+					"title": "Fragment shader",
+					"description": "A path to \"wgsl\" or \"glsl\" shader file that contains a fragment entry point.",
+					"allOf": [
+						{
+							"$ref": "#/definitions/FilePath"
+						}
+					]
+				},
+				"binds": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Binds"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"targets": {
+					"title": "Fragment shader targets",
+					"description": "Ordered list of texture resources the fragment shader will draw to. Ordering will correspond to location attributes in shader output.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"Compute": {
+			"type": "object",
+			"required": ["shader"],
+			"properties": {
+				"shader": {
+					"title": "Compute shader",
+					"description": "A path to \"wgsl\" or \"glsl\" shader file that contains a compute entry point.",
+					"allOf": [
+						{
+							"$ref": "#/definitions/FilePath"
+						}
+					]
+				},
+				"binds": {
+					"anyOf": [
+						{
+							"$ref": "#/definitions/Binds"
+						},
+						{
+							"type": "null"
+						}
+					]
+				}
+			}
+		},
+		"ClientError": {
+			"type": "object",
+			"required": ["destination", "message", "severity", "source"],
+			"properties": {
+				"severity": {
+					"$ref": "#/definitions/Severity"
+				},
+				"message": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"destination": {
+					"$ref": "#/definitions/Destination"
+				}
+			}
+		},
+		"Severity": {
+			"type": "string",
+			"enum": ["error", "warning"]
+		},
+		"Destination": {
+			"type": "string",
+			"enum": ["console", "toast"]
+		},
+		"SchemaEntry": {
+			"type": "object",
+			"required": ["configClass", "description", "name"],
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"configClass": {
+					"$ref": "#/definitions/ConfigClass"
+				}
+			}
+		},
+		"ConfigClass": {
+			"description": "Describes the various classes of user interactables\n\nView `front/src/components/preferences/*Controller.svelte` for more info on how these input classes are implemented in the frontend.",
+			"oneOf": [
+				{
+					"description": "<input type='number'/> with no fractional values",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["IntClass"]
+						},
+						"c": {
+							"$ref": "#/definitions/Int"
+						}
+					}
+				},
+				{
+					"description": "<input type='number'/> with fractional values",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["FloatClass"]
+						},
+						"c": {
+							"$ref": "#/definitions/Float"
+						}
+					}
+				},
+				{
+					"description": "<input/> plain string value",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["StrClass"]
+						},
+						"c": {
+							"$ref": "#/definitions/Str"
+						}
+					}
+				},
+				{
+					"description": "<select/> with list of values as options",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["EnumClass"]
+						},
+						"c": {
+							"$ref": "#/definitions/Enum"
+						}
+					}
+				},
+				{
+					"description": "<input type='checkbox'/>",
+					"type": "object",
+					"required": ["c", "ty"],
+					"properties": {
+						"ty": {
+							"type": "string",
+							"enum": ["BoolClass"]
+						},
+						"c": {
+							"$ref": "#/definitions/Bool"
+						}
+					}
+				}
+			]
+		},
+		"Int": {
+			"title": "Int",
+			"description": "Describes the constraints of an int interactable.\n\nUsed to generate html markup for changing fields of config structs.",
+			"type": "object",
+			"required": ["step"],
+			"properties": {
+				"min": {
+					"description": "The minimum value this input can be",
+					"type": ["integer", "null"],
+					"format": "int32"
+				},
+				"max": {
+					"description": "The maximum value this input can be",
+					"type": ["integer", "null"],
+					"format": "int32"
+				},
+				"step": {
+					"description": "The amount this input will step up and down",
+					"type": "integer",
+					"format": "uint32",
+					"minimum": 0.0
+				},
+				"postfix": {
+					"type": ["string", "null"]
+				}
+			}
+		},
+		"Float": {
+			"title": "FloatInput",
+			"description": "Describes the constraints of a float input.\n\nUsed to generate html markup for changing fields of config structs.",
+			"type": "object",
+			"required": ["scale"],
+			"properties": {
+				"min": {
+					"description": "The minimum value this input can be",
+					"type": ["number", "null"],
+					"format": "float"
+				},
+				"max": {
+					"description": "The maximum value this input can be",
+					"type": ["number", "null"],
+					"format": "float"
+				},
+				"step": {
+					"description": "The amount this input will step up and down",
+					"type": ["number", "null"],
+					"format": "float"
+				},
+				"postfix": {
+					"type": ["string", "null"]
+				},
+				"scale": {
+					"type": "integer",
+					"format": "int8"
+				}
+			}
+		},
+		"Str": {
+			"type": "object",
+			"properties": {
+				"regex": {
+					"type": ["string", "null"]
+				}
+			}
+		},
+		"Enum": {
+			"type": "object",
+			"required": ["variants"],
+			"properties": {
+				"variants": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"Bool": {
+			"type": "object"
+		},
+		"CompletionInfo": {
+			"type": "object",
+			"required": ["arg_descriptors"],
+			"properties": {
+				"arg_descriptors": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/ArgDescriptor"
+					}
+				},
+				"cursor_word_index": {
+					"type": ["integer", "null"],
+					"format": "uint",
+					"minimum": 0.0
+				}
+			}
+		},
+		"ArgDescriptor": {
+			"type": "object",
+			"required": ["completionKey", "description", "name", "value"],
+			"properties": {
+				"value": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"completionKey": {
+					"$ref": "#/definitions/CompletionKey"
+				}
+			}
+		},
+		"CompletionKey": {
+			"oneOf": [
+				{
+					"type": "string",
+					"enum": [
+						"AutoIndent",
+						"CursorBlinking",
+						"CursorStyle",
+						"LineNumbers",
+						"LogLevel",
+						"ShowCompletions",
+						"UiSpeed"
+					]
+				},
+				{
+					"description": "No completions.",
+					"type": "string",
+					"enum": ["Empty"]
+				},
+				{
+					"description": "Complete actions\n\nGenerated statically from bindgen.",
+					"type": "string",
+					"enum": ["ActionKey"]
+				},
+				{
+					"description": "Complete strings\n\nAt the moment does nothing, but could be useful to distinguish in the future.",
+					"type": "string",
+					"enum": ["Str"]
+				},
+				{
+					"description": "Complete file paths.\n\nGenerated at runtime from svelte file store",
+					"type": "string",
+					"enum": ["FilePath"]
+				},
+				{
+					"description": "Complete directory paths\n\nGenerated at runtime from svelte file store.",
+					"type": "string",
+					"enum": ["Path"]
+				},
+				{
+					"description": "Complete resource paths (i.e. 'viewport::texture')\n\nGenerated from @TODO",
+					"type": "string",
+					"enum": ["Resource"]
+				},
+				{
+					"description": "Complete config key paths (i.e. 'editor.vim_mode.enabled')\n\nGenerated statically from bindgen.",
+					"type": "string",
+					"enum": ["PreferenceKey"]
+				},
+				{
+					"description": "Complete ui region (i.e. 'terminal' or 'editor')\n\nGenerated statically from bindgen.",
+					"type": "string",
+					"enum": ["Region"]
+				},
+				{
+					"description": "Complete key (i.e. 'C-a')\n\nAt the moment does nothing, but could be useful to distinguish in the future.",
+					"type": "string",
+					"enum": ["Key"]
+				},
+				{
+					"description": "Store key\n\nGenerated at runtime on store initialization",
+					"type": "string",
+					"enum": ["StoreKey"]
+				}
+			]
+		},
+		"CompletionEntry": {
+			"description": "A completion.\n\nCompletions are generated from gpu-common types as part of the bindgen, but also at runtime for completions that cannot be known statically (i.e. file paths, resources).",
+			"type": "object",
+			"required": ["description", "matches", "snippetText"],
+			"properties": {
+				"matches": {
+					"description": "A list of aliases this completion will match on. It will always insert the first alias in the vector.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"snippetText": {
+					"description": "The snippet information on the right side of a completion.",
+					"type": "string"
+				},
+				"description": {
+					"description": "A long description of this completion.",
+					"type": "string"
+				}
+			}
+		}
+	}
+}

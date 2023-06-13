@@ -1,29 +1,31 @@
-import type { File, Files } from '$common'
+import type { File, FilePath, Files, Path, SupportedExtension } from '$gen'
+import { wFiles } from '$stores'
 import { get, type Writable } from 'svelte/store'
 
 export type FilesExtras = {
-	newFile: (file: File) => string
-	getFile: (fileid: string) => File | null
-	writeFile: (fileid: string, data: string) => void
-	updateFileMeta: (fileid: string, meta: Partial<Omit<File, 'data'>>) => void
-	removeFile: (fileid: string) => void
-	buildTree: () => FileTreeNode
+	newFile: (file: FileWithId) => FilePath
+	getFile: (fileid: FilePath | Path) => File | null
+	writeFile: (fileid: FilePath | Path, data: string) => void
+	updateFileMeta: (fileid: FilePath, meta: Partial<Omit<File, 'data'>>) => void
+	removeFile: (fileid: string) => File | undefined
+	paths: () => Path[]
+	filePaths: () => FilePath[]
 }
 export function initFilesMethods(files: Writable<Files>): FilesExtras {
-	function newFile(file: File): string {
-		const fileid = `${file.dir}/${file.fileName}.${file.extension}`
+	function newFile(file: FileWithId): FilePath {
+		const { id, ...fileNoId } = file
 		files.update(({ map }) => {
-			map[fileid] = file
+			map[id] = fileNoId
 			return { map }
 		})
-		return fileid
+		return id
 	}
 
-	function getFile(fileid: string): File | null {
+	function getFile(fileid: FilePath | Path): File | null {
 		return get(files).map[fileid] ?? null
 	}
 
-	function writeFile(fileid: string, data: string) {
+	function writeFile(fileid: FilePath | Path, data: string) {
 		files.update(({ map }) => {
 			if (!map[fileid]) return { map }
 			map[fileid] = {
@@ -34,25 +36,50 @@ export function initFilesMethods(files: Writable<Files>): FilesExtras {
 		})
 	}
 
-	function updateFileMeta(fileid: string, meta: Partial<Omit<File, 'data'>>) {
+	function updateFileMeta(fileid: FilePath, meta: Partial<Omit<File, 'data'>>) {
 		const file = getFile(fileid)
 		if (!file) return
 		removeFile(fileid)
-		newFile({ ...file, ...meta })
+		newFile({ id: fileid, ...file, ...meta })
 	}
 
-	function removeFile(fileid: string) {
+	function removeFile(fileid: string): File | undefined {
+		let removed
 		files.update(({ map }) => {
+			let curr = map[fileid]
+			if (!curr) return { map }
 			delete map[fileid]
+			removed = curr
 			return { map }
 		})
+		return removed
 	}
 
-	function buildTree(): FileTreeNode {
-		return treeFromFiles(get(files))
+	function filePaths(): FilePath[] {
+		return Object.keys(get(files).map)
 	}
 
-	return { newFile, getFile, writeFile, updateFileMeta, removeFile, buildTree }
+	function paths(): Path[] {
+		let filePaths = Object.keys(get(files).map)
+		let ret = new Set(filePaths)
+		for (let filePath of filePaths) {
+			while (filePath != '/') {
+				filePath = pathParent(filePath)
+				ret.add(filePath)
+			}
+		}
+		return Array.from(ret)
+	}
+
+	return {
+		newFile,
+		getFile,
+		writeFile,
+		updateFileMeta,
+		removeFile,
+		paths,
+		filePaths
+	}
 }
 
 /**
@@ -79,6 +106,66 @@ export type FileTreeNode = {
 	 * List entries can either be a file or another FileTreeNode
 	 */
 	children: FileTreeNodeChild[]
+}
+
+export function getChildren(path: string): string[] {
+	return Object.keys(get(wFiles).map).filter((p) => p.startsWith(path))
+}
+
+/**
+ * Retreieves parent absolute path from absoute path
+ * @param path a path i.e. '/some/path/to/file.txt'
+ * @returns parent path i.e. '/some/path/to'
+ */
+export function pathParent(path: string): string {
+	const [_, ...paths] = path.split('/')
+	if (paths.length <= 1) return '/'
+	paths.pop()
+	return '/' + paths.join('/')
+}
+
+/**
+ * Retrieves file name from path
+ * @param path i.e. '/some/path/to/file.txt'
+ * @returns [fileName, extension, ...dirs]
+ */
+export function pathToParts(path: FilePath): [string, string, string[]] {
+	const [file, ...dirs] = path.trim().split('/').reverse()
+	const [extension, ...fileName] = file.split('.').reverse()
+	return [fileName.join('.'), extension, dirs.filter((s) => s.length > 0)]
+}
+
+/**
+ * File name as displayed in frontend
+ * @param file
+ * @returns file name
+ */
+export function getCanonicalName(file: string | File | FileWithId): string {
+	if (typeof file == 'string') file = wFiles.getFile(file)!
+	return file.fileName + '.' + file.extension
+}
+
+export function fileWithNewPath(
+	file: File | FileWithId,
+	newPath: FilePath
+): File {
+	const [fileName, extension, dirs] = pathToParts(newPath)
+	return {
+		...file,
+		fileName,
+		extension: extension as SupportedExtension,
+		dir: dirs.pop() ?? ''
+	}
+}
+
+const RE_VALID_FILE_ID = /\/([.]?[_]*[\w_-]+\/)*([.]?[_]*[\w_-]*[.][a-z]+)/g
+/**
+ * Determine whether the path has valid formatting
+ * @param path
+ * @returns whether the path is vallid
+ */
+export function isValidPath(path: string): boolean {
+	return path.match(RE_VALID_FILE_ID)?.length == 1
 }
 
 /**
@@ -114,7 +201,7 @@ export type FileTreeNode = {
  * @param files Files from store
  * @returns Tree representation of files
  */
-function treeFromFiles(files: Files): FileTreeNode {
+export function treeFromFiles(files: Files): FileTreeNode {
 	const ret: FileTreeNode = { dir: '', absoluteDir: '', children: [] }
 	let ptr = ret
 
@@ -174,10 +261,23 @@ function sortChildren(ptr: FileTreeNodeChild) {
 }
 
 /**
- * File name as displayed in frontend
- * @param file
- * @returns file name
+ * Ensure this potential rename is valid. If return is undefined, then it is valid
+ * @param node file node that is being renamed
+ * @param rename new name
+ * @returns error message | undefined
  */
-export function getCanonicalName(file: File | FileWithId): string {
-	return file.fileName + '.' + file.extension
+export function validateRename(
+	node: FileTreeNodeChild,
+	rename: string
+): string | undefined {
+	if (rename.length == 0) return 'cannot be empty'
+	if ('id' in node) {
+		const newId = pathParent(node.id) + '/' + rename.trim()
+		if (newId != node.id && wFiles.getFile(newId) != null) return 'exists'
+		if (!isValidPath(newId)) return 'invalid'
+	} else {
+		// TODO:
+		console.log('Not yet implemeneted: ', node.absoluteDir)
+	}
+	return
 }

@@ -1,60 +1,70 @@
 <script lang="ts">
+	import { rAccordianOpen, toggleAccordian } from '$core/layout'
 	import Icon from '$lib/components/Icon.svelte'
-	import { wLayout } from '$stores'
+	import { slide } from 'svelte/transition'
 
 	export let title: string
 	function handleClick() {
-		wLayout.toggleAccordian(title)
+		toggleAccordian(title)
 	}
-	$: open = $wLayout.accordianOpen[title] ?? false
+	$: open = $rAccordianOpen[title] ?? false
 </script>
 
 <div class="accordian-container">
-	<div
-		class="accordian-title"
-		on:click={handleClick}
-		style="border-bottom: {open ? 'none' : 'var(--border2)'};"
-	>
+	<button class="accordian-title" on:click={handleClick}>
 		<div class="accordian-title-left">
-			<Icon stroked name="chevron-right" rotation={open ? '90deg' : '0deg'} />
-			<p>
-				{title}
-			</p>
+			<Icon
+				class="xs"
+				stroked
+				name="chevron-right"
+				rotation={open ? '90deg' : '0deg'}
+			/>
+			{title}
 		</div>
 
 		<div class="accordian-title-right">
 			<slot name="menu" />
 		</div>
+	</button>
+	<div
+		class="accordian-content hide"
+		transition:slide={{ duration: 50 }}
+		class:unhide={open}
+	>
+		<slot name="content" />
 	</div>
-	{#if open}
-		<div class="accordian-content">
-			<slot name="content" />
-		</div>
-	{/if}
 </div>
 
 <style>
 	.accordian-container {
 		display: flex;
 		height: fit-content;
+		width: 100%;
 		flex-direction: column;
+		background-color: var(--background-alt);
+		border-radius: var(--pane-radius);
 	}
 	.accordian-title {
+		height: var(--sm-nav);
+		font-size: var(--sm);
+		border-radius: var(--pane-radius);
+		padding-inline: var(--gap4);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding-inline: 0.25rem;
-		gap: 0.5rem;
 		flex: 0 0 auto;
-		background-color: var(--background-content);
 		user-select: none;
+		background: transparent;
+		font-weight: bold;
+		color: var(--text-accent-color);
 	}
 	.accordian-title:hover {
-		background-color: var(--glass-med);
+		background-color: var(--background-nav);
 	}
 	.accordian-title-left {
 		display: flex;
 		align-items: center;
+		gap: var(--nav-gap);
 	}
 	.accordian-title-right {
 		display: flex;
@@ -62,14 +72,8 @@
 	}
 	.accordian-content {
 		flex: 1 1 auto;
-		padding: 1rem;
-		border-bottom: var(--border2);
-		min-width: max-content;
-	}
-	p {
-		font-size: var(--sm);
-		margin: 0px;
-		padding: 4px;
-		color: var(--text-accent-color);
+		padding: 0;
+		/* border-bottom: var(--border); */
+		min-width: 100px;
 	}
 </style>

@@ -232,7 +232,7 @@ export const monarch: monaco.languages.IMonarchLanguage = {
 
 export type SeverityLevel = 'ignore' | 'warn' | 'error'
 
-export interface DiagnosticsOptions { }
+export interface DiagnosticsOptions {}
 
 export interface LanguageServiceDefaults {
 	readonly languageId: string

@@ -1,0 +1,4 @@
+root-path = "front/generated"
+json-to-ts-path = "front/json-to-ts.js"
+root-schema-name = "root-schema.json"
+ts-index-name= "index.ts"

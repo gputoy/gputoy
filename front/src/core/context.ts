@@ -1,5 +1,5 @@
+import { Context as WasmContext } from '$gen/client/gpu_wasm_client'
 import { wConfig, wFiles, wPrebuildDirty, wPrebuildResult } from '$stores'
-import { Context as WasmContext } from '$wasm/client/gpu_wasm_client'
 import {
 	get,
 	writable,

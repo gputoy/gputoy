@@ -1,23 +1,34 @@
-import type { Action, FilteredAction, Panel, ShiftPaneArgs } from '$common'
+import * as layout from '$core/layout'
 import { clearProject } from '$core/project'
+import type {
+	Action,
+	CopyMove,
+	Delete,
+	FilePath,
+	SupportedExtension
+} from '$gen'
 import { getAllModels, getModel } from '$monaco'
 import { wWorkerInternal } from '$monaco/wgsl/wgslMode'
 import {
+	getStore,
+	getStores,
+	wBuildDirty,
 	wConfig,
 	wConsole,
-	wConsoleOpen,
-	wDebugPanel,
 	wFileDirty,
 	wFiles,
-	wLayout,
 	wModelDirty,
+	wPrebuildDirty,
 	wRunState,
 	wWorkerData
 } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
 import isEqual from 'lodash/isEqual'
-
-const actionHistory: Action[] = []
+import { get } from 'svelte/store'
+import { prettyPrintJson } from './console'
+import context from './context'
+import { fileWithNewPath, getChildren, pathToParts } from './files'
+import { bindKey } from './keys'
 
 /**
  * Determines if two Actions are equal by value
@@ -27,9 +38,7 @@ const actionHistory: Action[] = []
  */
 export function isActionEqual(a: Action, b: Action): boolean {
 	if (a.ty !== b.ty) return false
-	// Both have action arguments within their type variant
-	if ('c' in a && 'c' in b) return isEqual(a.c, b.c)
-	return true
+	return 'c' in a && 'c' in b ? isEqual(a.c, b.c) : true
 }
 
 /**
@@ -38,7 +47,7 @@ export function isActionEqual(a: Action, b: Action): boolean {
  * @param filter
  * @returns
  */
-export function actionPermitted(fAction: FilteredAction) {
+export function actionPermitted(fAction: { action: Action }) {
 	return true
 }
 
@@ -55,7 +64,7 @@ export const FILTER_CONDITION_LIST = [
 	'projectPanelFocused',
 	'viewportPanelFocused'
 ]
-export type SingleFilter = typeof FILTER_CONDITION_LIST[number]
+export type SingleFilter = (typeof FILTER_CONDITION_LIST)[number]
 
 /**
  * Pushes Action to be executed
@@ -63,53 +72,67 @@ export type SingleFilter = typeof FILTER_CONDITION_LIST[number]
  */
 export function pushAction(action: Action) {
 	switch (action.ty) {
+		case 'clear':
+			clearConsole()
+			break
 		case 'playPause':
 			playPause()
 			break
-		case 'openDocument':
-			openDocument(action.c)
+		case 'openTab':
+			layout.openTab(action.c)
 			break
-		case 'nextDocument':
-			shiftDoument(1)
+		case 'closeTab':
+			layout.closeTab()
+		case 'nextTab':
+			layout.shiftTab(1)
 			break
-		case 'previousDocument':
-			shiftDoument(-1)
+		case 'prevTab':
+			layout.shiftTab(-1)
 			break
-		case 'rebuild':
+		case 'build':
 			rebuildProject()
 			break
 		case 'reset':
 			resetProject()
 			break
-		case 'toggleConsole':
-			toggleConsole()
+		case 'toggleUi':
+			layout.toggleRegionVisibility(action.c)
 			break
-		case 'togglePanel':
-			togglePanel(action.c)
+		case 'toggleAllPanes':
+			layout.toggleAllPanes()
 			break
-		case 'shiftPanel':
-			shiftPanel(action.c)
-			break
-		case 'focus':
-			focusPane(action.c)
-			break
-		case 'toggleDebugPanel':
-			toggleDebugPanel()
-			break
-		case 'closeFile':
-			closeCurrentFile()
-			break
-		case 'closeProject':
-			closeProject()
+		case 'closeTab':
+			layout.closeTab()
 			break
 		case 'setRunner':
 			setRunner(action.c)
 			break
-		case 'saveCurrentFile':
+		case 'saveFile':
 			saveCurrentFile()
 			break
 		case 'saveAllFiles':
 			saveAllFiles()
+			break
+		case 'move':
+			moveFile(action.c)
+			break
+		case 'copy':
+			copyFile(action.c)
+			break
+		case 'delete':
+			deleteFile(action.c)
+			break
+		case 'newFile':
+			createNewFile(action.c)
+			break
+		case 'exit':
+			exit()
+			break
+		case 'bindKey':
+			bindKey(action.c)
+			break
+		case 'dump':
+			dump(action.c)
 			break
 
 		/** @ts-ignore */
@@ -129,50 +152,29 @@ export function reverseAction(action: Action) {}
 /// ------------------- Action execution ----------------------
 
 async function playPause() {
-	// if (get(wPrebuildDirty)) {
-	//     context.prebuild()
-	// }
+	if (get(wPrebuildDirty)) {
+		context.prebuild()
+	}
 
-	// if (get(wBuildDirty)) {
-	//     context.build()
-	// }
+	if (get(wBuildDirty)) {
+		context.build()
+	}
 	wWorkerInternal.tryBuild()
 	wWorkerData.set(await wWorkerInternal.poll())
 	wRunState.playPause()
-}
-
-function openDocument(fileid: string) {
-	wLayout.openDocument(fileid)
-}
-function shiftDoument(shift: number) {
-	wLayout.moveWorkspaceIdx(shift)
-}
-
-function closeCurrentFile() {
-	wLayout.closeWorkspaceFile()
 }
 
 function rebuildProject() {}
 
 function resetProject() {}
 
-function toggleConsole() {
-	wConsoleOpen.update((o) => !o)
+function clearConsole() {
+	wConsole.set([])
 }
-
-function togglePanel(panel: Panel) {
-	wLayout.togglePanel(panel)
-}
-
-function toggleDebugPanel() {
-	wDebugPanel.update((show) => !show)
-}
-
-function shiftPanel(c: ShiftPaneArgs) {}
 
 function focusPane(c: string) {}
 
-function closeProject() {
+function exit() {
 	clearProject()
 }
 
@@ -186,7 +188,7 @@ function setRunner(fileid: string) {
 }
 
 async function saveCurrentFile() {
-	const currentFile = wLayout.getOpenFileId()
+	const currentFile = layout.getOpenFileId()
 	if (!currentFile) return
 	await wWorkerInternal.applyUpdateToFile(currentFile)
 	wModelDirty.remove(currentFile)
@@ -206,4 +208,93 @@ async function saveAllFiles() {
 		wFiles.writeFile(path, model.getValue())
 	})
 	wFileDirty.clear()
+}
+
+function createNewFile(args: FilePath) {
+	if (wFiles.getFile(args) != null) {
+		wConsole.error('File already exists: ' + args)
+	}
+	const [fileName, extension, dirs] = pathToParts(args)!
+	wFiles.newFile({
+		id: args,
+		fileName,
+		extension: extension as SupportedExtension,
+		dir: dirs.pop() ?? '',
+		data: ''
+	})
+}
+
+function moveFile(args: CopyMove) {
+	let paths = wFiles.paths()
+	if (!paths.includes(args.src)) {
+		wConsole.error("Source path doesn't exist: " + args.src)
+		return
+	}
+	if (paths.includes(args.dest)) {
+		wConsole.error('Destination path already exists: ' + args.dest)
+		return
+	}
+	const { src, dest, isDir } = args
+	if (isDir) {
+		const childPaths = getChildren(src)
+		childPaths
+			.map((p) => ({ src: p, dest: p.replace(src, dest), isDir: false }))
+			.forEach((arg) => moveFile(arg))
+		layout.moveFileTreeState(src, dest)
+		return
+	}
+	let didUpdate = false
+	wFiles.update(({ map }) => {
+		let curr = map[src]
+		if (curr && map[dest] == undefined) {
+			const newFile = fileWithNewPath(curr, dest)
+			if (!newFile) return { map }
+			map[dest] = newFile
+			delete map[src]
+			didUpdate = true
+		}
+		return { map }
+	})
+	if (didUpdate) {
+		layout.replaceIdInTabs(src, dest)
+	}
+}
+
+function copyFile(args: CopyMove) {
+	throw new Error('Function not implemented.')
+}
+
+var _undoDeleteFiles = []
+
+// TODO: scrap recursive implementation for one that gathers the
+// list of deleted file ids before-hand.
+function deleteFile(args: Delete) {
+	const { path, isDir } = args
+
+	if (isDir) {
+		const childPaths = getChildren(path)
+		childPaths.forEach((p) => deleteFile({ path: p, isDir: false }))
+		return
+	}
+	let deletedFile = wFiles.removeFile(path)
+	if (deletedFile) {
+		layout.deleteIdInTabs(path)
+	}
+}
+
+function dump(storeKey: string) {
+	storeKey = storeKey.slice(1)
+	let value
+	if (storeKey == '*') {
+		value = getStores()
+	} else {
+		let store = getStore(storeKey)
+		if (!store) {
+			wConsole.error('Invalid store-key: ' + storeKey)
+			return
+		}
+		value = get(store)
+	}
+	let json = prettyPrintJson(value)
+	wConsole.out(json)
 }

@@ -9,12 +9,12 @@
  * Feb 5th, 2023
  */
 
-import type { Files } from '$core/common'
+import type { Files } from '$gen'
 import {
 	Analyzer as WasmAnalyzer,
 	default as init_analyzer,
 	Position
-} from '$wasm/analyzer/gpu_wasm_analyzer'
+} from '$gen/analyzer/gpu_wasm_analyzer'
 import type * as monaco from 'monaco-editor'
 
 export type Diagnostic = {}
@@ -22,7 +22,6 @@ export type CompletionList = {}
 export type Hover = {}
 export type DocumentHighlight = {}
 export type SymbolInformation = {}
-export type CompletionInfo = {}
 
 export default class WgslWorker {
 	private ctx: monaco.worker.IWorkerContext
@@ -206,7 +205,7 @@ export interface CreateData {
 	/** @ts-ignore */
 	languageSettings: DiagnosticsOptions
 	enableSchemaRequest: boolean
-	wasmModuleUrl: string,
+	wasmModuleUrl: string
 	initFiles: Files
 }
 

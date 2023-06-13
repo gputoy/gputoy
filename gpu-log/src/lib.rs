@@ -35,7 +35,6 @@ impl log::Log for ClientLogger {
 pub fn init() -> Result<(), log::SetLoggerError> {
     log::set_logger(&STATIC_LOGGER)?;
     log::set_max_level(log::LevelFilter::Trace);
-    crate::trace!("test");
     Ok(())
 }
 

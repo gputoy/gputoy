@@ -14,7 +14,6 @@ pub enum BundleArgs {
     Viewport(viewport::Args),
 }
 
-#[cfg(feature = "naga")]
 pub trait Bundle {
     const TYPE_DECL: &'static str;
 }

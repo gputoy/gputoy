@@ -1,12 +1,8 @@
-use crate::{Config, Files, Layout};
-#[cfg(feature = "schema")]
-use schemars::JsonSchema;
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+use crate::{layout::Layout, Config, Files};
 
 #[derive(Debug)]
-#[cfg_attr(feature = "schema", derive(JsonSchema))]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Project {
     pub files: Files,
     pub layout: Option<Layout>,

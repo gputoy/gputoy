@@ -37,7 +37,7 @@ impl IntoDiagnostic for Error {
                 ..Default::default()
             },
             Self::UnexpectedExtension { expected, actual } => Diagnostic {
-                message: format!("Expected .{expected} file, got {actual}"),
+                message: format!("expected .{expected} file, got {actual}"),
                 ..Default::default()
             },
         };

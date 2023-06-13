@@ -1,0 +1,15 @@
+[package]
+name = "proc-macro"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc_macro = true
+
+[dependencies]
+syn = "1.0.109"
+quote = "1.0.23"
+macro_state = "0.2.0"
+serde = "*"
+serde_json = "*"
+convert_case = "0.6.0"

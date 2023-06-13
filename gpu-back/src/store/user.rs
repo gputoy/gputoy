@@ -47,7 +47,7 @@ impl UserRepository {
             .bind(update_user.full_name)
             .bind(update_user.bio)
             .bind(update_user.image)
-            .bind(update_user.config.map(Json))
+            .bind(update_user.preferences.map(Json))
             .fetch_one(&*self.pool)
             .await
             .map_err(From::from)

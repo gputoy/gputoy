@@ -35,7 +35,6 @@ impl IntoDiagnostic for crate::Error {
                     .with_message("unable to resolve")],
                 ..Default::default()
             },
-
             Self::Parse(key, error) => {
                 let diagnostic = error.diagnostic();
                 Diagnostic {

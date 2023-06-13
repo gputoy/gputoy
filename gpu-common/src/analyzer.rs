@@ -96,7 +96,7 @@ pub struct FilePrebuildResult {
 pub struct FileDependencyInfo {
     pub imports: Vec<Match>,
     // rename to not collide with ts export keyword
-    #[cfg_attr(feature = "serde", serde(rename = "exxports"))]
+    #[cfg_attr(feature = "serde", serde(rename = "fileExports"))]
     pub exports: FastHashMap<String, Match>,
     pub errors: Option<Vec<crate::sys::CompileError>>,
 }

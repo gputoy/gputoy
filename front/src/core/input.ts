@@ -1,95 +1,306 @@
-import type { Action, FilteredAction } from '$common'
-import { isActionEqual, pushAction } from '$core/actions'
-import {
-	wLastInputAction,
-	wUserKeybinds,
-	wUserModalOpen,
-	wUserPrefsOpen
-} from '$stores'
-import { get } from 'svelte/store'
+import * as completions from '$core/completions'
+import type { ArgDescriptor } from '$gen'
+import { wConsole } from '$stores'
 
-/**
- *  Map of keybinds to action
- */
-export type Keybinds = {
-	[key: string]: FilteredAction
+type UserPositonState = {
+	activeWord: string
+	wordIndex: number
+	wordStart: number
+	wordEnd: number
 }
 
-/**
- * Returns list of keybinds bound for input action
- * @param find action to find binds for in keybinds
- * @returns list of bound keybinds for action
- */
-export function findActionBinds(find: Action, keybinds: Keybinds): string[] {
-	return Object.entries(keybinds)
-		.filter(([_, filteredAction]) => isActionEqual(find, filteredAction.action))
-		.map(([keybind, _]) => keybind)
+type InputRef = {
+	key: string
+	elem: HTMLInputElement
+	descriptor?: ArgDescriptor
+	onSubmit: (val: any) => void
+	onChange?: (val: any) => void
 }
 
-/**
- * Returns first bind found, and null if no bind is bound for input action
- * @param find action to find bind for in keybinds
- * @returns first keybind for Action, or null if it doesn't exist
- */
-export function findActionBind(
-	find: Action | undefined,
-	keybinds: Keybinds
-): string | null {
-	if (!find) return null
-	const foundBinds = findActionBinds(find, keybinds)
-	return foundBinds.length > 0 ? foundBinds[0] : null
-}
+class History {
+	private history: string[] = []
+	private historyIdx = -1
+	private stashedInput: string | null = null
 
-/**
- * Transforms keyboard event to canonical keycode
- * @param ev Keyboard event
- * @returns Keybind. ex. 'C-k' is Ctrl+k, 'C-S-x' is Ctrl+Shft+x
- */
-export function toKeyIdx(ev: KeyboardEvent): string {
-	return (
-		(ev.ctrlKey ? 'C-' : '') +
-		(ev.shiftKey ? 'S-' : '') +
-		(ev.altKey ? 'A-' : '') +
-		ev.key.toLowerCase()
-	)
-}
+	constructor(private elem: HTMLInputElement) {}
 
-/**
- * 'keydown' handler, attached to document on mount within (dev)/+layout.svelte
- * @param ev KeyboardEvent from listener
- * @returns void
- */
-function onKeyDown(ev: KeyboardEvent) {
-	if (ev.key === 'Control' || ev.key === 'Shift' || ev.key === 'Alt') return
-	if (!(ev.ctrlKey || ev.shiftKey || ev.altKey)) return
-
-	if (ev.key === 'Escape') {
-		wUserPrefsOpen.set(false)
-		wUserModalOpen.set(false)
+	shift(shift: number) {
+		const elem = this.elem
+		if (!elem) return
+		let oldIndex = this.historyIdx
+		let newIndex = Math.min(
+			this.history.length - 1,
+			Math.max(-1, this.historyIdx + shift)
+		)
+		this.historyIdx = newIndex
+		if (oldIndex == -1 && newIndex == -1) return
+		else if (oldIndex == -1 && newIndex == 0) {
+			this.stashedInput = elem.value
+			elem.value = this.history[this.history.length - 1 - this.historyIdx]
+		} else if (oldIndex == 0 && newIndex == -1) {
+			elem.value = this.stashedInput ?? ''
+			this.stashedInput == null
+			return
+		} else {
+			elem.value = this.history[this.history.length - 1 - this.historyIdx]
+		}
 	}
 
-	const keyidx = toKeyIdx(ev)
-	const filteredAction = get(wUserKeybinds)[keyidx]
-	wLastInputAction.set({
-		code: keyidx,
-		action: filteredAction?.action
-	})
-	// TODO: use filtered action conditional
-	if (filteredAction === undefined) return
-	pushAction(filteredAction.action)
+	push(command: string) {
+		const lastCommand = this.history.pop()
+		if (!lastCommand || lastCommand == command) this.history.push(command)
+		else this.history.push(lastCommand, command)
+	}
 
-	ev.preventDefault()
-	ev.stopImmediatePropagation()
+	reset() {
+		this.historyIdx = -1
+		this.stashedInput = null
+	}
 }
 
-/**
- * Initializes keydown listener for document to bind user keybinds to
- * various editor actions.
- *
- * To only be used as an argument to onMount within (dev)/+layout.svelte
- * @returns event listener cleanup
- */
-export function initKeys() {
-	document.addEventListener('keydown', onKeyDown, { capture: true })
-	return document.removeEventListener('keydown', onKeyDown)
+class Input {
+	private history: History
+	constructor(private ref: InputRef) {
+		this.history = new History(ref.elem)
+	}
+
+	elem(): HTMLInputElement {
+		return this.ref.elem
+	}
+
+	attach() {
+		const elem = this.elem()
+		elem.onkeydown = this.onKeyDown.bind(this)
+		elem.onkeypress = this.onKeyPress.bind(this)
+	}
+
+	deattach() {
+		const elem = this.elem()
+		elem.onkeydown = null
+		elem.onkeypress = null
+	}
+
+	private onKeyDown(event: KeyboardEvent) {
+		const elem = this.elem()
+		if (!elem) return
+		switch (event.key) {
+			case 'ArrowLeft':
+			case 'ArrowRight':
+				this.refreshCompletions()
+				break
+			case 'Escape':
+				completions.reset()
+				break
+			case 'Tab':
+				let userPosition = this.getUserPosition(elem)
+				if (userPosition.activeWord.length == 0) {
+					this.refreshCompletions(true)
+					this.moveCompletionIndex(0, userPosition)
+				} else if (event.shiftKey) this.moveCompletionIndex(-1, userPosition)
+				else this.moveCompletionIndex(1, userPosition)
+				event.preventDefault()
+				break
+			case 'ArrowUp':
+				this.history.shift(1)
+				this.refreshCompletions()
+				event.preventDefault()
+				break
+			case 'ArrowDown':
+				this.history.shift(-1)
+				this.refreshCompletions()
+				event.preventDefault()
+				break
+			case 'Enter':
+				this.history.push(this.ref.elem.value)
+				this.history.reset()
+				this.ref.onSubmit(this.ref.elem.value)
+				event.preventDefault()
+				break
+			case 'Backspace':
+			case 'Delete':
+				let start = elem.selectionStart || 0
+				let end = elem.selectionEnd || 0
+
+				if (start < end) start++
+
+				this.removeRange(start, end)
+				elem.setSelectionRange(start - 1, start - 1)
+				this.refreshCompletions()
+
+				event.preventDefault()
+				break
+		}
+	}
+
+	private onKeyPress(event: KeyboardEvent) {
+		if (!this.elem) return
+		switch (event.key) {
+			case 'Tab':
+			case 'ArrowUp':
+			case 'ArrowDown':
+			case 'Enter':
+			case 'Backspace':
+			case 'Delete':
+				event.preventDefault()
+				break
+			default:
+				let charCode = event.charCode || event.which
+				this.pushChar(String.fromCharCode(charCode))
+				this.refreshCompletions()
+				event.preventDefault()
+			// event.stopImmediatePropagation()
+		}
+	}
+
+	private onChange(value: any) {
+		if (this.ref.onChange) this.ref.onChange(value)
+	}
+
+	private removeRange(start: number, end: number) {
+		const elem = this.elem()
+		if (!elem) return
+		let val = elem.value
+		let newValue = val.substring(0, start - 1) + val.substring(end)
+		if (newValue == elem.value) return
+		elem.value = newValue
+		this.onChange(elem.value)
+	}
+
+	private moveCompletionIndex(shift: number, userPosition: UserPositonState) {
+		const elem = this.elem()
+		const match = completions.shiftCompletionIndex(shift)
+		if (match) {
+			let insertText = match.insertText
+			let start = elem.value.substring(0, userPosition.wordStart)
+			let end = elem.value.substring(userPosition.wordEnd)
+			elem.value = start.concat(insertText, end)
+			this.onChange(elem.value)
+		}
+	}
+
+	private pushChar(char: string) {
+		const elem = this.elem()
+		if (!elem) return
+		this.history.reset()
+		const selectStart = elem.selectionStart ?? elem.value.length - 1
+		const newSelectStart = selectStart + char.length
+		let start = elem.value.substring(0, selectStart)
+		let end = elem.value.substring(selectStart)
+
+		elem.value = start.concat(char, end)
+		elem.selectionStart = newSelectStart
+		elem.selectionEnd = newSelectStart
+		this.onChange(elem.value)
+	}
+
+	/**
+	 * Returns char index and word index of user selection position
+	 * @returns [charIndex, wordIndex]
+	 */
+	private getUserPosition(elem: HTMLInputElement): UserPositonState {
+		const rawSplits = elem.value.split(' ')
+		let offset = 0,
+			wordIndex = 0,
+			activeWord = '',
+			selectionStart = elem.selectionStart ?? elem.value.length - 1
+
+		for (const [i, part] of rawSplits.entries()) {
+			if (part.length > 0 || i == rawSplits.length - 1) {
+				if (selectionStart > offset && selectionStart <= offset + part.length) {
+					wordIndex = i
+					activeWord = part
+					break
+				}
+			}
+			offset += part.length + 1
+		}
+		return {
+			activeWord,
+			wordIndex,
+			wordStart: offset,
+			wordEnd: offset + activeWord.length
+		}
+	}
+
+	/**
+	 * Given the current input value and user selection position,
+	 * generate console prompt action and argument completions. Then, notify frontend
+	 * of new completions using svelte stores.
+	 */
+	refreshCompletions(forceShow = false) {
+		setTimeout(() => this._refreshCompletions(forceShow), 10)
+	}
+
+	private _refreshCompletions(forceShow: boolean) {
+		const elem = this.elem()
+		if (!elem) return
+		if (elem.value.length == 0 && !forceShow) {
+			completions.reset()
+			return
+		}
+		completions.updateLocationFromDomRect(elem.getBoundingClientRect())
+		const { value, selectionStart } = elem
+		if (this.ref.descriptor) {
+			completions.regenerateCompletions(
+				value,
+				selectionStart ?? 0,
+				this.ref.descriptor
+			)
+		} else {
+			completions.regenerateCompletions(value, selectionStart ?? 0)
+		}
+	}
+
+	clear() {
+		const elem = this.elem()
+		if (!elem) return
+		elem.value = ''
+		completions.reset()
+	}
 }
+
+class InputController {
+	private _map: { [key: string]: Input } = {}
+	private activeInputKey: string | null = null
+
+	get(key: string): Input | null {
+		return this._map[key] ?? null
+	}
+
+	currentInput(): Input | null {
+		return this.activeInputKey ? this._map[this.activeInputKey] : null
+	}
+	currentElem(): HTMLInputElement | null {
+		return this.currentInput()?.elem() ?? null
+	}
+
+	register(inputRef: InputRef) {
+		this._map[inputRef.key] = new Input(inputRef)
+	}
+
+	deregister(key: string) {
+		if (this.activeInputKey == key) this.deattach()
+		delete this._map[key]
+	}
+
+	attach(key: string) {
+		this.deattach()
+		const input = this._map[key]
+		if (!input) {
+			wConsole.debug('Cant attach, No input at key ' + key)
+			return
+		}
+		input.attach()
+		this.activeInputKey = key
+		completions.updateLocationFromDomRect(input.elem().getBoundingClientRect())
+		input.refreshCompletions()
+	}
+
+	deattach() {
+		this.currentInput()?.deattach()
+		this.activeInputKey = null
+		completions.reset()
+	}
+}
+
+export default new InputController()

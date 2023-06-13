@@ -1,0 +1,17 @@
+procs:
+  all:
+    shell: "make all"
+    autostart: false
+  front:
+    shell: "make start"
+  back:
+    shell: "make api"
+  front-prod:
+    shell: "make start target=prod"
+    autostart: false
+  back-prod:
+    shell: "make api target=prod"
+    autostart: false
+  theme-gen:
+    shell: "make front/generated/themes.json"
+    autostart: false

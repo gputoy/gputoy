@@ -10,12 +10,13 @@ import type WgslWorker from './wgslWorker'
 class ServiceBase {
 	constructor(
 		protected _worker: (...uris: monaco.Uri[]) => Promise<WgslWorker>
-	) { }
+	) {}
 }
 
 export class SuggestAdapter
 	extends ServiceBase
-	implements monaco.languages.CompletionItemProvider {
+	implements monaco.languages.CompletionItemProvider
+{
 	public get triggerCharacters(): string[] {
 		return ['.', '@', ':']
 	}
@@ -119,7 +120,8 @@ export class SuggestAdapter
 
 export class ReferenceAdapter
 	extends ServiceBase
-	implements monaco.languages.ReferenceProvider {
+	implements monaco.languages.ReferenceProvider
+{
 	async provideReferences(
 		model: monaco.editor.ITextModel,
 		position: monaco.Position,
