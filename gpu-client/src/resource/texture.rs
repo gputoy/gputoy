@@ -21,7 +21,7 @@ enum TextureInner {
 #[derive(Debug)]
 pub struct TextureResource {
     texture: TextureInner,
-    pub(crate) args: TextureArgs,
+    args: TextureArgs,
 }
 
 pub struct TextureView {}

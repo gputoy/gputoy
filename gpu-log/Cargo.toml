@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [features]
-default = ["warn"]
+default = ["info"]
 # each log type enumerated; do not use these directly
 _trace = []
 _debug = []

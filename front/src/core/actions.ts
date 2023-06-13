@@ -17,10 +17,7 @@ import {
 	wConsole,
 	wFileDirty,
 	wFiles,
-	wModelDirty,
-	wPrebuildDirty,
-	wRunState,
-	wWorkerData
+	wModelDirty, wRunState
 } from '$stores'
 import { toast } from '@zerodevx/svelte-toast'
 import isEqual from 'lodash/isEqual'
@@ -147,32 +144,30 @@ export function pushAction(action: Action) {
  *  TODO: create action reversal system
  * @param action
  */
-export function reverseAction(action: Action) {}
+export function reverseAction(action: Action) { }
 
 /// ------------------- Action execution ----------------------
 
 async function playPause() {
-	if (get(wPrebuildDirty)) {
-		context.prebuild()
+	console.log('start try build')
+	const result = await wWorkerInternal.tryBuild()
+	console.log('done try build')
+	// wWorkerData.set(await wWorkerInternal.poll())
+	if (get(wBuildDirty) && result) {
+		context.build(result)
 	}
-
-	if (get(wBuildDirty)) {
-		context.build()
-	}
-	wWorkerInternal.tryBuild()
-	wWorkerData.set(await wWorkerInternal.poll())
 	wRunState.playPause()
 }
 
-function rebuildProject() {}
+function rebuildProject() { }
 
-function resetProject() {}
+function resetProject() { }
 
 function clearConsole() {
 	wConsole.set([])
 }
 
-function focusPane(c: string) {}
+function focusPane(c: string) { }
 
 function exit() {
 	clearProject()

@@ -3,6 +3,8 @@
 	import PreferenceController from './PreferenceController.svelte'
 
 	export let filter: string | null
+
+	export function focus() {}
 </script>
 
 <div class="body pane no-scrollbar">
@@ -16,7 +18,7 @@
 		flex: 1 1 auto;
 		display: flex;
 		flex-direction: column;
-		gap: var(--gap4);
+		gap: var(--gap8);
 		overflow-y: scroll;
 		max-width: 450px;
 		min-width: 325px;

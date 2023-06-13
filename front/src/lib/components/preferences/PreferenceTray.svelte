@@ -6,6 +6,7 @@
 	import SearchRounded from '~icons/material-symbols/search-rounded'
 	import PreferenceList from './PreferenceList.svelte'
 
+	let prefs: PreferenceList
 	let input: Input
 	$: searchParam = ''
 	$: {
@@ -13,6 +14,9 @@
 	}
 	function handleSearchChange(event: CustomEvent<string>) {
 		searchParam = event.detail
+	}
+	function handleSearchSubmit() {
+		prefs.focus()
 	}
 </script>
 
@@ -29,6 +33,7 @@
 				key="pref-search"
 				completionKey="Empty"
 				on:change={handleSearchChange}
+				on:submit={handleSearchSubmit}
 			/>
 		</div>
 		<select class="sm">
@@ -38,7 +43,7 @@
 		</select>
 		<button class="md"><Icon name="arrow-up" /></button>
 	</div>
-	<PreferenceList filter={searchParam} />
+	<PreferenceList filter={searchParam} bind:this={prefs} />
 </div>
 
 <style>

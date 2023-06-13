@@ -1,13 +1,14 @@
-import { browser } from '$app/environment'
 import { setCssVar } from '$core/theme'
 import { PREFERENCE_KEYS, type PreferenceKey, type Preferences } from '$gen'
 import DEFAULT_PREFERENCES from '$gen/prefs/defaults.json'
-import debounce from 'lodash/debounce'
 import _get from 'lodash/get'
 import _set from 'lodash/set'
 import { derived, writable, type Readable, type Writable } from 'svelte/store'
+import * as localstore from './localstore'
 
 type PreferenceStore = Record<PreferenceKey, Writable<any>>
+
+const LOCAL_STORE_KEY = 'prefs'
 
 /**
  * Destructures the default preference object into a flat map.
@@ -15,8 +16,9 @@ type PreferenceStore = Record<PreferenceKey, Writable<any>>
  */
 function initStore(): PreferenceStore {
 	let stores = {} as PreferenceStore
+	const localPreferences = localstore.get<Preferences>(LOCAL_STORE_KEY) ?? DEFAULT_PREFERENCES
 	for (const key of PREFERENCE_KEYS) {
-		stores[key as PreferenceKey] = writable(_get(DEFAULT_PREFERENCES, key))
+		stores[key as PreferenceKey] = writable(_get(localPreferences, key) ?? _get(DEFAULT_PREFERENCES, key))
 	}
 	return stores
 }
@@ -39,6 +41,8 @@ export const dPreferences: Readable<Preferences> = derived(
 		set(prefs)
 	}
 )
+
+localstore.bind(dPreferences, LOCAL_STORE_KEY)
 
 /**
  * Readable preference
@@ -99,20 +103,6 @@ export function toPreferenceKey(maybeKey: string): PreferenceKey | null {
 	if (index < 0) return null
 	return PREFERENCE_KEYS[index]
 }
-
-/**
- * Writes to local storage only after the alloted amount of time after
- * last edit has occured
- */
-const writeToLocalStorage = debounce(_writeToLocalStorage, 500)
-function _writeToLocalStorage(prefs: Preferences) {
-	if (browser) {
-		localStorage.setItem('prefs', JSON.stringify(prefs))
-		localStorage.setItem('prefs:updated', JSON.stringify(Date.now()))
-	}
-}
-
-dPreferences.subscribe(writeToLocalStorage)
 
 // TODO: move to more appropirate module
 _wPreferences['workspace.handle-size'].subscribe((value) =>

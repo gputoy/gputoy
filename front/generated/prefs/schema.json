@@ -1,7 +1,117 @@
 {
-  "editor.word-wrap": {
-    "name": "word-wrap",
-    "description": " Whether to wrap lines in the code editor.",
+  "editor.guides.highlight-active-indentation": {
+    "name": "highlight-active-indentation",
+    "description": " Enable highlighting of the active indent guide.",
+    "configClass": {
+      "ty": "BoolClass",
+      "c": {}
+    }
+  },
+  "editor.font-size": {
+    "name": "font-size",
+    "description": " Font size of code in the editor.",
+    "configClass": {
+      "ty": "IntClass",
+      "c": {
+        "min": 5,
+        "max": 64,
+        "step": 1,
+        "postfix": "px"
+      }
+    }
+  },
+  "console.show-completions": {
+    "name": "show-completions",
+    "description": " How much detail should completions provide.",
+    "configClass": {
+      "ty": "EnumClass",
+      "c": {
+        "variants": [
+          "full",
+          "suggestions",
+          "none"
+        ]
+      }
+    }
+  },
+  "editor.auto-indent": {
+    "name": "auto-indent",
+    "description": " Controls whether the editor should automatically\n adjust the indentation when users type, paste, move or indent lines.",
+    "configClass": {
+      "ty": "EnumClass",
+      "c": {
+        "variants": [
+          "none",
+          "keep",
+          "brackets",
+          "advanced",
+          "full"
+        ]
+      }
+    }
+  },
+  "editor.font": {
+    "name": "font",
+    "description": " Font to use in the editor.\n\n Comma-delimited list like \"FiraMono,mono\"",
+    "configClass": {
+      "ty": "StrClass",
+      "c": {
+        "regex": null
+      }
+    }
+  },
+  "editor.guides.bracket-pairs-horizontal": {
+    "name": "bracket-pairs-horizontal",
+    "description": " Enable rendering of vertical bracket pair guides.",
+    "configClass": {
+      "ty": "BoolClass",
+      "c": {}
+    }
+  },
+  "editor.guides.highlight-active-bracket-pair": {
+    "name": "highlight-active-bracket-pair",
+    "description": " Enable highlighting of the active bracket pair.",
+    "configClass": {
+      "ty": "BoolClass",
+      "c": {}
+    }
+  },
+  "editor.font-ligatures": {
+    "name": "font-ligatures",
+    "description": " Render font ligatures in the code editor.",
+    "configClass": {
+      "ty": "BoolClass",
+      "c": {}
+    }
+  },
+  "editor.cursor-style": {
+    "name": "cursor-style",
+    "description": " Style of the cursor in the code editor.",
+    "configClass": {
+      "ty": "EnumClass",
+      "c": {
+        "variants": [
+          "line",
+          "line-thin",
+          "block",
+          "block-outline",
+          "underline",
+          "underline-thin"
+        ]
+      }
+    }
+  },
+  "editor.minimap": {
+    "name": "minimap",
+    "description": " Whether to show a minimap in the top-right of the code editor.",
+    "configClass": {
+      "ty": "BoolClass",
+      "c": {}
+    }
+  },
+  "editor.guides.bracket-pairs": {
+    "name": "bracket-pairs",
+    "description": " Enable rendering of bracket pair guides.",
     "configClass": {
       "ty": "BoolClass",
       "c": {}
@@ -22,22 +132,6 @@
       }
     }
   },
-  "editor.guides.highlight-active-indentation": {
-    "name": "highlight-active-indentation",
-    "description": " Enable highlighting of the active indent guide.",
-    "configClass": {
-      "ty": "BoolClass",
-      "c": {}
-    }
-  },
-  "editor.guides.bracket-pairs": {
-    "name": "bracket-pairs",
-    "description": " Enable rendering of bracket pair guides.",
-    "configClass": {
-      "ty": "BoolClass",
-      "c": {}
-    }
-  },
   "editor.guides.indentation": {
     "name": "indentation",
     "description": " Enable rendering of indent guides.",
@@ -46,50 +140,65 @@
       "c": {}
     }
   },
-  "editor.font-ligatures": {
-    "name": "font-ligatures",
-    "description": " Render font ligatures in the code editor.",
+  "workspace.handle-size": {
+    "name": "handle-size",
+    "description": " The size of the pane drag handle.",
+    "configClass": {
+      "ty": "IntClass",
+      "c": {
+        "min": 0,
+        "max": 12,
+        "step": 1,
+        "postfix": "px"
+      }
+    }
+  },
+  "editor.smooth-caret": {
+    "name": "smooth-caret",
+    "description": " Enable smooth caret movement animations.",
     "configClass": {
       "ty": "BoolClass",
       "c": {}
     }
   },
-  "editor.smooth-scrolling": {
-    "name": "smooth-scrolling",
-    "description": " Animate smooth scrolling in the editor.",
+  "editor.word-wrap": {
+    "name": "word-wrap",
+    "description": " Whether to wrap lines in the code editor.",
     "configClass": {
       "ty": "BoolClass",
       "c": {}
     }
   },
-  "console.show-completions": {
-    "name": "show-completions",
-    "description": " How much detail should completions provide.",
+  "editor.scroll-beyond-last-line": {
+    "name": "scroll-beyond-last-line",
+    "description": " Enable scrolling to go one screen size past the last line.",
+    "configClass": {
+      "ty": "BoolClass",
+      "c": {}
+    }
+  },
+  "console.wrap": {
+    "name": "wrap",
+    "description": " True: Wrap console messages. May scramble certain error messages.\n False: Console messages overflow past the size of the viewport.",
+    "configClass": {
+      "ty": "BoolClass",
+      "c": {}
+    }
+  },
+  "workspace.ui-speed": {
+    "name": "ui-speed",
+    "description": " The speed of ui transitions.",
     "configClass": {
       "ty": "EnumClass",
       "c": {
         "variants": [
-          "full",
-          "suggestions",
-          "none"
+          "instant",
+          "snappy",
+          "quick",
+          "smooth",
+          "slow"
         ]
       }
-    }
-  },
-  "editor.guides.highlight-active-bracket-pair": {
-    "name": "highlight-active-bracket-pair",
-    "description": " Enable highlighting of the active bracket pair.",
-    "configClass": {
-      "ty": "BoolClass",
-      "c": {}
-    }
-  },
-  "editor.vim-mode.enabled": {
-    "name": "enabled",
-    "description": "",
-    "configClass": {
-      "ty": "BoolClass",
-      "c": {}
     }
   },
   "console.level": {
@@ -124,129 +233,20 @@
       }
     }
   },
-  "editor.scroll-beyond-last-line": {
-    "name": "scroll-beyond-last-line",
-    "description": " Enable scrolling to go one screen size past the last line.",
+  "editor.smooth-scrolling": {
+    "name": "smooth-scrolling",
+    "description": " Animate smooth scrolling in the editor.",
     "configClass": {
       "ty": "BoolClass",
       "c": {}
     }
   },
-  "editor.guides.bracket-pairs-horizontal": {
-    "name": "bracket-pairs-horizontal",
-    "description": " Enable rendering of vertical bracket pair guides.",
+  "editor.vim-mode.enabled": {
+    "name": "enabled",
+    "description": "",
     "configClass": {
       "ty": "BoolClass",
       "c": {}
-    }
-  },
-  "editor.font": {
-    "name": "font",
-    "description": " Font to use in the editor.\n\n Comma-delimited list like \"FiraMono,mono\"",
-    "configClass": {
-      "ty": "StrClass",
-      "c": {
-        "regex": null
-      }
-    }
-  },
-  "editor.minimap": {
-    "name": "minimap",
-    "description": " Whether to show a minimap in the top-right of the code editor.",
-    "configClass": {
-      "ty": "BoolClass",
-      "c": {}
-    }
-  },
-  "console.wrap": {
-    "name": "wrap",
-    "description": " True: Wrap console messages. May scramble certain error messages.\n False: Console messages overflow past the size of the viewport.",
-    "configClass": {
-      "ty": "BoolClass",
-      "c": {}
-    }
-  },
-  "workspace.ui-speed": {
-    "name": "ui-speed",
-    "description": " The speed of ui transitions.",
-    "configClass": {
-      "ty": "EnumClass",
-      "c": {
-        "variants": [
-          "instant",
-          "snappy",
-          "quick",
-          "smooth",
-          "slow"
-        ]
-      }
-    }
-  },
-  "workspace.handle-size": {
-    "name": "handle-size",
-    "description": " The size of the pane drag handle.",
-    "configClass": {
-      "ty": "IntClass",
-      "c": {
-        "min": 0,
-        "max": 12,
-        "step": 1,
-        "postfix": "px"
-      }
-    }
-  },
-  "editor.cursor-style": {
-    "name": "cursor-style",
-    "description": " Style of the cursor in the code editor.",
-    "configClass": {
-      "ty": "EnumClass",
-      "c": {
-        "variants": [
-          "line",
-          "line-thin",
-          "block",
-          "block-outline",
-          "underline",
-          "underline-thin"
-        ]
-      }
-    }
-  },
-  "editor.auto-indent": {
-    "name": "auto-indent",
-    "description": " Controls whether the editor should automatically\n adjust the indentation when users type, paste, move or indent lines.",
-    "configClass": {
-      "ty": "EnumClass",
-      "c": {
-        "variants": [
-          "none",
-          "keep",
-          "brackets",
-          "advanced",
-          "full"
-        ]
-      }
-    }
-  },
-  "editor.smooth-caret": {
-    "name": "smooth-caret",
-    "description": " Enable smooth caret movement animations.",
-    "configClass": {
-      "ty": "BoolClass",
-      "c": {}
-    }
-  },
-  "editor.font-size": {
-    "name": "font-size",
-    "description": " Font size of code in the editor.",
-    "configClass": {
-      "ty": "IntClass",
-      "c": {
-        "min": 5,
-        "max": 64,
-        "step": 1,
-        "postfix": "px"
-      }
     }
   }
 }

@@ -23,7 +23,7 @@ FRONT_NODE_ENV = VITE_MAKE_ANALYZER_PATH=$(target)/$(WASM_ANALYZER_MODULE_NAME).
 	VITE_MAKE_CLIENT_PATH=$(target)/$(WASM_CLIENT_MODULE_NAME).wasm \
 	VITE_MAKE_COMMON_PATH=$(target)/$(WASM_COMMON_MODULE_NAME)
 # All frontend source files (for dependencies)
-_front := $(shell find $(FRONT_DIR)/src -name "*")
+_front := $(shell find ${FRONT_DIR} -not \( -path front/src/routes -prune \) -not \( -path front/node_modules -prune \) -not \( -path front/.svelte-kit -prune \) -name "*")
 
 # Rust constants (referenced by target)
 
@@ -181,7 +181,7 @@ $(WASM_OUT)/$(target)/%.wasm: $(_gpu-log) $(_gpu-common) $$(_gpu-$$*) $$(_gpu-wa
 front-build: $(FRONT_DIR)/node_modules $(BINDGEN_OUT)/common.ts wasm-build $(THEME_JSON_OUT) $(if $(findstring $(target),prod),$(FRONT_OUT))
 
 # Build nodejs server for frontend
-$(FRONT_OUT):
+$(FRONT_OUT): $(_front)
 	$(FRONT_NODE_ENV) npm run build --prefix $(FRONT_DIR)
 
 # -------------------------- Nixpacks --------------------------

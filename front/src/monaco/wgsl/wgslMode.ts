@@ -1,3 +1,4 @@
+import type { PrebuildResult } from '$gen'
 import { wConfig, wModelDirty } from '$stores'
 import * as monaco from 'monaco-editor'
 import {
@@ -55,7 +56,7 @@ class WorkerInternalReadable implements Readable<any> {
 		service.applyChanges(uri)
 	}
 
-	async tryBuild(): Promise<void> {
+	async tryBuild(): Promise<PrebuildResult | null> {
 		const service = await this._worker()
 		const runnerUri = get(wConfig).runner ?? ''
 		const result = await service.tryBuild(runnerUri)
@@ -72,9 +73,9 @@ class WorkerInternalReadable implements Readable<any> {
 				monaco.editor.getModels().map((model) => [model.uri.path, model])
 			)
 			for (const diagnostic of diagnostics) {
-				diagnostic.labels.filterMap((label: Label) => {
+				for (const label of diagnostic.labels) {
 					const model = models.get(label.file_id)
-					if (!model) return
+					if (!model) return null
 					const start = model.getPositionAt(label.range.start)
 					const end = model.getPositionAt(label.range.end)
 
@@ -86,17 +87,20 @@ class WorkerInternalReadable implements Readable<any> {
 						message: label.message,
 						severity: diagnostic.severity
 					}
-					return marker
-				})
+					if (monacoDiagnostics[label.file_id]) monacoDiagnostics[label.file_id].push(marker)
+					else monacoDiagnostics[label.file_id] = [marker]
+				}
 			}
 			for (const [fileid, diagnostics] of Object.entries(monacoDiagnostics)) {
 				const model = models.get(fileid)
-				if (!model) return
-				monaco.editor.setModelMarkers(model, 'test-owner', diagnostics)
+				if (!model) return null
+				monaco.editor.setModelMarkers(model, 'wgsl-worker', diagnostics)
 			}
 			console.info('tryBuild result: ', result)
+			return result
 		} else {
 			console.error('tryBuild error: ', result)
+			return null
 		}
 	}
 }

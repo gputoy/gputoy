@@ -42,9 +42,9 @@ export function initUserMethods(
 		if (Cookies.get('id')) response = await api.getSession()
 
 		if (!response || 'message' in response) {
-			const configString = localStorage?.getItem('config')
-			const prefs = configString ? JSON.parse(configString) : undefined
-			setPreferences(prefs)
+			// const configString = localStorage?.getItem('config')
+			// const prefs = configString ? JSON.parse(configString) : undefined
+			// setPreferences(prefs)
 			return
 		}
 		user.set(response)

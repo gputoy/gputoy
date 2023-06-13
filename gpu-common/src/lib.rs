@@ -54,5 +54,9 @@ pub fn bindgen(config: crate::bindgen::Config) -> crate::bindgen::Result<()> {
         .file(config.root_schema_name)
         .containing_schema::<crate::schema::RootSchema>()?;
 
+    builder
+        .file("runner.schema.json")
+        .containing_schema::<crate::Runner>()?;
+
     builder.finish()
 }

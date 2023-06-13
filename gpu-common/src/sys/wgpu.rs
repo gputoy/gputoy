@@ -215,9 +215,9 @@ mod wgpu_ext {
                 dimension: None,
                 aspect: wgpu::TextureAspect::All,
                 base_mip_level: 0,
-                mip_level_count: NonZeroU32::new(args.mip_level_count),
+                mip_level_count: Some(args.mip_level_count),
                 base_array_layer: 0,
-                array_layer_count: NonZeroU32::new(args.size[2]),
+                array_layer_count: Some(args.size[2]),
             }
         }
     }

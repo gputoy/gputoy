@@ -2,6 +2,7 @@ use crate::Error;
 
 mod state;
 pub use state::SystemState;
+use wgpu::Limits;
 
 #[derive(Debug)]
 pub struct System {
@@ -26,18 +27,17 @@ impl System {
             .await
             .ok_or(Error::NoAdapter)?;
 
-        let limits = adapter.limits();
         gpu_log::debug!("Adapter limits: {limits:#?}");
 
         #[cfg(target_arch = "wasm32")]
-        let features = wgpu::Features::all_webgpu_mask();
+        let features = wgpu::Features::empty();
         #[cfg(not(target_arch = "wasm32"))]
         let features = wgpu::Features::all_native_mask();
 
         let desc = wgpu::DeviceDescriptor {
             label: None,
             features,
-            limits,
+            limits: Limits::downlevel_webgl2_defaults(),
         };
         gpu_log::info!("Requesting device");
         let (device, queue) = adapter.request_device(&desc, None).await?;

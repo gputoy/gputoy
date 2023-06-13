@@ -1,16 +1,24 @@
 <script lang="ts">
 	export let value: any
+	let div: HTMLDivElement
 
 	function handleClick() {
 		value = !value
 	}
-	function handleKeypress() {}
+	function handleKeypress(ev: KeyboardEvent) {
+		if (ev.key == 'Enter') {
+			value = !value
+		}
+	}
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <div
+	bind:this={div}
 	class={`${$$restProps.class || 'sm'} root`}
 	on:click={handleClick}
 	on:keypress={handleKeypress}
+	tabindex="0"
 >
 	<div class="val">
 		{#if value}
@@ -37,6 +45,13 @@
 		padding-inline: var(--gap4);
 		gap: var(--gap4);
 		font-weight: normal;
+		box-sizing: border-box;
+	}
+	.root:focus {
+		border-bottom: 1px solid var(--accent-color);
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
+		outline: none;
 	}
 	.root:hover {
 		background-color: var(--input-hover);

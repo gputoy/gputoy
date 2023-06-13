@@ -60,7 +60,7 @@
 		dispatch('change', value)
 	}
 
-	export function focus(preventScroll = false) {
+	export function focus() {
 		input.focus()
 	}
 

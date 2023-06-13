@@ -27,11 +27,6 @@ import {
 	type Writable
 } from 'svelte/store'
 import {
-	rCompletionIndex,
-	rCompletions,
-	rCompletionsPosition
-} from './completions'
-import {
 	initRunStateMethods,
 	type RunState,
 	type RunStateExtras
@@ -283,9 +278,3 @@ export const dProject = derived(
 dProject.subscribe((p) => {
 	if (p != null) writeToProjectLocalStorage(p)
 })
-
-const storeMap: Record<string, Readable<any>> = {
-	'completions.matches': rCompletions,
-	'completions.index': rCompletionIndex,
-	'completions.position': rCompletionsPosition
-}
